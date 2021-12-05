@@ -254,7 +254,7 @@
                     <dependency>
                         <groupId>net.shibboleth.maven.enforcer.rules</groupId>
                         <artifactId>maven-dist-enforcer</artifactId>
-                        <version>2.1.0</version>
+                        <version>3.0.0-SNAPSHOT</version>
                     </dependency>
                 </dependencies>
                 <executions>
@@ -267,7 +267,10 @@
                         <configuration>
                             <rules>
                                 <jarEnforcer implementation="net.shibboleth.mvn.enforcer.impl.JarEnforcer">
-                                    <enforcerData>${basedir}/src/main/enforcer</enforcerData>
+                                    <dataGroupId>net.shibboleth.gpg</dataGroupId>
+                                    <dataArtifactId>gpgdata</dataArtifactId>
+                                    <dataVersion>1.0.0</dataVersion>
+                                    <dataKeyRing>${basedir}/src/main/enforcer/shibKeys.gpg</dataKeyRing>
                                     <parentPomDir>${basedir}/../idp-parent</parentPomDir>
                                     <jarDirs>${project.build.directory}/${idp.finalName}/bin/lib ${project.build.directory}/${idp.finalName}/webapp/WEB-INF/lib</jarDirs>
                                     <checkSignatures>true</checkSignatures>
