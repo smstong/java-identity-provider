@@ -269,10 +269,11 @@
                                 <jarEnforcer implementation="net.shibboleth.mvn.enforcer.impl.JarEnforcer">
                                     <dataGroupId>net.shibboleth.gpg</dataGroupId>
                                     <dataArtifactId>gpgdata</dataArtifactId>
-                                    <dataVersion>1.0.0</dataVersion>
+                                    <dataVersion>1.0.0-SNAPSHOT</dataVersion>
                                     <dataKeyRing>${basedir}/src/main/enforcer/shibKeys.gpg</dataKeyRing>
                                     <parentPomDir>${basedir}/../idp-parent</parentPomDir>
-                                    <jarDirs>${project.build.directory}/${idp.finalName}/bin/lib ${project.build.directory}/${idp.finalName}/webapp/WEB-INF/lib</jarDirs>
+                                    <zipFiles>${project.build.directory}/${idp.finalName}.zip</zipFiles>
+                                    <tgzFiles>${project.build.directory}/${idp.finalName}.tar.gz</tgzFiles>
                                     <checkSignatures>true</checkSignatures>
                                     <checkDependencies>true</checkDependencies>
                                     <listJarSources>false</listJarSources>
