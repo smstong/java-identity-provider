@@ -278,7 +278,6 @@
                                     <checkDependencies>true</checkDependencies>
                                     <listJarSources>false</listJarSources>
                                     <checkM2>${net.shibboleth.idp.checkM2}</checkM2>
-                                    <artifactMap>${basedir}/src/main/enforcer/artifactMap.properties</artifactMap>
                                 </jarEnforcer>
                             </rules>
                         </configuration>
