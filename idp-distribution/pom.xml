@@ -267,8 +267,8 @@
                         <configuration>
                             <rules>
                                 <jarEnforcer implementation="net.shibboleth.mvn.enforcer.impl.JarEnforcer">
-                                    <dataGroupId>net.shibboleth.gpg</dataGroupId>
-                                    <dataArtifactId>gpgdata</dataArtifactId>
+                                    <dataGroupId>net.shibboleth.maven.enforcer.rules</dataGroupId>
+                                    <dataArtifactId>maven-dist-enforcer-data</dataArtifactId>
                                     <dataVersion>1.0.0-SNAPSHOT</dataVersion>
                                     <dataKeyRing>${basedir}/src/main/enforcer/shibKeys.gpg</dataKeyRing>
                                     <parentPomDir>${basedir}/../idp-parent</parentPomDir>
