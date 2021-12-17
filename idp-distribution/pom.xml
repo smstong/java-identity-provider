@@ -250,6 +250,43 @@
                     <tarLongFileMode>gnu</tarLongFileMode>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <dependencies>
+                    <dependency>
+                        <groupId>net.shibboleth.maven.enforcer.rules</groupId>
+                        <artifactId>maven-dist-enforcer</artifactId>
+                        <version>3.0.0</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>idp-enforce</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <jarEnforcer implementation="net.shibboleth.mvn.enforcer.impl.JarEnforcer">
+                                    <dataGroupId>net.shibboleth.maven.enforcer.rules</dataGroupId>
+                                    <dataArtifactId>maven-dist-enforcer-data</dataArtifactId>
+                                    <dataVersion>1.0.0-SNAPSHOT</dataVersion>
+                                    <dataKeyRing>${basedir}/src/main/enforcer/shibbolethKeys.gpg</dataKeyRing>
+                                    <parentPomDir>${basedir}/../idp-parent</parentPomDir>
+                                    <zipFiles>${project.build.directory}/${idp.finalName}.zip</zipFiles>
+                                    <tgzFiles>${project.build.directory}/${idp.finalName}.tar.gz</tgzFiles>
+                                    <checkSignatures>true</checkSignatures>
+                                    <checkDependencies>false</checkDependencies>
+                                    <listJarSources>false</listJarSources>
+                                    <checkM2>false</checkM2>
+                                </jarEnforcer>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>
