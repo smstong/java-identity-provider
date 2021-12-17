@@ -111,6 +111,7 @@ public class DependencyTest extends OpenSAMLInitBaseTestCase implements PomLoade
             home = System.getenv("_");
         }
         if (home == null) {
+            assertNotNull(home);
             throw new SkipException("Maven Not Located");
         }
         if (!Files.exists(Path.of(home).resolve("bin").resolve("mvn"))) {
