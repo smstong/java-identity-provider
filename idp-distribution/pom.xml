@@ -253,7 +253,7 @@
                     <dependency>
                         <groupId>net.shibboleth.maven.enforcer.rules</groupId>
                         <artifactId>maven-dist-enforcer</artifactId>
-                        <version>3.0.0</version>
+                        <version>3.1.0-SNAPSHOT</version>
                     </dependency>
                 </dependencies>
                 <executions>
@@ -274,7 +274,9 @@
                                     <zipFiles>${project.build.directory}/${idp.finalName}.zip</zipFiles>
                                     <tgzFiles>${project.build.directory}/${idp.finalName}.tar.gz</tgzFiles>
                                     <checkSignatures>true</checkSignatures>
-                                    <checkDependencies>false</checkDependencies>
+                                    <checkDependencies>true</checkDependencies>
+                                    <compileRuntimeArtifactFatal>false</compileRuntimeArtifactFatal>
+                                    <pomVersionMismatchFatal>false</pomVersionMismatchFatal>
                                     <listJarSources>false</listJarSources>
                                     <checkM2>false</checkM2>
                                 </jarEnforcer>
@@ -285,4 +287,21 @@
             </plugin>
         </plugins>
     </build>
+
+    <!-- Add the snap shot repository which allows us to specify the SNAPSHOT jar enforcer above -->
+    <pluginRepositories>
+        <pluginRepository>
+            <id>shib-snapshot</id>
+            <url>https://build.shibboleth.net/nexus/content/repositories/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <checksumPolicy>fail</checksumPolicy>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
+
 </project>
