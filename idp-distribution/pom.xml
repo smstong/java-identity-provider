@@ -19,6 +19,7 @@
     <properties>
         <idp.finalName>shibboleth-identity-provider-${project.version}</idp.finalName>
         <idp.assemblyDirectory>${project.build.directory}/${idp.finalName}</idp.assemblyDirectory>
+	<net.shibboleth.maven.enforcer.rules.checkM2>false</net.shibboleth.maven.enforcer.rules.checkM2>
     </properties>
 
     <dependencies>
@@ -278,7 +279,7 @@
                                     <compileRuntimeArtifactFatal>false</compileRuntimeArtifactFatal>
                                     <pomVersionMismatchFatal>false</pomVersionMismatchFatal>
                                     <listJarSources>false</listJarSources>
-                                    <checkM2>false</checkM2>
+                                    <checkM2>${net.shibboleth.maven.enforcer.rules.checkM2}</checkM2>
                                 </jarEnforcer>
                             </rules>
                         </configuration>
