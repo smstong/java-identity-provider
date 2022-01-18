@@ -80,6 +80,8 @@
         <ant.version>1.10.12</ant.version>
         <commons.compress.version>1.21</commons.compress.version>
         <xmlsec.version>2.1.7</xmlsec.version>
+	<!-- Use the latest javadoc plugin, see JMVN-23 -->
+	<maven-javadoc-plugin.version>3.3.0.1</maven-javadoc-plugin.version>
         <shibboleth.site.deploy.url>//shibboleth.net/home/javasites/staging/</shibboleth.site.deploy.url>
         <checkstyle.configLocation>${project.basedir}/../idp-parent/resources/checkstyle/checkstyle.xml</checkstyle.configLocation>
         <idp-parent.site.url>${shibboleth.site.deploy.url}java-identity-provider/${project.version}/</idp-parent.site.url>
