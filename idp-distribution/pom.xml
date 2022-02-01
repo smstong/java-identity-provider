@@ -19,6 +19,7 @@
     <properties>
         <idp.finalName>shibboleth-identity-provider-${project.version}</idp.finalName>
         <idp.assemblyDirectory>${project.build.directory}/${idp.finalName}</idp.assemblyDirectory>
+	<net.shibboleth.maven.enforcer.rules.checkM2>false</net.shibboleth.maven.enforcer.rules.checkM2>
     </properties>
 
     <dependencies>
@@ -246,7 +247,62 @@
                     <tarLongFileMode>gnu</tarLongFileMode>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <dependencies>
+                    <dependency>
+                        <groupId>net.shibboleth.maven.enforcer.rules</groupId>
+                        <artifactId>maven-dist-enforcer</artifactId>
+                        <version>3.1.0</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>idp-enforce</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <jarEnforcer implementation="net.shibboleth.mvn.enforcer.impl.JarEnforcer">
+                                    <dataGroupId>net.shibboleth.maven.enforcer.rules</dataGroupId>
+                                    <dataArtifactId>maven-dist-enforcer-data</dataArtifactId>
+                                    <dataVersion>1.0.0</dataVersion>
+                                    <dataKeyRing>${basedir}/src/main/enforcer/shibbolethKeys.gpg</dataKeyRing>
+                                    <parentPomDir>${basedir}/../idp-parent</parentPomDir>
+                                    <zipFiles>${project.build.directory}/${idp.finalName}.zip</zipFiles>
+                                    <tgzFiles>${project.build.directory}/${idp.finalName}.tar.gz</tgzFiles>
+                                    <checkSignatures>true</checkSignatures>
+                                    <checkDependencies>true</checkDependencies>
+                                    <compileRuntimeArtifactFatal>false</compileRuntimeArtifactFatal>
+                                    <pomVersionMismatchFatal>false</pomVersionMismatchFatal>
+                                    <listJarSources>false</listJarSources>
+                                    <checkM2>${net.shibboleth.maven.enforcer.rules.checkM2}</checkM2>
+                                </jarEnforcer>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
+
+    <!-- Add the snap shot repository which allows us to specify the SNAPSHOT jar enforcer above -->
+    <pluginRepositories>
+        <pluginRepository>
+            <id>shib-snapshot</id>
+            <url>https://build.shibboleth.net/nexus/content/repositories/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <checksumPolicy>fail</checksumPolicy>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
 
 </project>
