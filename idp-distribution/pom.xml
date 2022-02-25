@@ -289,20 +289,4 @@
         </plugins>
     </build>
 
-    <!-- Add the snap shot repository which allows us to specify the SNAPSHOT jar enforcer above -->
-    <pluginRepositories>
-        <pluginRepository>
-            <id>shib-snapshot</id>
-            <url>https://build.shibboleth.net/nexus/content/repositories/snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <checksumPolicy>fail</checksumPolicy>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
-
-
 </project>
