@@ -171,7 +171,9 @@
     </util:list>
 
     <bean id="shibboleth.HttpServletRequest" class="net.shibboleth.utilities.java.support.net.ThreadLocalHttpServletRequestProxy" />
+    <alias name="shibboleth.HttpServletRequest" alias="shibboleth.HttpServletRequestSupplier"/>
     <bean id="shibboleth.HttpServletResponse" class="net.shibboleth.utilities.java.support.net.ThreadLocalHttpServletResponseProxy" />
+    <alias name="shibboleth.HttpServletResponse" alias="shibboleth.HttpServletResponseSupplier"/>
 
     <bean id="shibboleth.DefaultResponseHeaderMap"
             class="org.springframework.beans.factory.config.MapFactoryBean">
