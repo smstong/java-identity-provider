@@ -55,9 +55,23 @@ public class SimpleTicketServiceTest {
 
     @Test
     public void testCreateRemoveServiceTicket() throws Exception {
-        final ServiceTicket st = createServiceTicket();
+        final ServiceTicket st = createServiceTicket(TEST_SESSION_ID);
         assertNotNull(st);
         assertNotNull(st.getTicketState().getSessionId());
+        assertNotNull(st.getTicketState().getPrincipalName());
+        final ServiceTicket st2 = ticketService.removeServiceTicket(st.getId());
+        assertEquals(st, st2);
+        assertEquals(st.getExpirationInstant(), st2.getExpirationInstant());
+        assertEquals(st.getService(), st2.getService());
+        assertEquals(st.getTicketState(), st2.getTicketState());
+        assertNull(ticketService.removeServiceTicket(st.getId()));
+    }
+
+    @Test
+    public void testCreateRemoveServiceTicketNoSession() throws Exception {
+        final ServiceTicket st = createServiceTicket(null);
+        assertNotNull(st);
+        assertNull(st.getTicketState().getSessionId());
         assertNotNull(st.getTicketState().getPrincipalName());
         final ServiceTicket st2 = ticketService.removeServiceTicket(st.getId());
         assertEquals(st, st2);
@@ -100,12 +114,12 @@ public class SimpleTicketServiceTest {
         assertNull(ticketService.removeProxyTicket(pt.getId()));
     }
 
-    private ServiceTicket createServiceTicket() {
+    private ServiceTicket createServiceTicket(final String sessionId) {
         return ticketService.createServiceTicket(
                 new TicketIdentifierGenerationStrategy("ST", 25).generateIdentifier(),
                 expiry(),
                 TEST_SERVICE,
-                new TicketState(TEST_SESSION_ID, "bob", Instant.now().truncatedTo(ChronoUnit.MILLIS), "Password"),
+                new TicketState(sessionId, "bob", Instant.now().truncatedTo(ChronoUnit.MILLIS), "Password"),
                 false);
     }
 
@@ -113,7 +127,7 @@ public class SimpleTicketServiceTest {
         return ticketService.createProxyGrantingTicket(
                 new TicketIdentifierGenerationStrategy("PGT", 50).generateIdentifier(),
                 expiry(),
-                createServiceTicket());
+                createServiceTicket(TEST_SESSION_ID));
     }
 
     private static Instant expiry() {

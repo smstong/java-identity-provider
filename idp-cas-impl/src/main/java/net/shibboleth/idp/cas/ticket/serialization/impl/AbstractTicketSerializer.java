@@ -37,6 +37,7 @@ import javax.json.JsonValue;
 import javax.json.stream.JsonGenerator;
 import javax.json.stream.JsonGeneratorFactory;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import net.shibboleth.idp.cas.ticket.Ticket;
 import net.shibboleth.idp.cas.ticket.TicketState;
 import net.shibboleth.shared.annotation.constraint.NotEmpty;
@@ -106,15 +107,19 @@ public abstract class AbstractTicketSerializer<T extends Ticket> implements Stor
         final StringWriter buffer = new StringWriter(200);
         try (final JsonGenerator gen = generatorFactory.createGenerator(buffer)) {
             gen.writeStartObject()
-                    .write(SERVICE_FIELD, ticket.getService())
-                    .write(EXPIRATION_FIELD, ticket.getExpirationInstant().toEpochMilli());
+                .write(SERVICE_FIELD, ticket.getService())
+                .write(EXPIRATION_FIELD, ticket.getExpirationInstant().toEpochMilli());
             
             if (ticket.getTicketState() != null) {
-                gen.writeStartObject(STATE_FIELD)
-                        .write(SESSION_FIELD, ticket.getTicketState().getSessionId())
-                        .write(PRINCIPAL_FIELD, ticket.getTicketState().getPrincipalName())
-                        .write(AUTHN_INSTANT_FIELD, ticket.getTicketState().getAuthenticationInstant().toEpochMilli())
-                        .write(AUTHN_METHOD_FIELD, ticket.getTicketState().getAuthenticationMethod());
+                gen.writeStartObject(STATE_FIELD);
+                if (ticket.getTicketState().getSessionId() != null) {
+                    gen.write(SESSION_FIELD, ticket.getTicketState().getSessionId());
+                } else {
+                    gen.writeNull(SESSION_FIELD);
+                }
+                gen.write(PRINCIPAL_FIELD, ticket.getTicketState().getPrincipalName())
+                    .write(AUTHN_INSTANT_FIELD, ticket.getTicketState().getAuthenticationInstant().toEpochMilli())
+                    .write(AUTHN_METHOD_FIELD, ticket.getTicketState().getAuthenticationMethod());
                 
                 if (ticket.getTicketState().getConsentedAttributeIds() != null) {
                     gen.writeStartArray(CONSENTED_ATTRS_FIELD);
@@ -151,8 +156,15 @@ public abstract class AbstractTicketSerializer<T extends Ticket> implements Stor
             final JsonObject so = to.getJsonObject(STATE_FIELD);
             final TicketState state;
             if (so != null) {
+                final JsonValue session = so.get(SESSION_FIELD);
+                final String sessionId;
+                if (!JsonValue.NULL.equals(session)) {
+                    sessionId = ((JsonString) session).getString();
+                } else {
+                    sessionId = null;
+                }
                 state = new TicketState(
-                        so.getString(SESSION_FIELD),
+                        sessionId,
                         so.getString(PRINCIPAL_FIELD),
                         Instant.ofEpochMilli(so.getJsonNumber(AUTHN_INSTANT_FIELD).longValueExact()),
                         so.getString(AUTHN_METHOD_FIELD));
