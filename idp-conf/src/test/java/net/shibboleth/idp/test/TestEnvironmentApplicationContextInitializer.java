@@ -26,6 +26,7 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.mock.env.MockPropertySource;
 
+import net.shibboleth.idp.test.flows.AbstractFlowTest;
 import net.shibboleth.shared.primitive.LoggerFactory;
 
 /**
@@ -47,8 +48,13 @@ public class TestEnvironmentApplicationContextInitializer
     /** {@inheritDoc} */
     @Override public void initialize(@Nonnull final ConfigurableApplicationContext applicationContext) {
         final MockPropertySource mock = new MockPropertySource();
+        final String idpHome = AbstractFlowTest.getIdpHome().toFile().getAbsolutePath();
+        final String flow  = AbstractFlowTest.getIdpHome().resolve("flows").toFile().getAbsolutePath();
+        assert idpHome!=null && flow!= null;
+        //mock.setProperty("idp.home", idpHome);
+        //mock.setProperty("idp.webflows", flow);
         mock.setProperty("idp.home", "classpath:");
-        mock.setProperty("idp.webflows", "classpath*:/flows");
+        mock.setProperty("idp.webflows", "classpath:/flows");
         mock.setProperty("idp.storage.htmlLocalStorage", "false");
         mock.setProperty("idp.session.trackSPSessions", "false");
         mock.setProperty("idp.session.secondaryServiceIndex", "false");
