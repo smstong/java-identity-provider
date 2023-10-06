@@ -8,7 +8,7 @@
     <parent>
         <groupId>net.shibboleth</groupId>
         <artifactId>parent</artifactId>
-        <version>11.3.5</version>
+        <version>11.3.6-SNAPSHOT</version>
     </parent>
 
     <name>Shibboleth Identity Provider</name>
@@ -172,6 +172,17 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>net.shibboleth.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <links combine.children="append">
+                        <link>${javadoc.url}/java-support/${java-support.version}</link>
+                        <link>${javadoc.url}/spring-extensions/${spring-extensions.version}</link>
+                        <link>${javadoc.url}/java-opensaml/${opensaml.version}</link>
+                    </links>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
