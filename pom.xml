@@ -55,6 +55,8 @@
 
         <module>idp-testing</module>
 
+        <module>idp-msi</module>
+
         <module>idp-bom</module>
     </modules>
 

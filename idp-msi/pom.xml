@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>net.shibboleth.idp</groupId>
+        <artifactId>idp-parent</artifactId>
+	<!-- DO NO CHANGE VERSION without changing msi.version below -->
+        <version>5.1.0-SNAPSHOT</version>
+    </parent>
+
+    <name>Shibboleth IdP :: Msi</name>
+    <description>MSI generation (Windows only)</description>
+    <artifactId>idp-msi</artifactId>
+    <packaging>pom</packaging>
+
+
+    <properties>
+        <!-- where to put the jetty-base we are making -->
+        <assemblyDirectory>${project.build.directory}/idp-jetty-base</assemblyDirectory>
+	<!-- msi Version  - CHANGE IN LOCKSTEP WITH THE VERSION ABOVE
+	     99 is shorthand for SNAPSHOT
+	-->
+	<msi.version>5.1.0.99</msi.version>
+    </properties>
+
+    <profiles>
+        <profile>
+            <id>build-msi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <!-- Unpack distribution -->
+                            <execution>
+                                <id>unpack-dist</id>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>${project.groupId}</groupId>
+                                            <artifactId>idp-distribution</artifactId>
+                                            <version>${project.version}</version>
+                                            <type>zip</type>
+                                            <outputDirectory>${project.build.directory}</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- WIX  -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>${maven-exec-plugin.version}</version>
+                        <executions>
+                            <!-- clean -->
+                            <execution>
+                                <id>clean</id>
+                                <phase>clean</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>msbuild</executable>
+                                    <executable>dotnet</executable>
+                                    <arguments>
+                                        <argument>clean</argument>
+                                        <argument>src/main/wix/idp.vcxproj</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <!--Build -->
+                            <execution>
+                                <id>compile</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>dotnet</executable>
+                                    <arguments>
+                                        <argument>build</argument>
+                                        <argument>src/main/wix/idp.vcxproj</argument>
+                                        <argument>/p:MsiVersion=${msi.version};IdpVersion=${project.version}</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- copy built output to final location, giving the MSI an appropriate name -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.8</version>
+                        <executions>
+                            <execution>
+                                <id>move-msi-to-target</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <copy file="src/main/wix/obj/Debug/idp.msi"
+					      tofile="${project.build.directory}/shibboleth-identity-provider-${project.version}-x64.msi"/>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Assemble the artifacts. -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <configuration>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>src/main/assembly/zip.xml</descriptor>
+                            </descriptors>
+			    <!-- Turn off compression -->
+			    <archiverConfig>
+				<compress>false</compress>
+			    </archiverConfig>
+                            <tarLongFileMode>gnu</tarLongFileMode>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>make-assembly</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

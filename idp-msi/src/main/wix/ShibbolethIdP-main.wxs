@@ -13,7 +13,7 @@
 <?define UpgradeUUID="8d3bfb53-47ff-4cbc-9363-cbf9e46bedc4"?>
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-    <Package Name="Shibboleth IdP V5" Language="1033" Version="5.0.0.0" Manufacturer="The Shibboleth Consortium" UpgradeCode="$(var.UpgradeUUID)" InstallerVersion="310"><SummaryInformation Description="Shibboleth IdP V5" Manufacturer="The Shibboleth Consortium" />
+    <Package Name="Shibboleth IdP V5" Language="1033" Version="$(var.msiVersion)" Manufacturer="The Shibboleth Consortium" UpgradeCode="$(var.UpgradeUUID)" InstallerVersion="310"><SummaryInformation Description="Shibboleth IdP V5" Manufacturer="The Shibboleth Consortium" />
 
         <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." AllowSameVersionUpgrades="yes" Schedule="afterInstallInitialize" />
         <MediaTemplate EmbedCab="yes" />

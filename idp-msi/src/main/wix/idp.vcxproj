@@ -1,0 +1,28 @@
+<Project Sdk="WixToolset.Sdk/4.0.2">
+    <ItemGroup>
+	<PackageReference Include="WixToolset.Util.wixext" Version="4.0.2"/>
+	<PackageReference Include="WixToolset.UI.wixext" Version="4.0.2"/>
+	<PackageReference Include="WixToolset.Firewall.wixext" Version="4.0.2" />
+	<PackageReference Include="WixToolset.Heat" Version="4.0.2" />
+    </ItemGroup>
+    <PropertyGroup>
+	<IdPVersion>unspecified</IdPVersion>
+	<MsiVersion>255.255.255.255</MsiVersion>
+	<InstallerPlatform>x64</InstallerPlatform>
+	<HarvestDirectoryAutogenerateGuids>false</HarvestDirectoryAutogenerateGuids>
+	<HarvestDirectoryGenerateGuidsNow>true</HarvestDirectoryGenerateGuidsNow>
+	<UnpackDir>..\..\..\target\shibboleth-identity-provider-$(IdPVersion)</UnpackDir>
+	<DefineConstants>idpSrc=$(UnpackDir);msiVersion=$(MsiVersion)</DefineConstants>
+	<SuppressIces>ICE61</SuppressIces>
+    </PropertyGroup>
+
+    <ItemGroup>
+	<HarvestDirectory Include="$(UnpackDir)">
+	    <ComponentGroupName>IdPGroup</ComponentGroupName>
+	    <DirectoryRefId>IDPDISTDIR</DirectoryRefId>
+	    <PreprocessorVariable>var.idpSrc</PreprocessorVariable>
+	    <SuppressRootDirectory>true</SuppressRootDirectory>
+	</HarvestDirectory>
+	<BindPath Include="jetty-extract" />
+    </ItemGroup>
+</Project>
