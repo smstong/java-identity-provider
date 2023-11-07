@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!-- Licensed under the Apache License, Version 2.0 (the "License");
+﻿<!-- Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
      You may obtain a copy of the License at
      
@@ -12,7 +10,7 @@
      implied.  See the License for the specific language governing
      permissions and limitations under the License.  -->
 
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <!-- This file contains the description of the dialog which captures installation
        values for first time installs -->
     <Fragment>
@@ -56,15 +54,15 @@
                 <!-- Stuff at the bottom: line, Back,Next, [space] Cancel -->
                 <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="1" />
                 <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="&amp;Back">
-                    <Publish Event="NewDialog" Value="InstallDirDlgShib">1</Publish>
+                    <Publish Event="NewDialog" Value="InstallDirDlgShib" />
                 </Control>
 
                 <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Text="&amp;Next" Default="yes">
-                    <Publish Event="NewDialog" Value="WarnDlgShib">1</Publish>
+                    <Publish Event="NewDialog" Value="WarnDlgShib" />
                 </Control>
 
                 <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Text="&amp;Cancel" Cancel="yes">
-                    <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+                    <Publish Event="SpawnDialog" Value="CancelDlg" />
                 </Control>
             </Dialog>
 

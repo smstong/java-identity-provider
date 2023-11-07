@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Licensed under the Apache License, Version 2.0 (the "License");
+﻿<!-- Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
      You may obtain a copy of the License at
 
@@ -11,14 +10,14 @@
      implied.  See the License for the specific language governing
      permissions and limitations under the License.  -->
 
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <!-- This file contains the description of the dialog which captures installation
        values for first time installs -->
     <Fragment>
 
         <UI>
          
-          <TextStyle Id="JettyWarning_Font" Bold="yes" Red="200" Green="0" Blue="0" Size="8" FaceName="Tahoma"/>
+          <TextStyle Id="JettyWarning_Font" Bold="yes" Red="200" Green="0" Blue="0" Size="8" FaceName="Tahoma" />
 
       <!-- This Dialog sets up:
            - INSTALLDIR
@@ -38,8 +37,8 @@
                 <!-- Where? -->
                 <Control Id="Dest" Type="Edit" X="25" Y="71" Width="228" Height="17" Property="INSTALLDIR" Text="[INSTALLDIR]" />
                 <Control Id="ChangeFolder" Type="PushButton" X="265" Y="71" Height="17" Width="56" Text="B&amp;rowse...">
-                    <Publish Event="SpawnDialog" Value="BrowseDlg" Order="1">1</Publish>
-                    <Publish Event="[_BrowseProperty]" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
+                    <Publish Event="SpawnDialog" Value="BrowseDlg" Order="1" />
+                    <Publish Event="[_BrowseProperty]" Value="[WIXUI_INSTALLDIR]" Order="1" />
                 </Control>
 
                 <!-- AD? -->
@@ -54,23 +53,19 @@
                 <!-- Stuff at the bottom: line, Back,Next, [space] Cancel -->
                 <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="1" />
                 <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="&amp;Back">
-                    <Publish Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
+                    <Publish Event="NewDialog" Value="LicenseAgreementDlg" />
                 </Control>
 
                 <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Text="&amp;Next" Default="yes">
-                    <Publish Event="SetTargetPath" Value="[WIXUI_INSTALLDIR]">1</Publish>
-                    <Publish Event="DoAction" Value="WixUIValidatePath">NOT WIXUI_DONTVALIDATEPATH</Publish>
-                    <Publish Event="SpawnDialog" Value="InvalidDirDlg">NOT WIXUI_DONTVALIDATEPATH AND WIXUI_INSTALLDIR_VALID&lt;&gt;"1"</Publish>
-                    <Publish Event="NewDialog" Value="WarnDlgShib">
-            (WIXUI_DONTVALIDATEPATH OR WIXUI_INSTALLDIR_VALID="1") AND CONFIGURE_AD &lt;&gt;"TRUE"
-		    </Publish>
-                    <Publish Event="NewDialog" Value="ConfigADDlg">
-            (WIXUI_DONTVALIDATEPATH OR WIXUI_INSTALLDIR_VALID="1") AND CONFIGURE_AD="TRUE"
-          </Publish>
+                    <Publish Event="SetTargetPath" Value="[WIXUI_INSTALLDIR]" />
+                    <Publish Event="DoAction" Value="WixUIValidatePath_$(sys.BUILDARCHSHORT)" Condition="NOT WIXUI_DONTVALIDATEPATH" />
+                    <Publish Event="SpawnDialog" Value="InvalidDirDlg" Condition="NOT WIXUI_DONTVALIDATEPATH AND WIXUI_INSTALLDIR_VALID&lt;&gt;&quot;1&quot;" />
+                    <Publish Event="NewDialog" Value="WarnDlgShib" Condition="(WIXUI_DONTVALIDATEPATH OR WIXUI_INSTALLDIR_VALID=&quot;1&quot;) AND CONFIGURE_AD &lt;&gt;&quot;TRUE&quot;" />
+                    <Publish Event="NewDialog" Value="ConfigADDlg" Condition="(WIXUI_DONTVALIDATEPATH OR WIXUI_INSTALLDIR_VALID=&quot;1&quot;) AND CONFIGURE_AD=&quot;TRUE&quot;" />
                 </Control>
 
                 <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Text="&amp;Cancel" Cancel="yes">
-                    <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+                    <Publish Event="SpawnDialog" Value="CancelDlg" />
                 </Control>
             </Dialog>
 
