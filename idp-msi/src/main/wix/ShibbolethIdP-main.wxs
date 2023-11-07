@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+     
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an 'AS IS' BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+     implied.  See the License for the specific language governing
+     permissions and limitations under the License.  -->
+
+<?define UpgradeUUID="8d3bfb53-47ff-4cbc-9363-cbf9e46bedc4"?>
+
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Product Id="*" Name="Shibboleth IdP V5" Language="1033" Version="5.0.0.0" Manufacturer="The Shibboleth Consortium" UpgradeCode="$(var.UpgradeUUID)">
+        <Package InstallerVersion="310" Compressed="yes" InstallScope="perMachine" Platform="x64" Description="Shibboleth IdP V5" Manufacturer="The Shibboleth Consortium" />
+
+        <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." AllowSameVersionUpgrades="yes" Schedule="afterInstallInitialize" />
+        <MediaTemplate EmbedCab="yes" />
+
+        <Condition Message="C run time libraray not installed">UCRTBASE_DLL</Condition>
+	<Condition Message="JDK not installed">JAVA_EXECUTABLE</Condition>
+
+        <!-- Information for the properties page of the msi -->
+
+        <Property Id="ARPCONTACT" Value="contact@shibboleth.net" />
+        <Property Id="ARPHELPLINK" Value="https://shibboleth.atlassian.net/wiki/spaces/IDP5/pages/3199500769/WindowsInstallation" />
+        <Property Id="ARPURLUPDATEINFO" Value="  https://wiki.shibboleth.net/confluence/display/IDP5/Installation#Installation-WindowsInstallation" />
+        <Property Id="ARPURLINFOABOUT" Value="http://shibboleth.net/" />
+        <Property Id="ARPNOMODIFY" Value="TRUE" />
+
+        <Feature Id="ProductFeature" Title="IdP" Level="1">
+            <ComponentRef Id="DeleteFiles" />
+            <ComponentGroupRef Id="IdPGroup" />
+            <ComponentGroupRef Id="SaveRegistry" />
+        </Feature>
+
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="CommonAppDataFolder">
+                <Directory Id="ProgramDataShib" Name="Shibboleth">
+                    <Directory Id="IDPDISTDIR" Name="IdP"/>
+                </Directory>
+            </Directory>
+            <Directory Id="INSTALLDIR" Name="shibboleth-idp"/>
+        </Directory>
+
+        <Property Id="JAVA_EXECUTABLE" Secure="yes">
+            <DirectorySearch Id="JavaBinSearch" Depth="0" Path="[%JAVA_HOME]\bin">
+                <FileSearch Id="JavaBinSearch" Name="java.exe" />
+            </DirectorySearch>
+        </Property>
+
+        <Property Id="UCRTBASE_DLL" Secure="yes">
+            <DirectorySearch Id="UcrtBaseSearch" Depth="0" Path="[System64Folder]">
+                <FileSearch Id="UcrtSearch" Name="ucrtbase.dll" />
+            </DirectorySearch>
+        </Property>
+
+        <!-- Inherit the setup, if they were. -->
+        <CustomAction Id="SetDefaultInstallDir" Property="DefaultInstallDir" Value="[WindowsVolume]opt\shibboleth-idp\" />
+
+        <CustomAction Id="InheritInstallDir" Property="INSTALLDIR" Value="[OLD_INSTALLDIR]" />
+        <CustomAction Id="SetInstallDir" Property="INSTALLDIR" Value="[DefaultInstallDir]" />
+
+        <!-- Other properties -->
+        <CustomAction Id="SetDNSName" Property="DNSNAME" Value="[ComputerName]" />
+
+        <Binary Id="WriteConfigFilesSrc" SourceFile="scripts\shib_write_configs.vbs" />
+
+        <CustomAction Id="WriteConfigFiles" BinaryKey="WriteConfigFilesSrc" VBScriptCall="" Execute="deferred" Impersonate="no" />
+        <CustomAction Id="SetWriteConfigFiles" Property="WriteConfigFiles" Value="[INSTALLDIR];@;[DNSNAME];@;[IDP_SCOPE];@;[DEBUG_INSTALL];@;[CONFIGURE_AD];@;[AD_DOMAIN];@;[AD_USER];@;[AD_PASS];@;[AD_USE_GC]" />
+
+
+        <!-- Ant actions set the command line in two parts because of ICE03 -->
+        <CustomAction Id="SetIdpInstall1" Property="QtIdpInstall1" Value="&quot;[JAVA_EXECUTABLE]&quot; -cp &quot;[IDPDISTDIR]bin\lib\*;[IDPDISTDIR]webapp\WEB-INF\lib\*&quot; net.shibboleth.idp.installer.impl.IdPInstallerCLI"/>
+        <CustomAction Id="SetIdpInstall2" Property="QtIdpInstall2" Value="--propertyFile &quot;[INSTALLDIR]idp.install.properties&quot; --sourceDir [IDPDISTDIR]" />
+        <CustomAction Id="SetIdpInstall3" Property="QtIdpInstall" Value="[QtIdpInstall1] [QtIdpInstall2]" />
+        <CustomAction Id="RunIdpInstall" Directory="ProgramDataShib" ExeCommand="[QtIdpInstall]" Execute="deferred" Impersonate="no" />
+        <CustomAction Id="QtIdpInstall" BinaryKey="WixCA" DllEntry="CAQuietExec" Execute="deferred" Impersonate="no" />
+
+        <InstallUISequence>
+
+            <!-- inherit installationDir if there is something to inherit (Conditions set in ShibolethIdP-registry) -->
+            <Custom Action="SetDefaultInstallDir" After="AppSearch" />
+            <Custom Action="InheritInstallDir" After="AppSearch">OLD_INSTALLDIR AND NOT INSTALLDIR</Custom>
+            <Custom Action="SetInstallDir" After="SetDefaultInstallDir">NOT OLD_INSTALLDIR AND NOT INSTALLDIR</Custom>
+            <Custom Action="SetDNSName" After="AppSearch">NOT DNSNAME</Custom>
+
+        </InstallUISequence>
+
+        <InstallExecuteSequence>
+
+            <!-- Duplicate actions from the UI case - but only for auto 3->3 upgrades -->
+            <Custom Action="InheritInstallDir" After="AppSearch">OLD_INSTALLDIR AND NOT INSTALLDIR</Custom>
+
+            <!-- Work -->
+
+            <Custom Action="SetWriteConfigFiles" After="CostFinalize">NOT Installed</Custom>
+            <Custom Action="WriteConfigFiles" After="InstallFiles">NOT Installed</Custom>
+            <Custom Action="SetIdpInstall1" After="WriteConfigFiles">NOT Installed</Custom>
+            <Custom Action="SetIdpInstall2" After="SetIdpInstall1">NOT Installed</Custom>
+            <Custom Action="SetIdpInstall3" After="SetIdpInstall2">NOT Installed</Custom>
+            <Custom Action="RunIdpInstall" After="SetIdpInstall3">(NOT Installed) AND DEBUG_INSTALL</Custom>
+            <Custom Action="QtIdpInstall" After="SetIdpInstall3">(NOT Installed) AND (NOT DEBUG_INSTALL)</Custom>
+
+        </InstallExecuteSequence>
+
+        <Upgrade Id="$(var.UpgradeUUID)">
+            <UpgradeVersion ExcludeLanguages="yes" IncludeMaximum="yes" Maximum="127.255.255" Minimum="0.0.1" OnlyDetect="yes" Property="ALREADYINSTALLED" />
+        </Upgrade>
+
+        <UIRef Id="ShibbolethInstallDir" />
+    </Product>
+</Wix>

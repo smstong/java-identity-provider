@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+     
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an 'AS IS' BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+     implied.  See the License for the specific language governing
+     permissions and limitations under the License.  -->
+
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <!-- The dialog to display if we sense a non default installation directory -->
+    <Fragment>
+
+        <UI>
+            <Dialog Id="WarnDlgShib" Width="370" Height="270" Title="[ProductName] Installation">
+                <!-- Stuff at the top: picture, some text, a line -->
+                <Control Id="TopBitMap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" Text="WixUI_Bmp_Banner" />
+                <Control Id="TopInfo" Type="Text" X="15" Y="6" Width="150" Height="12" Text="{\WixUI_Font_Title}Install Shibboleth" Transparent="yes" />
+                <Control Id="TopDetailed" Type="Text" X="25" Y="24" Width="320" Height="12" Text="Dont forget to set file permissions" Transparent="yes" />
+                <Control Id="TopLine" Type="Line" X="0" Y="44" Width="370" Height="1" />
+
+                <!-- Where we are installing -->
+                <Control Id="Warn" Type="Bitmap" X="25" Y="51" Height="32" Width="32" Text="WixUI_Ico_Exclam" />
+                <Control Id="Warn2" Type="Text" X="73" Y="51" Height="12" Width="270" Text="NOTE That unless you will be installing Jetty with the" />
+                <Control Id="Warn3" Type="Text" X="73" Y="64" Height="12" Width="270" Text="Shibboleth project installer you should set appropriate permissions." />
+                <Control Id="Warn4" Type="Text" X="73" Y="90" Height="12" Width="270" Text="See the Documentation for details." />
+                <Control Id="Warn5" Type="Text" X="73" Y="106" Height="12" Width="270" Text="The 'setacl' batch file provides an example." />
+
+                <!-- Stuff at the bottom: line, Back,Next, [space] Cancel -->
+                <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="1" />
+                <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="&amp;Back">
+                    <Publish Event="NewDialog" Value="ConfigADDlg">CONFIGURE_AD</Publish>
+                    <Publish Event="NewDialog" Value="InstallDirDlgShib">NOT CONFIGURE_AD</Publish>
+                </Control>
+
+                <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Text="&amp;Next" Default="yes">
+                    <Publish Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+                </Control>
+
+                <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Text="&amp;Cancel" Cancel="yes">
+                    <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+                </Control>
+            </Dialog>
+        </UI>
+    </Fragment>
+</Wix>
