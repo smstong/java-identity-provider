@@ -74,7 +74,7 @@
         <Publish Dialog="BrowseDlg" Control="OK" Event="SpawnDialog" Value="InvalidDirDlg" Order="4" Condition="WIXUI_INSTALLDIR_VALID&lt;&gt;&quot;1&quot;" />
 
         <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="InstallDirDlgShib" Condition="LicenseAccepted = &quot;1&quot;" />
-
+ <Publish Dialog="LicenseAgreementDlg" Control="Print"  Event="DoAction" Value="WixUIPrintEula_$(sys.BUILDARCHSHORT)" />
         <Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="VerifyReadyDlg" />
         <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg" />
 
