@@ -96,7 +96,7 @@
                                     <arguments>
                                         <argument>build</argument>
                                         <argument>src/main/wix/idp.vcxproj</argument>
-                                        <argument>/p:MsiVersion=${msi.version};IdpVersion=${project.version}</argument>
+                                        <argument>/p:MsiVersion=${msi.version};IdpVersion=${project.version};SuppressValidation=${supress.validation}</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
