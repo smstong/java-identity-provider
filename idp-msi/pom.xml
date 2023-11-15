@@ -23,6 +23,7 @@
 	<!-- msi Version  - CHANGE IN LOCKSTEP WITH THE VERSION ABOVE
 	     99 is shorthand for SNAPSHOT
 	-->
+	<supress.validation>false</supress.validation>
 	<msi.version>5.1.0.99</msi.version>
     </properties>
 
@@ -81,6 +82,7 @@
                                     <arguments>
                                         <argument>clean</argument>
                                         <argument>src/main/wix/idp.vcxproj</argument>
+					<argument>/p:SuppressValidation=${supress.validation}</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
