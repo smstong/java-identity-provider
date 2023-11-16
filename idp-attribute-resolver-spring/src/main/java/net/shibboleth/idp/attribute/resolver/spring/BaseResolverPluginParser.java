@@ -159,6 +159,7 @@ public abstract class BaseResolverPluginParser extends AbstractCustomBeanDefinit
                 log.warn("excludeResolutionPhases ignored, using resolutionPhases");
             }
             phasesBuilder = BeanDefinitionBuilder.genericBeanDefinition(ResolutionLabelPredicate.class);
+            phasesBuilder.setFactoryMethod("byList");
             phasesBuilder.addConstructorArgValue(
                     SpringSupport.getAttributeValueAsList(config.getAttributeNodeNS(null, "resolutionPhases")));
         } else if (config.hasAttributeNS(null, "excludeResolutionPhases")) {
