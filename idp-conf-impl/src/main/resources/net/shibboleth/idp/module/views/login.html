@@ -1,0 +1,138 @@
+<!--/*
+Thymeleaf template for DisplayUsernamePasswordPage view-state
+
+Context variables:
+flowExecutionUrl - the form action location
+flowRequestContext - the Spring Web Flow RequestContext
+flowExecutionKey - the SWF execution key (this is built into the flowExecutionUrl)
+profileRequestContext - root of context tree
+rpContext - the reyling-party context
+authenticationContext - context with authentication request information
+authenticationErrorContext - context with login error state
+authenticationWarningContext - context with login warning state
+ldapResponseContext - context with LDAP state (if using native LDAP)
+rpUIContext - the context with SP UI information from the metadata
+encoder - HTMLEncoder class
+cspDigester - Calculates base64-encoded SHA-2 hashes (call apply)
+cspNonce - Calculates secure nonces (call generateIdentifier)
+request - HttpServletRequest
+response - HttpServletResponse
+environment - Spring Environment object for property resolution
+custom - arbitrary object injected by deployer
+username - username associated with the current authentication event
+
+Following velocity variables are TBD
+#set ($onClick = "this.childNodes[0].nodeValue='#springMessageText('idp.login.pleasewait', 'Logging in, please wait...')'")
+#$response.addHeader("Content-Security-Policy", "script-src-attr 'unsafe-hashes' 'sha256-$cspDigester.apply($onClick)'")
+*/-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title data-th-text="#{idp.title}">Web Login Service</title>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+        <link rel="stylesheet"
+              type="text/css"
+              href="/css/placeholder.css"
+              data-th-href="@{ #{idp.css} }">
+    </head>
+    <body>
+        <main class="main">
+            <header>
+                <img class="main-logo"
+                     src="/images/placeholder-logo.png"
+                     alt="Organizational logo"
+                     data-th-src="@{ #{idp.logo} }"
+                     data-th-alt-title="@{ #{idp.logo.alt-text} }">
+                <div data-th-with="serviceName=${rpUIContext.serviceName}">
+                    <h1 data-th-if="${not #strings.isEmpty(serviceName) && rpContext.relyingPartyId.contains(serviceName)}"
+                        data-th-text="#{idp.login.loginTo} + ' ' + ${serviceName}">
+                        Login to The Shibboleth Consortium
+                    </h1>
+                </div>
+            </header>
+            
+            <section>
+                <form data-th-action="${flowExecutionUrl}" action="#" method="post">
+                    <div th:replace="~{csrf/csrf}"></div>
+
+                    <!--/*
+                        SP Description & Logo (optional)
+                        These idpui lines will display added information (if available
+                        in the metadata) about the Service Provider (SP) that requested
+                        authentication. These idpui lines are "active" in this example
+                        (not commented out) - this extra SP info will be displayed.
+                        Remove or comment out these lines to stop the display of the
+                        added SP information.
+                    */-->
+                    <div data-th-object="${rpUIContext}">
+                        <img data-th-if="*{logo}"
+                             class="service-logo"
+                             src= "https://www.shibboleth.net/wp-content/uploads/2020/10/shibboleth-logo.jpg"
+                             alt="The Shibboleth Consortium"
+                             data-th-src="*{logo}"
+                             data-th-alt-title="*{serviceName}">
+                        <p data-th-if="*{serviceDescription}"
+                           data-th-text="*{serviceDescription}">
+                            The Shibboleth Consortium is committed to ensuring the longevity of Shibboleth systems. 
+                        </p>
+                    </div>
+
+                    <div data-th-if="${authenticationErrorContext}">
+                        <p data-th-text="${authenticationErrorContext.displayErrorMessage}"
+                           class="output-message output--error">[authentication error message displayed here]</p>
+                    </div>
+
+                    <label for="username" data-th-text="#{idp.login.username}">Username</label>
+                    <input id="username" name="j_username" type="text" data-th-value="${username}">
+                        
+                    <label for="password" data-th-text="#{idp.login.password}">Password</label>
+                    <input type="password" name="j_password" id="password" value="">
+    
+                    <!--/* You may need to modify this to taste, such as changing the flow name checked to authn/MFA. */-->
+                    <div data-th-unless="${authenticationContext.activeResults.containsKey('authn/Password')}">
+                        <input type="checkbox" name="donotcache" value="1" id="donotcache">
+                        <label for="donotcache" data-th-text="#{idp.login.donotcache}">Don't Remember Login</label>
+                    </div>
+                    <input id="_shib_idp_revokeConsent" type="checkbox" name="_shib_idp_revokeConsent" value="true" />
+                    <label for="_shib_idp_revokeConsent" data-th-text="#{idp.attribute-release.revoke}">
+                        Clear prior granting of permission for release of your information to this service.
+                    </label>
+                    <div class="grid">
+                        <div class="grid-item">
+                            <button type="submit"
+                                    name="_eventId_proceed"
+                                    data-th-onclick="${onClick}"
+                                    data-th-text="#{idp.login.login}">
+                                Login
+                            </button>
+                        </div>
+                    </div>
+                </form>
+    
+                <ul>
+                    <li>
+                        <a href="#"
+                           data-th-href="@{ #{idp.url.password.reset} }"
+                           data-th-text="#{idp.login.forgotPassword}">
+                            Forgot your password?
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#"
+                           data-th-href="@{ #{idp.url.helpdesk} }"
+                           data-th-text="#{idp.login.needHelp}">
+                            Need Help?
+                        </a>
+                    </li>
+                </ul>
+            </section>
+        </main>
+        <footer class="footer">
+            <div class="cc">
+                <p data-th-text="#{idp.footer}">Insert your footer text here.</p>
+            </div>
+        </footer>
+     </body>
+</html>

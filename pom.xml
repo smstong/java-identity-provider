@@ -69,6 +69,7 @@
         <shib-attribute.version>5.1.0-SNAPSHOT</shib-attribute.version>
         <shib-profile.groupId>net.shibboleth</shib-profile.groupId>
         <shib-profile.version>5.1.0-SNAPSHOT</shib-profile.version>
+        <thymeleaf.version>3.1.2.RELEASE</thymeleaf.version>
         <checkstyle.configLocation>${project.basedir}/resources/checkstyle/checkstyle.xml</checkstyle.configLocation>
     </properties>
 
@@ -335,6 +336,11 @@
                 <groupId>${shib-shared.groupId}</groupId>
                 <artifactId>shib-velocity-spring</artifactId>
                 <version>${shib-shared.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.thymeleaf</groupId>
+                <artifactId>thymeleaf-spring6</artifactId>
+                <version>${thymeleaf.version}</version>
             </dependency>
 
             <!-- Provided Dependencies -->

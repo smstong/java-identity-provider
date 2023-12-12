@@ -1,0 +1,10 @@
+<!--/*
+Thymeleaf template to handle form field for CSRF check
+*/-->
+<div data-th-if="${csrfToken}">
+    <input data-th-name="${csrfToken.parameterName}"
+           data-th-value="${csrfToken.token}"
+           type="hidden"
+           name="csrf_token"
+           value="[random_value]">
+</div>

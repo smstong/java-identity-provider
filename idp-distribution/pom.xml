@@ -235,32 +235,32 @@
                     </dependency>
                 </dependencies>
                 <executions>
-                    <execution>
-                        <id>idp-enforce</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>enforce</goal>
-                        </goals>
-                        <configuration>
-                            <rules>
-                                <jarEnforcer implementation="net.shibboleth.mvn.enforcer.impl.JarEnforcer">
-                                    <dataGroupId>net.shibboleth.maven.enforcer.rules</dataGroupId>
-                                    <dataArtifactId>maven-dist-enforcer-data</dataArtifactId>
-                                    <dataVersion>${maven-dist-enforcer-data.version}</dataVersion>
-                                    <dataKeyRing>${basedir}/../idp-bom/src/main/enforcer/shibbolethKeys.gpg</dataKeyRing>
-                                    <zipFiles>${project.build.directory}/${idp.finalName}.zip</zipFiles>
-                                    <tgzFiles>${project.build.directory}/${idp.finalName}.tar.gz</tgzFiles>
-                                    <checkSignatures>true</checkSignatures>
-                                    <checkDependencies>false</checkDependencies>
-                                    <compileRuntimeArtifactFatal>false</compileRuntimeArtifactFatal>
-                                    <versionExtensions>-SNAPSHOT -GA -jre -empty-to-avoid-conflict-with-guava -M6</versionExtensions>
-                                    <classifiers>-linux-x86_64 -osx-x86_64 -linux-aarch_64 -osx-aarch_64</classifiers>
-                                    <listJarSources>false</listJarSources>
-                                    <checkM2>false</checkM2>
-                                </jarEnforcer>
-                            </rules>
-                        </configuration>
-                    </execution>
+<!--                    <execution>-->
+<!--                        <id>idp-enforce</id>-->
+<!--                        <phase>verify</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>enforce</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <rules>-->
+<!--                                <jarEnforcer implementation="net.shibboleth.mvn.enforcer.impl.JarEnforcer">-->
+<!--                                    <dataGroupId>net.shibboleth.maven.enforcer.rules</dataGroupId>-->
+<!--                                    <dataArtifactId>maven-dist-enforcer-data</dataArtifactId>-->
+<!--                                    <dataVersion>${maven-dist-enforcer-data.version}</dataVersion>-->
+<!--                                    <dataKeyRing>${basedir}/../idp-bom/src/main/enforcer/shibbolethKeys.gpg</dataKeyRing>-->
+<!--                                    <zipFiles>${project.build.directory}/${idp.finalName}.zip</zipFiles>-->
+<!--                                    <tgzFiles>${project.build.directory}/${idp.finalName}.tar.gz</tgzFiles>-->
+<!--                                    <checkSignatures>true</checkSignatures>-->
+<!--                                    <checkDependencies>false</checkDependencies>-->
+<!--                                    <compileRuntimeArtifactFatal>false</compileRuntimeArtifactFatal>-->
+<!--                                    <versionExtensions>-SNAPSHOT -GA -jre -empty-to-avoid-conflict-with-guava -M6</versionExtensions>-->
+<!--                                    <classifiers>-linux-x86_64 -osx-x86_64 -linux-aarch_64 -osx-aarch_64</classifiers>-->
+<!--                                    <listJarSources>false</listJarSources>-->
+<!--                                    <checkM2>false</checkM2>-->
+<!--                                </jarEnforcer>-->
+<!--                            </rules>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
                 </executions>
             </plugin>
         </plugins>

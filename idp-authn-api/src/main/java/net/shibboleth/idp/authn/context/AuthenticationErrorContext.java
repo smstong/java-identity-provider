@@ -45,7 +45,11 @@ public final class AuthenticationErrorContext extends BaseContext {
     
     /** Error conditions detected through classified error messages. */
     @Nonnull private Collection<String> classifiedErrors;
-    
+
+    /** Error message to be displayed to user. */
+    @Nullable private String displayErrorMessage;
+
+
     /** Constructor. */
     public AuthenticationErrorContext() {
         exceptions = new ArrayList<>();
@@ -107,5 +111,24 @@ public final class AuthenticationErrorContext extends BaseContext {
     @Nullable public String getLastClassifiedError() {
         return classifiedErrors.stream().reduce((first, second) -> second).orElse(null);
     }
-    
+
+    /**
+     * @return Error message to be displayed to the user.
+     *
+     * @since 5.1.0
+     */
+    @Nullable public String getDisplayErrorMessage() {
+        return displayErrorMessage;
+    }
+
+    /**
+     * Sets the error message to be displayed to the user.
+     *
+     * @param message Error message
+     *
+     * @since 5.1.0
+     */
+    public void setDisplayErrorMessage(@Nullable String message) {
+        this.displayErrorMessage = message;
+    }
 }

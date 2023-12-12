@@ -79,9 +79,16 @@
     <bean class="org.springframework.web.servlet.view.BeanNameViewResolver">
         <property name="order" value="1" />
     </bean>
+
+    <bean id="shibboleth.ThymeleafViewResolver" class="org.thymeleaf.spring6.view.ThymeleafViewResolver">
+        <property name="templateEngine" ref="thymeleafTemplateEngine" />
+        <property name="order" value="2" />
+        <property name="viewNames" value="login" />
+        <property name="contentType" value="text/html;charset=utf-8" />
+    </bean>
             
     <bean id="shibboleth.VelocityViewResolver" class="net.shibboleth.shared.spring.velocity.VelocityViewResolver">
-        <property name="order" value="2" />
+        <property name="order" value="3" />
         <property name="cache" value="true"/>
         <property name="prefix" value=""/>
         <property name="suffix" value=".vm"/>
@@ -89,7 +96,7 @@
     </bean>
 
     <bean id="shibboleth.InternalViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-        <property name="order" value="3" />
+        <property name="order" value="4" />
         <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
         <property name="prefix" value="/WEB-INF/jsp/"/>
         <property name="suffix" value=".jsp"/>
@@ -100,6 +107,30 @@
     <bean class="net.shibboleth.shared.spring.velocity.VelocityConfigurer">
         <property name="resourceLoaderPath"
             value="#{'%{idp.views:%{idp.home}/views}'.trim()},classpath:/net/shibboleth/idp/views,classpath:/META-INF/net/shibboleth/idp/views" />
+    </bean>
+
+    <bean id="thymeleafTemplateEngine" class="org.thymeleaf.spring6.SpringTemplateEngine">
+        <property name="templateResolvers">
+            <util:set>
+                <bean class="org.thymeleaf.spring6.templateresolver.SpringResourceTemplateResolver">
+                    <property name="name" value="deployerViews" />
+                    <property name="checkExistence" value="true"/>
+                    <property name="cacheable" value="true"/>
+                    <property name="templateMode" value="HTML" />
+                    <property name="prefix" value="#{'%{idp.views:%{idp.home}/views}'.trim()}/"/>
+                    <property name="suffix" value=".html"/>
+                </bean>
+                <bean class="org.thymeleaf.spring6.templateresolver.SpringResourceTemplateResolver">
+                    <property name="name" value="classpathViews" />
+                    <property name="checkExistence" value="true"/>
+                    <property name="cacheable" value="true"/>
+                    <property name="templateMode" value="HTML" />
+                    <property name="prefix" value="classpath:/net/shibboleth/idp/views/"/>
+                    <property name="suffix" value=".html"/>
+                </bean>
+            </util:set>
+        </property>
+        <property name="enableSpringELCompiler" value="true" />
     </bean>
     
     <!-- Import any user defined beans or overrides for the MVC config. -->
