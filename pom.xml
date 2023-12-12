@@ -70,6 +70,7 @@
         <shib-attribute.version>5.1.0-SNAPSHOT</shib-attribute.version>
         <shib-profile.groupId>net.shibboleth</shib-profile.groupId>
         <shib-profile.version>5.1.0-SNAPSHOT</shib-profile.version>
+        <thymeleaf.version>3.1.2.RELEASE</thymeleaf.version>
         <checkstyle.configLocation>${project.basedir}/resources/checkstyle/checkstyle.xml</checkstyle.configLocation>
     </properties>
 
