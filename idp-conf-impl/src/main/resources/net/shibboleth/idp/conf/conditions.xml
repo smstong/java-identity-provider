@@ -27,6 +27,11 @@
     <bean id="shibboleth.Conditions.Constant" abstract="true"
         class="net.shibboleth.shared.logic.PredicateSupport" factory-method="constant" />
 
+    <bean id="shibboleth.BiConditions.FALSE"
+        class="net.shibboleth.shared.logic.BiPredicateSupport" factory-method="alwaysFalse" />
+    <bean id="shibboleth.BiConditions.TRUE"
+        class="net.shibboleth.shared.logic.BiPredicateSupport" factory-method="alwaysTrue" />
+
     <bean id="shibboleth.BiConditions.AND"
         class="net.shibboleth.shared.logic.BiPredicateSupport" factory-method="and" abstract="true" />
     <bean id="shibboleth.BiConditions.NOT"
