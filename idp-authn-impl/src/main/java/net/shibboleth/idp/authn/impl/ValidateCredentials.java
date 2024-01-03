@@ -29,6 +29,8 @@ import org.opensaml.profile.action.EventIds;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 
+import com.google.common.net.UrlEscapers;
+
 import net.shibboleth.idp.authn.AccountLockoutManager;
 import net.shibboleth.idp.authn.AuthenticationResult;
 import net.shibboleth.idp.authn.AuthnAuditFields;
@@ -42,7 +44,11 @@ import net.shibboleth.shared.annotation.constraint.NotEmpty;
 import net.shibboleth.shared.annotation.constraint.NotLive;
 import net.shibboleth.shared.annotation.constraint.Unmodifiable;
 import net.shibboleth.shared.collection.CollectionSupport;
+import net.shibboleth.shared.net.CookieManager;
 import net.shibboleth.shared.primitive.LoggerFactory;
+import net.shibboleth.shared.primitive.StringSupport;
+import net.shibboleth.shared.security.DataSealer;
+import net.shibboleth.shared.security.DataSealerException;
 
 /**
  * An action that processes a list of {@link CredentialValidator} objects to produce an {@link AuthenticationResult}.
@@ -284,19 +290,91 @@ public class ValidateCredentials extends AbstractAuditingValidationAction implem
      */
     public static class UsernamePasswordCleanupHook implements Consumer<ProfileRequestContext> {
 
+        /** Class logger. */
+        @Nonnull private final Logger log = LoggerFactory.getLogger(UsernamePasswordCleanupHook.class);
+        
+        /** Username cookie name. */
+        @Nullable @NotEmpty private String cookieName;
+
+        /** Optional cookie manager to use. */
+        @Nullable private CookieManager cookieManager;
+
+        /** Optional data sealer to use. */
+        @Nullable private DataSealer dataSealer;
+
+        /**
+         * Set cookie name to use for cached username.
+         * 
+         * @param name cookie name
+         * 
+         * @since 5.1.0
+         */
+        public void setCookieName(@Nullable final String name) {
+            cookieName = StringSupport.trimOrNull(name);
+        }
+        
+        /**
+         * Sets optional {@link CookieManager} to use.
+         * 
+         * @param manager cookie manager
+         * 
+         * @since 5.1.0
+         */
+        public void setCookieManager(@Nullable final CookieManager manager) {
+            cookieManager = manager;
+        }
+
+        /**
+         * Sets optional {@link DataSealer} to use.
+         * 
+         * @param sealer data sealer
+         * 
+         * @since 5.1.0
+         */
+        public void setDataSealer(@Nullable final DataSealer sealer) {
+            dataSealer = sealer;
+        }
+        
+// Checkstyle: CyclomaticComplexity OFF
         /** {@inheritDoc} */
         public void accept(@Nullable final ProfileRequestContext input) {
-            if (input != null) {
-                final AuthenticationContext authnCtx = input.getSubcontext(AuthenticationContext.class);
-                if (authnCtx != null) {
-                    final UsernamePasswordContext upCtx = authnCtx.getSubcontext(UsernamePasswordContext.class);
-                    if (upCtx != null) {
-                        upCtx.setPassword(null);
-                        authnCtx.removeSubcontext(upCtx);
+            
+            final AuthenticationContext authnCtx =
+                    input != null ? input.getSubcontext(AuthenticationContext.class) : null;
+            if (authnCtx == null) {
+                return;
+            }
+
+            final UsernamePasswordContext upCtx = authnCtx.getSubcontext(UsernamePasswordContext.class);
+            if (upCtx == null) {
+                return;
+            }
+            
+            final String localCookieName = cookieName;
+            if (authnCtx.isResultCacheable()) {
+                if (cookieManager != null && dataSealer != null && localCookieName != null) {
+                    String wrapped = upCtx.getUsername();
+                    if (wrapped != null) {
+                        try {
+                            assert dataSealer != null;
+                            wrapped = dataSealer.wrap(wrapped);
+                            assert cookieManager != null;
+                            cookieManager.addCookie(localCookieName,
+                                    UrlEscapers.urlFormParameterEscaper().escape(wrapped));
+                        } catch (final DataSealerException e) {
+                            wrapped = null;
+                            log.warn("Error sealing username cookie", e);
+                        }
                     }
                 }
+            } else if (cookieManager != null && localCookieName != null) {
+                cookieManager.unsetCookie(localCookieName);
             }
+
+            upCtx.setPassword(null);
+            authnCtx.removeSubcontext(upCtx);
         }
     }
+// Checkstyle: CyclomaticComplexity ON
 
 }
