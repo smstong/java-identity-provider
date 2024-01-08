@@ -17,12 +17,14 @@ package net.shibboleth.idp.authn;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 
 import net.shibboleth.shared.annotation.constraint.NotEmpty;
@@ -54,6 +56,9 @@ public abstract class AbstractExtractionAction extends AbstractAuthenticationAct
     
     /** Trim prior to transforms? */
     private boolean trim;
+    
+    /** Generic hook for remapping username. */
+    @Nullable private BiFunction<ProfileRequestContext,String,String> usernameRemappingStrategy; 
     
     /** Constructor. */
     public AbstractExtractionAction() {
@@ -114,16 +119,52 @@ public abstract class AbstractExtractionAction extends AbstractAuthenticationAct
     }
     
     /**
-     * Apply any configured regular expression replacements to an input value and return the result.
+     * Sets a general hook for remapping username.
+     * 
+     * @param strategy username remapping strategy
+     * 
+     * @since 5.1.0
+     */
+    public void setUsernameRemappingStrategy(@Nullable final BiFunction<ProfileRequestContext,String,String> strategy) {
+        checkSetterPreconditions();
+        
+        usernameRemappingStrategy = strategy;
+    }
+    
+    /**
+     * Apply any configured rules, regular expression replacements, or remapping strategy
+     * to an input value and return the result.
      * 
      * @param input the input string
      * 
-     * @return  the result of applying the expressions
+     * @return  the result of applying the rules
+     * 
+     * @deprecated
      */
+    @Deprecated(since="5.1.0", forRemoval=true)
     @Nullable @NotEmpty protected String applyTransforms(@Nullable final String input) {
         
+        // No deprecation warning due to legacy plugins unable to convert their calls.
+        return applyTransforms(null, input);
+    }
+    
+// Checkstyle: CyclomaticComplexity OFF
+    /**
+     * Apply any configured rules, regular expression replacements, or remapping strategy
+     * to an input value and return the result.
+     * 
+     * @param profileRequestContext profile request context
+     * @param input the input string
+     * 
+     * @return  the result of applying the rules
+     * 
+     * @since 5.1.0
+     */
+    @Nullable @NotEmpty protected String applyTransforms(@Nullable final ProfileRequestContext profileRequestContext,
+            @Nullable final String input) {
         if (input == null) {
-            return null;
+            return usernameRemappingStrategy != null ?
+                    usernameRemappingStrategy.apply(profileRequestContext, input) : null;
         }
         
         String s = input;
@@ -142,7 +183,7 @@ public abstract class AbstractExtractionAction extends AbstractAuthenticationAct
         }
         
         if (transforms.isEmpty()) {
-            return s;
+            return usernameRemappingStrategy != null ? usernameRemappingStrategy.apply(profileRequestContext, s) : s;
         }
         
         for (final Pair<Pattern,String> p : transforms) {
@@ -156,7 +197,8 @@ public abstract class AbstractExtractionAction extends AbstractAuthenticationAct
             }
         }
 
-        return s;
+        return usernameRemappingStrategy != null ? usernameRemappingStrategy.apply(profileRequestContext, s) : s;
     }
+// Checkstyle: CyclomaticComplexity ON
 
 }

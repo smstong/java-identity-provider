@@ -119,7 +119,7 @@ public class ExtractUsernamePasswordFromFormRequest extends AbstractExtractionAc
             return;
         }
         
-        upCtx.setUsername(applyTransforms(username));
+        upCtx.setUsername(applyTransforms(profileRequestContext, username));
 
         final String password = request.getParameter(passwordFieldName);
         if (password == null || password.isEmpty()) {
