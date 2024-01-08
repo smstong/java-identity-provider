@@ -184,7 +184,7 @@ public class PrePopulateUsername extends AbstractExtractionAction {
         usernameContext.setUsername(null);
         usernameContext.setPassword(null);
 
-        String username = getUsernameFromForm(authenticationContext);
+        String username = getUsernameFromForm(profileRequestContext);
         if (username != null && !username.isEmpty()) {
             log.debug("{} Populating username '{}' from form submission into UsernamePasswordContext",
                     getLogPrefix(), username);
@@ -212,15 +212,15 @@ public class PrePopulateUsername extends AbstractExtractionAction {
      * 
      * <p>Also processes do-not-cache instruction.</p>
      * 
-     * @param authenticationContext authentication context
+     * @param profileRequestContext profile request context
      * 
      * @return submitted username, after applying any configured transforms
      */
-    @Nullable private String getUsernameFromForm(@Nonnull final AuthenticationContext authenticationContext) {
+    @Nullable private String getUsernameFromForm(@Nonnull final ProfileRequestContext profileRequestContext) {
         
         final HttpServletRequest request = getHttpServletRequest();
         if (request != null) {
-            return applyTransforms(request.getParameter(usernameFieldName));
+            return applyTransforms(profileRequestContext, request.getParameter(usernameFieldName));
         }
         
         return null;

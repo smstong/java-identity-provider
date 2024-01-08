@@ -59,7 +59,7 @@ public class ExtractUserAgentAddress extends AbstractExtractionAction {
             return;
         }
         
-        final String addressString = applyTransforms(HttpServletSupport.getRemoteAddr(request));
+        final String addressString = applyTransforms(profileRequestContext, HttpServletSupport.getRemoteAddr(request));
         if (addressString == null || !InetAddresses.isInetAddress(addressString)) {
             log.debug("{} User agent's address, {}, is not a valid IP address", getLogPrefix(), addressString);
             ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.NO_CREDENTIALS);

@@ -86,7 +86,8 @@ public class ExtractUsernamePasswordFromBasicAuth extends AbstractExtractionActi
             return;
         }
         
-        upCtx.setUsername(applyTransforms(decodedCredentials.getFirst())).setPassword(decodedCredentials.getSecond());
+        upCtx.setUsername(applyTransforms(profileRequestContext, decodedCredentials.getFirst()))
+            .setPassword(decodedCredentials.getSecond());
     }
     // CheckStyle: ReturnCount ON
 
