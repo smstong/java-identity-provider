@@ -22,6 +22,8 @@
 #set ($rpContext = $profileRequestContext.getSubcontext('net.shibboleth.profile.context.RelyingPartyContext'))
 #set ($username = $authenticationContext.ensureSubcontext('net.shibboleth.idp.authn.context.UsernamePasswordContext').getUsername())
 ##
+#set ($nonce = $cspNonce.generateIdentifier())
+$response.addHeader("Content-Security-Policy", "script-src-elem 'nonce-$nonce'")
 #set ($onClick = "this.childNodes[0].nodeValue='#springMessageText('idp.login.pleasewait', 'Logging in, please wait...')'")
 $response.addHeader("Content-Security-Policy", "script-src-attr 'unsafe-hashes' 'sha256-$cspDigester.apply($onClick)'")
 <!DOCTYPE html>
@@ -105,5 +107,15 @@ $response.addHeader("Content-Security-Policy", "script-src-attr 'unsafe-hashes' 
                 <p>#springMessageText("idp.footer", "Insert your footer text here.")</p>
             </div>
         </footer>
+
+        <script #if ($nonce)nonce="$nonce"#end>
+        <!--
+        const input = document.getElementById('username');
+        const end = input.value.length;
+        input.setSelectionRange(end, end);
+        input.focus();
+        // -->
+        </script>
+        
      </body>
 </html>
