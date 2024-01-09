@@ -73,11 +73,11 @@ $response.addHeader("Content-Security-Policy", "script-src-attr 'unsafe-hashes' 
                     #parse("login-error.vm")
 
                     <label for="username">#springMessageText("idp.login.username", "Username")</label>
-                    <input id="username" name="j_username" type="text"
+                    <input type="text" id="username" name="j_username"
                         value="#if($username)$encoder.encodeForHTML($username)#end" />
                         
                     <label for="password">#springMessageText("idp.login.password", "Password")</label>
-                    <input type="password" name="j_password" id="password" value="" />
+                    <input type="password" id="password" name="j_password" value="" />
     
                     ## You may need to modify this to taste, such as changing the flow name checked to authn/MFA.
                     #if (!$authenticationContext.getActiveResults().containsKey('authn/Password'))
@@ -110,10 +110,13 @@ $response.addHeader("Content-Security-Policy", "script-src-attr 'unsafe-hashes' 
 
         <script #if ($nonce)nonce="$nonce"#end>
         <!--
-        const input = document.getElementById('username');
-        const end = input.value.length;
-        input.setSelectionRange(end, end);
-        input.focus();
+        const ufield = document.getElementById('username');
+        const pfield = document.getElementById('password');
+        if (ufield.value == null) {
+            ufield.focus();
+        } else {
+            pfield.focus();
+        }
         // -->
         </script>
         
