@@ -14,6 +14,8 @@
 
 package net.shibboleth.idp.authn.impl;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.function.Function;
 
 import javax.annotation.Nonnull;
@@ -32,6 +34,7 @@ import net.shibboleth.idp.session.IdPSession;
 import net.shibboleth.idp.session.context.SessionContext;
 import net.shibboleth.shared.annotation.constraint.NonnullBeforeExec;
 import net.shibboleth.shared.annotation.constraint.NotEmpty;
+import net.shibboleth.shared.collection.CollectionSupport;
 import net.shibboleth.shared.logic.Constraint;
 import net.shibboleth.shared.net.CookieManager;
 import net.shibboleth.shared.net.URISupport;
@@ -72,8 +75,8 @@ public class PrePopulateUsername extends AbstractExtractionAction {
     /** Optional data sealer to use. */
     @Nullable private DataSealer dataSealer;
     
-    /** Whether to pull username from existing session or not. */
-    private boolean checkSession;
+    /** Order to pull username from. */
+    @Nonnull private List<String> precedence;
     
     /** Context to operate on. */
     @NonnullBeforeExec private UsernamePasswordContext usernameContext;
@@ -85,6 +88,7 @@ public class PrePopulateUsername extends AbstractExtractionAction {
                         new ChildContextLookup<>(AuthenticationContext.class));
             
         usernameFieldName = "j_username";
+        precedence = CollectionSupport.listOf("form", "session", "cookie");
     }
     
     /**
@@ -146,16 +150,16 @@ public class PrePopulateUsername extends AbstractExtractionAction {
     }
     
     /**
-     * Sets whether tp pull username from existing session as a fallback.
+     * Sets the precedence rules to use in populating the username.
      * 
-     * <p>Defaults to false.</p>
+     * <p>Valid tokens are "form", "session", and "cookie" and that is the default order.</p>
      * 
-     * @param flag flag to set
+     * @param order precedence to use
      */
-    public void setCheckSession(final boolean flag) {
+    public void setPrecedence(@Nonnull final Collection<String> order) {
         checkSetterPreconditions();
 
-        checkSession = flag;
+        precedence = CollectionSupport.copyToList(StringSupport.normalizeStringCollection(order));
     }
 
     /** {@inheritDoc} */
@@ -176,6 +180,7 @@ public class PrePopulateUsername extends AbstractExtractionAction {
         return true;
     }
 
+// Checkstyle: CyclomaticComplexity OFF
     /** {@inheritDoc} */
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
@@ -183,29 +188,48 @@ public class PrePopulateUsername extends AbstractExtractionAction {
         
         usernameContext.setUsername(null);
         usernameContext.setPassword(null);
-
-        String username = getUsernameFromForm(profileRequestContext);
-        if (username != null && !username.isEmpty()) {
-            log.debug("{} Populating username '{}' from form submission into UsernamePasswordContext",
-                    getLogPrefix(), username);
-            usernameContext.setUsername(username);
-            return;
-        }
-
-        username = getUsernameFromCookie(profileRequestContext);
-        if (username != null && !username.isEmpty()) {
-            log.debug("{} Populating cached username '{}' from cookie into UsernamePasswordContext",
-                    getLogPrefix(), username);
-            usernameContext.setUsername(username);
-        }
-
-        username = getUsernameFromSession(profileRequestContext, authenticationContext);
-        if (username != null && !username.isEmpty()) {
-            log.debug("{} Populating username '{}' from session into UsernamePasswordContext", getLogPrefix(),
-                    username);
-            usernameContext.setUsername(username);
+        
+        String username;
+        
+        for (final String source : precedence) {
+            switch (source) {
+                case "form":
+                    username = getUsernameFromForm(profileRequestContext);
+                    if (username != null && !username.isEmpty()) {
+                        log.debug("{} Populating username '{}' from form submission into UsernamePasswordContext",
+                                getLogPrefix(), username);
+                        usernameContext.setUsername(username);
+                        return;
+                    }
+                    break;
+                    
+                case "session":
+                    username = getUsernameFromSession(profileRequestContext, authenticationContext);
+                    if (username != null && !username.isEmpty()) {
+                        log.debug("{} Populating username '{}' from session into UsernamePasswordContext",
+                                getLogPrefix(), username);
+                        usernameContext.setUsername(username);
+                        return;
+                    }
+                    break;
+                    
+                case "cookie":
+                    username = getUsernameFromCookie(profileRequestContext);
+                    if (username != null && !username.isEmpty()) {
+                        log.debug("{} Populating cached username '{}' from cookie into UsernamePasswordContext",
+                                getLogPrefix(), username);
+                        usernameContext.setUsername(username);
+                        return;
+                    }
+                    break;
+                    
+                default:
+                    log.warn("{} Unsupported precedence value for username population: {}", getLogPrefix(), source);
+                    break;
+            }
         }
     }
+// Checkstyle: CyclomaticComplexity ON
     
     /**
      * Gets the username from a form submission.
@@ -264,7 +288,7 @@ public class PrePopulateUsername extends AbstractExtractionAction {
     @Nullable private String getUsernameFromSession(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
         
-        if (checkSession && !authenticationContext.getActiveResults().isEmpty()) {
+        if (!authenticationContext.getActiveResults().isEmpty()) {
             final SessionContext sessionContext = profileRequestContext.getSubcontext(SessionContext.class);
             if (sessionContext != null) {
                 final IdPSession idpSession = sessionContext.getIdPSession();
