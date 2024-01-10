@@ -112,7 +112,7 @@ $response.addHeader("Content-Security-Policy", "script-src-attr 'unsafe-hashes' 
         <!--
         const ufield = document.getElementById('username');
         const pfield = document.getElementById('password');
-        if (ufield.value == null) {
+        if (ufield.value.trim().length == 0) {
             ufield.focus();
         } else {
             pfield.focus();
