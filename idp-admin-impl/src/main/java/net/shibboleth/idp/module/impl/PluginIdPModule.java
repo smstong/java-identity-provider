@@ -28,6 +28,7 @@ import net.shibboleth.shared.annotation.constraint.NotEmpty;
  * produced by the Shibboleth Project ourselves and for which the documentation
  * will be in the wiki in a fixed location.
  * 
+ * TODO: Make abstract in V6 and make all constructors protected. 
  */
 public class PluginIdPModule extends PropertyDrivenIdPModule {
 
@@ -42,9 +43,26 @@ public class PluginIdPModule extends PropertyDrivenIdPModule {
      * 
      * @throws IOException if an I/O error occurs
      * @throws ModuleException if a generic error occurs
+     * 
+     * @deprecated
      */
+    @Deprecated(forRemoval=true, since="5.1.0")
     public PluginIdPModule(@Nonnull final Class<? extends IdPModule> claz) throws IOException, ModuleException {
         super(claz);
+    }
+    
+    /**
+     * Constructor for concrete modules.
+     *
+     * @param version version of plugin
+     * @param claz implementation class of the module
+     * 
+     * @throws IOException if an I/O error occurs
+     * @throws ModuleException if a generic error occurs
+     */
+    protected PluginIdPModule(@Nonnull final String version, @Nonnull final Class<? extends IdPModule> claz)
+            throws IOException, ModuleException {
+        super(version, claz);
     }
 
     /**
