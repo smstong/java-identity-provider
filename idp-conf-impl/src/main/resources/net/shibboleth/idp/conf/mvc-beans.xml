@@ -80,10 +80,9 @@
         <property name="order" value="1" />
     </bean>
 
-    <bean id="shibboleth.ThymeleafViewResolver" class="org.thymeleaf.spring6.view.ThymeleafViewResolver">
+    <bean id="shibboleth.ThymeleafViewResolver" class="net.shibboleth.shared.spring.thymeleaf.ChainingThymeleafViewResolver">
         <property name="templateEngine" ref="thymeleafTemplateEngine" />
         <property name="order" value="2" />
-        <property name="viewNames" value="login" />
         <property name="contentType" value="text/html;charset=utf-8" />
     </bean>
             
