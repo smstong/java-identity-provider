@@ -36,7 +36,7 @@
     
     <bean id="ScriptedAction" class="net.shibboleth.idp.profile.ScriptedAction" factory-method="resourceScript" scope="prototype">
         <constructor-arg>
-            <bean parent="shibboleth.ConditionalReesource"
+            <bean parent="shibboleth.ConditionalResource"
                 c:_0="%{idp.home}/conf/admin/hello-world.js"
                 p:defaultContent="null;" />
         </constructor-arg>
