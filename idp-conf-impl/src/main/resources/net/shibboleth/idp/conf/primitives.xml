@@ -32,7 +32,7 @@
 
     <!-- Resource beans. -->    
 
-    <bean id="shibboleth.ConditionalReesource" abstract="true"
+    <bean id="shibboleth.ConditionalResource" abstract="true"
         class="net.shibboleth.shared.spring.resource.ConditionalResource" />
 
     <bean id="shibboleth.RunnableFileSystemResource" abstract="true"
