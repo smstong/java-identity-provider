@@ -59,6 +59,7 @@
     </modules>
 
     <properties>
+        <shibboleth.projectName>java-identity-provider</shibboleth.projectName>
         <shib-shared.groupId>net.shibboleth</shib-shared.groupId>
         <shib-shared.version>9.1.0-SNAPSHOT</shib-shared.version>
         <opensaml.groupId>org.opensaml</opensaml.groupId>
@@ -381,9 +382,9 @@
     </dependencyManagement>
 
     <scm>
-        <connection>${shibboleth.scm.connection}java-identity-provider</connection>
-        <developerConnection>${shibboleth.scm.developerConnection}java-identity-provider</developerConnection>
-        <url>${shibboleth.scm.url}java-identity-provider.git</url>
+        <connection>${shibboleth.scm.connection}${shibboleth.projectName}</connection>
+        <developerConnection>${shibboleth.scm.developerConnection}${shibboleth.projectName}</developerConnection>
+        <url>${shibboleth.scm.url}${shibboleth.projectName}.git</url>
     </scm>
 
     <build>
