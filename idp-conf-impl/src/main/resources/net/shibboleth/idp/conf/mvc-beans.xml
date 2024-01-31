@@ -111,6 +111,7 @@
             value="#{'%{idp.views:%{idp.home}/views}'.trim()},classpath:/net/shibboleth/idp/views,classpath:/META-INF/net/shibboleth/idp/views" />
     </bean>
 
+    <!-- TODO: we'd need a factory bean to build the set below due to idp.views allowing for multiple paths. -->
     <bean id="thymeleafTemplateEngine" class="org.thymeleaf.spring6.SpringTemplateEngine">
         <property name="templateResolvers">
             <util:set>
