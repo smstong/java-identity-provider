@@ -131,7 +131,7 @@
                     <property name="suffix" value=".html"/>
                 </bean>
                 <bean class="org.thymeleaf.spring6.templateresolver.SpringResourceTemplateResolver">
-                    <property name="name" value="classpathViews" />
+                    <property name="name" value="pluginViews" />
                     <property name="checkExistence" value="true"/>
                     <property name="cacheable" value="true"/>
                     <property name="templateMode" value="HTML" />
