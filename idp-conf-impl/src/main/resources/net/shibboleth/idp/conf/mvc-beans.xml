@@ -130,6 +130,14 @@
                     <property name="prefix" value="classpath:/net/shibboleth/idp/views/"/>
                     <property name="suffix" value=".html"/>
                 </bean>
+                <bean class="org.thymeleaf.spring6.templateresolver.SpringResourceTemplateResolver">
+                    <property name="name" value="classpathViews" />
+                    <property name="checkExistence" value="true"/>
+                    <property name="cacheable" value="true"/>
+                    <property name="templateMode" value="HTML" />
+                    <property name="prefix" value="classpath:/META-INF/net/shibboleth/idp/views"/>
+                    <property name="suffix" value=".html"/>
+                </bean>
             </util:set>
         </property>
         <property name="enableSpringELCompiler" value="true" />
