@@ -20,10 +20,6 @@ response - HttpServletResponse
 environment - Spring Environment object for property resolution
 custom - arbitrary object injected by deployer
 username - username associated with the current authentication event
-
-Following velocity variables are TBD
-#set ($onClick = "this.childNodes[0].nodeValue='#springMessageText('idp.login.pleasewait', 'Logging in, please wait...')'")
-#$response.addHeader("Content-Security-Policy", "script-src-attr 'unsafe-hashes' 'sha256-$cspDigester.apply($onClick)'")
 */-->
 <!DOCTYPE html>
 <html>
@@ -101,9 +97,13 @@ Following velocity variables are TBD
                     </label>
                     <div class="grid">
                         <div class="grid-item">
-                            <button type="submit"
+                            <button data-th-with="onClick='loginOnClick(this)',
+                                        digest=${cspDigester.apply(onClick)},
+                                        cspValue=|script-src-attr 'unsafe-hashes' 'sha256-${digest}'|,
+                                        csp=${response.addHeader('Content-Security-Policy', cspValue)}"
+                                    type="submit"
                                     name="_eventId_proceed"
-                                    data-th-onclick="${onClick}"
+                                    onclick="loginOnClick(this)"
                                     data-th-text="#{idp.login.login}">
                                 Login
                             </button>
@@ -134,5 +134,26 @@ Following velocity variables are TBD
                 <p data-th-text="#{idp.footer}">Insert your footer text here.</p>
             </div>
         </footer>
+
+        <script data-th-with="nonce=${cspNonce.generateIdentifier()},
+                cspValue=|script-src-elem 'nonce-${nonce}'|,
+                csp=${response.addHeader('Content-Security-Policy', cspValue)}"
+            data-th-nonce="${nonce}"
+            data-th-inline="javascript">
+        <!--
+        function loginOnClick(button) {
+        	button.childNodes[0].nodeValue = /*[[#{idp.login.pleasewait}]]*/ "Logging in, please wait...";
+        }
+        
+        const ufield = document.getElementById('username');
+        const pfield = document.getElementById('password');
+        if (ufield.value.trim().length == 0) {
+            ufield.focus();
+        } else {
+            pfield.focus();
+        }
+        // -->
+        </script>
+        
      </body>
 </html>
