@@ -11,6 +11,9 @@
     <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"
         p:placeholderPrefix="%{" p:placeholderSuffix="}" />
 
+    <!-- Needed to allow for auto-wiring of ViewResolvers. -->
+    <context:annotation-config />
+
     <!-- Default flow mappings. -->
     <bean id="shibboleth.DefaultFlowMap" lazy-init="true"
             class="org.springframework.beans.factory.config.MapFactoryBean">
@@ -198,15 +201,11 @@
 
     <webflow:flow-builder-services id="flowBuilderServices" view-factory-creator="mvcViewFactoryCreator" />
 
+    <!-- Collects all ViewResolver beans via auto-wiring and exposes as List for the SWF bean following it. -->
+    <bean id="mvcViewResolverFactory" class="net.shibboleth.shared.spring.factory.ViewResolversFactoryBean" />
+
     <bean id="mvcViewFactoryCreator" class="org.springframework.webflow.mvc.builder.MvcViewFactoryCreator"
-            p:useSpringBeanBinding="true">
-        <property name="viewResolvers">
-            <list>
-                <ref bean="shibboleth.VelocityViewResolver" />
-                <ref bean="shibboleth.InternalViewResolver" />
-            </list>
-        </property>
-    </bean>
+        p:useSpringBeanBinding="true" p:viewResolvers-ref="mvcViewResolverFactory" />
 
     <bean id="profileRequestContextFlowExecutionListener"
           class="net.shibboleth.idp.profile.support.ProfileRequestContextFlowExecutionListener" />
