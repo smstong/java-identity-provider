@@ -83,8 +83,9 @@
         <property name="order" value="1" />
     </bean>
             
-    <bean id="shibboleth.VelocityViewResolver" class="net.shibboleth.shared.spring.velocity.VelocityViewResolver">
-        <property name="order" value="2" />
+    <bean id="shibboleth.VelocityViewResolver" class="net.shibboleth.shared.spring.velocity.VelocityViewResolver"
+            c:_0-ref="#{'%{idp.views.velocity.activationCondition:shibboleth.Conditions.TRUE}'.trim()}">
+        <property name="order" value="%{idp.views.velocity.order:2}" />
         <property name="cache" value="true"/>
         <property name="prefix" value=""/>
         <property name="suffix" value=".vm"/>
@@ -92,7 +93,7 @@
     </bean>
 
     <bean id="shibboleth.InternalViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-        <property name="order" value="3" />
+        <property name="order" value="%{idp.views.jsp.order:3}" />
         <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
         <property name="prefix" value="/WEB-INF/jsp/"/>
         <property name="suffix" value=".jsp"/>
