@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import net.shibboleth.idp.Version;
 import net.shibboleth.profile.module.ModuleException;
@@ -80,7 +81,7 @@ public class PropertyDrivenIdPModule extends PropertyDrivenModule implements IdP
      * 
      * @since 5.1.0
      */
-    protected PropertyDrivenIdPModule(@Nonnull final String version, @Nonnull final Class<? extends IdPModule> claz)
+    protected PropertyDrivenIdPModule(@Nullable final String version, @Nonnull final Class<? extends IdPModule> claz)
             throws IOException, ModuleException {
         this(version, claz.getResourceAsStream(DEFAULT_RESOURCE));
     }
@@ -96,7 +97,7 @@ public class PropertyDrivenIdPModule extends PropertyDrivenModule implements IdP
      * 
      * @since 5.1.0
      */
-    protected PropertyDrivenIdPModule(@Nonnull final String version, @Nonnull final InputStream inputStream)
+    protected PropertyDrivenIdPModule(@Nullable final String version, @Nonnull final InputStream inputStream)
             throws IOException, ModuleException {
         super(version, inputStream);
     }
@@ -111,7 +112,7 @@ public class PropertyDrivenIdPModule extends PropertyDrivenModule implements IdP
      * 
      * @since 5.1.0
      */
-    protected PropertyDrivenIdPModule(@Nonnull final String version, @Nonnull final Properties properties)
+    protected PropertyDrivenIdPModule(@Nullable final String version, @Nonnull final Properties properties)
             throws ModuleException {
         super(version, properties);
     }

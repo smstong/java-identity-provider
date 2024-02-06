@@ -17,6 +17,7 @@ package net.shibboleth.idp.module.impl;
 import java.io.IOException;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import net.shibboleth.idp.module.IdPModule;
 import net.shibboleth.idp.module.PropertyDrivenIdPModule;
@@ -59,8 +60,10 @@ public class PluginIdPModule extends PropertyDrivenIdPModule {
      * 
      * @throws IOException if an I/O error occurs
      * @throws ModuleException if a generic error occurs
+     * 
+     * @since 5.1.0
      */
-    protected PluginIdPModule(@Nonnull final String version, @Nonnull final Class<? extends IdPModule> claz)
+    protected PluginIdPModule(@Nullable final String version, @Nonnull final Class<? extends IdPModule> claz)
             throws IOException, ModuleException {
         super(version, claz);
     }
