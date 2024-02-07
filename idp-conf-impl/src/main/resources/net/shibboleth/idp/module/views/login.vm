@@ -10,6 +10,8 @@
 ## authenticationErrorContext - context with login error state
 ## authenticationWarningContext - context with login warning state
 ## ldapResponseContext - context with LDAP state (if using native LDAP)
+## username - username from previous rendering of form
+## rpContext - the context with information about the relying party (SP)
 ## rpUIContext - the context with SP UI information from the metadata
 ## encoder - HTMLEncoder class
 ## cspDigester - Calculates base64-encoded SHA-2 hashes (call apply)
@@ -18,9 +20,6 @@
 ## response - HttpServletResponse
 ## environment - Spring Environment object for property resolution
 ## custom - arbitrary object injected by deployer
-##
-#set ($rpContext = $profileRequestContext.getSubcontext('net.shibboleth.profile.context.RelyingPartyContext'))
-#set ($username = $authenticationContext.ensureSubcontext('net.shibboleth.idp.authn.context.UsernamePasswordContext').getUsername())
 ##
 #set ($nonce = $cspNonce.generateIdentifier())
 $response.addHeader("Content-Security-Policy", "script-src-elem 'nonce-$nonce'")
