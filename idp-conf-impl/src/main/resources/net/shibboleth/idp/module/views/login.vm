@@ -11,6 +11,7 @@
 ## authenticationWarningContext - context with login warning state
 ## ldapResponseContext - context with LDAP state (if using native LDAP)
 ## username - username from previous rendering of form
+## errorMessageFunction - function to produce error message for form
 ## rpContext - the context with information about the relying party (SP)
 ## rpUIContext - the context with SP UI information from the metadata
 ## encoder - HTMLEncoder class
@@ -68,8 +69,11 @@ $response.addHeader("Content-Security-Policy", "script-src-attr 'unsafe-hashes' 
                     #if ($desc)
                         <p>$encoder.encodeForHTML($desc)</p>
                     #end
-                            
-                    #parse("login-error.vm")
+                    
+                    #set ($errorMessage = $errorMessageFunction.apply($profileRequestContext))
+                    #if ($errorMessage)
+                        <p class="output-message output--error">$encoder.encodeForHTML($errorMessage)</p>        
+                    #end
 
                     <label for="username">#springMessageText("idp.login.username", "Username")</label>
                     <input type="text" id="username" name="j_username"
