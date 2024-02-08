@@ -98,6 +98,12 @@
         <!-- Runtime Dependencies -->
 
         <!-- Test Dependencies -->
+        <dependency>
+            <groupId>${shib-attribute.groupId}</groupId>
+            <artifactId>shib-attribute-testing</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Needed for XMLObject providers. -->
         <dependency>
             <groupId>${opensaml.groupId}</groupId>
