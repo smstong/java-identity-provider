@@ -76,10 +76,4 @@
         </plugins>
     </build>
 
-    <scm>
-        <connection>${shibboleth.scm.connection}java-identity-provider</connection>
-        <developerConnection>${shibboleth.scm.developerConnection}java-identity-provider</developerConnection>
-        <url>${shibboleth.scm.url}java-identity-provider.git</url>
-    </scm>
-
 </project>
