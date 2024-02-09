@@ -221,14 +221,14 @@ public final class PluginInstallerCLI extends AbstractIdPHomeAwareCommandLine<Pl
             return RC_IO;
         }
         if (doList) {
-        	// we made a change to do a list operation
+                // we made a change to do a list operation
             try (final PluginInstaller inst = new PluginInstaller(
                 Constraint.isNotNull(getHttpClient(), "HJttpClient cannot be non null (by construction"))) {
-	            constructPluginInstaller(inst, args);
-	            ret = doList(false, null);
+                    constructPluginInstaller(inst, args);
+                    ret = doList(false, null);
             } catch (ComponentInitializationException e) {
-            	getLogger().error("Post Install list failed:", e);
-            	return RC_IO;
+                getLogger().error("Post Install list failed:", e);
+                return RC_IO;
             }
         }
         return ret;
@@ -293,7 +293,7 @@ public final class PluginInstallerCLI extends AbstractIdPHomeAwareCommandLine<Pl
         final var versionMap = state.getPluginInfo().getAvailableVersions();
         final List<InstallableComponentVersion> versionList = new ArrayList<>(versionMap.keySet());
         versionList.sort(null);
-        outOrLog("\tVersions ");
+        outOrLog("\tPlugin Versions ");
         for (final InstallableComponentVersion version:versionList) {
             final String downLoadDetails;
             assert version != null;
@@ -365,10 +365,10 @@ public final class PluginInstallerCLI extends AbstractIdPHomeAwareCommandLine<Pl
                        plugin.getPluginId(),
                        plugin.getMajorVersion(),plugin.getMinorVersion(), plugin.getPatchVersion()));
                 for (final String module:plugin.getRequiredModules()) {
-					if (!modules.contains(module)) {
-						getLogger().error("Plugin {} requires non-enabled module {}", plugin.getPluginId(), module);
-						result = RC_MODULE;
-					}
+                                        if (!modules.contains(module)) {
+                                                getLogger().error("Plugin {} requires non-enabled module {}", plugin.getPluginId(), module);
+                                                result = RC_MODULE;
+                                        }
                 }
                 if (fullList) {
                     printDetails(plugin);
@@ -422,8 +422,29 @@ public final class PluginInstallerCLI extends AbstractIdPHomeAwareCommandLine<Pl
         }
     }
 
+    /** The IdP Version (or a suitable default).*/
+    @Nullable private InstallableComponentVersion determinedIdpVersion;
+
+    /**
+     * Get The IdP Version (or a suitable default).
+     * @return the version.
+     */
+    @Nonnull private InstallableComponentVersion getIdPVersion() {
+        InstallableComponentVersion ver = determinedIdpVersion;
+        if (ver == null) {
+                final String idpVersionString = Version.getVersion();
+                if (idpVersionString!=null) {
+                        determinedIdpVersion = ver =  new InstallableComponentVersion(idpVersionString);
+                } else {
+                    getLogger().error("Could not locate IdP Version, assuming 5.0.0");
+                    determinedIdpVersion = ver= new InstallableComponentVersion(5,0,0);
+                }
+        }
+        return ver;
+    }
+
     /** Find the best update version.
-     * @param pluginVersion The Plugin version
+     * @param pluginVersion The Plugin versionget
      * @param pluginInfo all about the plugin
      * @return the best version (or null)
      */
@@ -431,15 +452,7 @@ public final class PluginInstallerCLI extends AbstractIdPHomeAwareCommandLine<Pl
             @Nonnull final InstallableComponentVersion pluginVersion,
             @Nonnull final InstallableComponentInfo pluginInfo) {
 
-        final InstallableComponentVersion idpVersion;
-        final String idpVersionString = Version.getVersion();
-        if (idpVersionString!=null) {
-            idpVersion =  new InstallableComponentVersion(idpVersionString);
-        } else {
-            getLogger().error("Could not locate IdP Version, assuming 5.0.0");
-            idpVersion = new InstallableComponentVersion(5,0,0);
-        }
-        return InstallableComponentSupport.getBestVersion(idpVersion, pluginVersion, pluginInfo);
+        return InstallableComponentSupport.getBestVersion(getIdPVersion(), pluginVersion, pluginInfo);
     }
 
     /** Go to the well known url (or the provided one) and list all
@@ -478,7 +491,7 @@ public final class PluginInstallerCLI extends AbstractIdPHomeAwareCommandLine<Pl
             if (existingPlugin == null) {
                 final InstallableComponentVersion version = getBestVersion(nullVersion, value);
                 if (version == null) {
-                    getLogger().debug("Plugin {} has no version available", entry.getKey());
+                    getLogger().debug("No Version of Plugin {} is available for install with IdP", entry.getKey(), getIdPVersion());
                 } else {
                     outOrLog(String.format("Plugin %s: version %s available for install", entry.getKey(), version));
                 }
@@ -517,7 +530,7 @@ public final class PluginInstallerCLI extends AbstractIdPHomeAwareCommandLine<Pl
         }
         final Properties props = loadAllPluginInfo();
         if (props == null) {
-            getLogger().error("AutoInstall not possible");
+            getLogger().error("Auto-install not possible");
             return RC_INIT;
         }
         final InstallableComponentInfo info = new PluginInfo(pluginId, props);
@@ -528,7 +541,7 @@ public final class PluginInstallerCLI extends AbstractIdPHomeAwareCommandLine<Pl
         final InstallableComponentVersion versionToInstall =
                 getBestVersion(new InstallableComponentVersion(0,0,0), info);
         if (versionToInstall == null) {
-            getLogger().error("Plugin {}: No version available to install", pluginId);
+            getLogger().error("Plugin {}: No plugin version available to install on IdP {}", pluginId, getIdPVersion());
             return RC_INIT;
         }
         final URL updateURL = info.getUpdateURL(versionToInstall); 
@@ -594,15 +607,15 @@ public final class PluginInstallerCLI extends AbstractIdPHomeAwareCommandLine<Pl
         if (pluginVersion == null) {
             installVersion = getBestVersion(new InstallableComponentVersion(plugin), state.getPluginInfo());
             if (installVersion == null) {
-                getLogger().info("No suitable update version available");
+                getLogger().info("No suitable update version for plugin {} available for IdP {}", pluginId, getIdPVersion());
                 return false;
             }
         } else {
             installVersion = pluginVersion;
             final var versions = state.getPluginInfo().getAvailableVersions();
             if (!versions.containsKey(installVersion)) {
-                getLogger().error("Specified version {} could not be found. Available versions: {}",
-                        installVersion, versions.keySet());
+                getLogger().error("Specified version {} of plugin {} could not be found. Available versions: {}",
+                        installVersion, pluginId, versions.keySet());
                 return false;
             }
         }

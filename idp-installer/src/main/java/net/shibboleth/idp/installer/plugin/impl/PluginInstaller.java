@@ -298,12 +298,12 @@ public final class PluginInstaller extends AbstractInitializableComponent implem
             final InstallableComponentVersion pluginVersion = new InstallableComponentVersion(getDescription());
             final InstallableComponentVersion idpVersion = getIdPVersion();
             if (!state.getPluginInfo().isSupportedWithIdPVersion(pluginVersion, idpVersion)) {
-                LOG.error("Plugin {} version {} is not supported with IdP Version {}",
+                LOG.error("Plugin {} version {} is not supported with IdP version {}",
                         pluginId, pluginVersion, idpVersion);
                 throw new BuildException("Version Mismatch");
             }
         }
-        LOG.info("Installing Plugin {} version {}.{}.{}", pluginId,
+        LOG.info("Installing Plugin '{}' version {}.{}.{}", pluginId,
                 getDescription().getMajorVersion(),getDescription().getMinorVersion(),
                 getDescription().getPatchVersion());
 
