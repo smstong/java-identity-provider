@@ -489,4 +489,9 @@
         </constructor-arg>    
     </bean>
 
- </beans>
+    <!-- Bean to inject into any view where we need Attribute assistance. -->
+    <alias name="%{idp.attribute.helper:shibboleth.DefaultAttributeHelper}" alias="shibboleth.AttributeHelper"/>
+
+    <bean id="shibboleth.DefaultAttributeHelper" class="net.shibboleth.idp.ui.helper.AttributeHelper"/>
+
+</beans>

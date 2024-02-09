@@ -8,7 +8,7 @@ import org.testng.annotations.Test;
 import net.shibboleth.idp.attribute.IdPAttribute;
 import net.shibboleth.idp.attribute.context.AttributeContext;
 import net.shibboleth.idp.attribute.resolver.testing.ResolverTestSupport;
-import net.shibboleth.idp.ui.impl.AttributeHelper;
+import net.shibboleth.idp.ui.helper.AttributeHelper;
 import net.shibboleth.profile.context.RelyingPartyContext;
 import net.shibboleth.shared.collection.CollectionSupport;
 import net.shibboleth.shared.component.ComponentInitializationException;
