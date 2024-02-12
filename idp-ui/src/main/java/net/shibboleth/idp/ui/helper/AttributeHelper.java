@@ -37,7 +37,7 @@ public final class AttributeHelper extends AbstractIdentifiableInitializableComp
 
     /** How to get the AttributeContext we are looking at. */
     @SuppressWarnings("null")
-	@Nonnull private Function<ProfileRequestContext,AttributeContext> attributeContextStrategy =
+        @Nonnull private Function<ProfileRequestContext,AttributeContext> attributeContextStrategy =
             new ChildContextLookup<>(AttributeContext.class).compose(new ChildContextLookup<>(RelyingPartyContext.class));
 
     /** Logger. */
@@ -51,89 +51,119 @@ public final class AttributeHelper extends AbstractIdentifiableInitializableComp
         attributeContextStrategy = Constraint.isNotNull(strategy, "Injected strategy must not be null");
     }
 
-    /** Return the first (filtered) attribute Value from the attribute of that name.
-     * @param prc the ProfileRequestContext
-     * @param attributeName the attribute name to look up
-     * @param defaultValue what to return if nothing found.
-     * @return the default value or the attribute value
+    /** Return the first (filtered) attribute Value from the attribute of that name as an {@link IdPAttributeValue}.
+     * @param prc The ProfileRequestContext
+     * @param attributeName The attribute name to look up
+     * @return The attribute value or null
      */
-    @Nonnull public String getFirstAttributeValue(final ProfileRequestContext prc,
-    		final @Nonnull @NotEmpty String attributeName,
-            final @Nonnull  String defaultValue) {
+    @Nullable public IdPAttributeValue getFirstAttributeValue(final ProfileRequestContext prc,
+           final @Nonnull @NotEmpty String attributeName) {
         if (prc == null) {
-            log.error("Provided ProfileRequestContext was null, returning {}", defaultValue);
-            return defaultValue;
+            log.error("Provided ProfileRequestContext was null");
+            return null;
         }
-        Constraint.isNotNull(defaultValue, "Default value must be non-null");
         Constraint.isNotNull(attributeName, "Attribute Name must be non-niull");
         final AttributeContext context = attributeContextStrategy.apply(prc);
         if (context == null) {
-            log.error("Attribute Context could not be located, returning {}", defaultValue);
-            return defaultValue;
+            log.error("Attribute Context could not be located");
+            return null;
         }
-        return getFirstValue(context.getIdPAttributes().get(attributeName), defaultValue);
+        return getFirstValue(context.getIdPAttributes().get(attributeName));
     }
 
-    /** Return the first (filtered) attribute Value from the attribute of that name.
-     * @param prc the ProfileRequestContext
-     * @param attributeName the attribute name to look up
-     * @return the attribute value or ""
+    /** Return the first (filtered) attribute Value from the attribute of that name as a Display String.
+     * @param prc The ProfileRequestContext
+     * @param attributeName The attribute name to look up
+     * @param defaultValue What to return if nothing found.
+     * @return The default value or the attribute value
      */
-    @Nonnull public String getFirstAttributeValue(final ProfileRequestContext prc,
-    		final @Nonnull @NotEmpty String attributeName) {
-        return getFirstAttributeValue(prc, attributeName, "");
+    @Nonnull public String getFirstAttributeDisplayValue(final ProfileRequestContext prc,
+                final @Nonnull @NotEmpty String attributeName,
+            final @Nonnull  String defaultValue) {
+        Constraint.isNotNull(defaultValue, "Default value must be non-null");
+        final IdPAttributeValue value = getFirstAttributeValue(prc, attributeName);
+        if (value == null) {
+                log.error("No Attribute Value found, returning {}", defaultValue);
+                return defaultValue;
+        }
+        return value.getDisplayValue();
     }
 
-    /** Return the first (unfiltered) attribute Value from the attribute of that name.
-     * @param prc the ProfileRequestContext
-     * @param attributeName the attribute name to look up
-     * @param defaultValue what to return if nothing found.
-     * @return the default value or the attribute value
+    /** Return the first (filtered) attribute Value from the attribute of that name as a Display String.
+     * @param prc The ProfileRequestContext
+     * @param attributeName The attribute name to look up
+     * @return The attribute value or ""
      */
-    @Nonnull public String getFirstUnfilteredAttributeValue(final ProfileRequestContext prc,
-			 final @Nonnull @NotEmpty String attributeName,
+    @Nonnull public String getFirstAttributeDisplayValue(final ProfileRequestContext prc,
+                final @Nonnull @NotEmpty String attributeName) {
+        return getFirstAttributeDisplayValue(prc, attributeName, "");
+    }
+
+    /** Return the first (unfiltered) attribute Value from the attribute of that name as an {@link IdPAttributeValue}.
+     * @param prc The ProfileRequestContext
+     * @param attributeName The attribute name to look up
+     * @return The attribute value or null
+     */
+    @Nullable public IdPAttributeValue getFirstUnfilteredAttributeValue(final ProfileRequestContext prc,
+                         final @Nonnull @NotEmpty String attributeName) {
+
+        if (prc == null) {
+            log.error("Provided ProfileRequestContext was null");
+            return null;
+        }
+        Constraint.isNotNull(attributeName, "Attribute Name must be non-niull");
+        final AttributeContext context = attributeContextStrategy.apply(prc);
+        if (context == null) {
+            log.error("Attribute Context could not be located");
+            return null;
+        }
+        return getFirstValue(context.getUnfilteredIdPAttributes().get(attributeName));
+    }
+
+
+    /** Return the first (unfiltered) attribute Value from the attribute of that name as a Display String
+     * @param prc The ProfileRequestContext
+     * @param attributeName The attribute name to look up
+     * @param defaultValue What to return if nothing found.
+     * @return The default value or the attribute value
+     */
+    @Nonnull public String getFirstUnfilteredAttributeDisplayValue(final ProfileRequestContext prc,
+                         final @Nonnull @NotEmpty String attributeName,
              final @Nonnull String defaultValue) {
 
-        if (prc == null) {
-            log.error("Provided ProfileRequestContext was null, returning {}", defaultValue);
-            return defaultValue;
-        }
         Constraint.isNotNull(defaultValue, "Default value must be non-null");
-        Constraint.isNotNull(attributeName, "Attribute Name must be non-niull");
-        final AttributeContext context = attributeContextStrategy.apply(prc);
-        if (context == null) {
-            log.error("Attribute Context could not be located, returning {}", defaultValue);
+        final IdPAttributeValue value = getFirstUnfilteredAttributeValue(prc, attributeName);
+        if (value == null) {
+            log.error("No Attribute Value found, returning {}", defaultValue);
             return defaultValue;
         }
-        return getFirstValue(context.getUnfilteredIdPAttributes().get(attributeName), defaultValue);
+        return value.getDisplayValue();
     }
 
-    /** Return the first (unfiltered) attribute Value from the attribute of that name.
-     * @param prc the ProfileRequestContext
-     * @param attributeName the attribute name to look up
-     * @param defaultValue what to return if nothing found.
-     * @return the attribute value or ""
+    /** Return the first (unfiltered) attribute Value from the attribute of that name as a Display String.
+     * @param prc The ProfileRequestContext
+     * @param attributeName The attribute name to look up
+     * @return The attribute value or ""
      */
-    @Nonnull public String getFirstUnfilteredAttributeValue(final ProfileRequestContext prc,
+    @Nonnull public String getFirstUnfilteredAttributeDisplayValue(final ProfileRequestContext prc,
             @Nonnull @NotEmpty final String attributeName) {
-        return getFirstUnfilteredAttributeValue(prc, attributeName, "");
+        return getFirstUnfilteredAttributeDisplayValue(prc, attributeName, "");
     }
 
     /** Helper method to get the first attribute name from the attribute.
      * @param Attribute the Attribute or null if there wasn't one
-     * @param defaultValue the value to return if no values are found
-     * @return defaultValue or the display string of the first attribute
+     * @return the first attribute valkue or null
      */
-    @Nonnull private String getFirstValue(final @Nullable IdPAttribute attribute, @Nonnull String defaultValue) {
+    @Nullable private IdPAttributeValue getFirstValue(final @Nullable IdPAttribute attribute) {
         if (attribute == null) {
-            log.info("No attribute found, returning {}", defaultValue);
-            return defaultValue;
+            log.debug("No attribute found");
+            return null;
         }
         List<IdPAttributeValue> values = attribute.getValues();
         if (values == null|| values.size() < 1) {
-            log.info("No attribute values associated with {}, returning {}", attribute.getId(), defaultValue);
-            return defaultValue;
+            log.info("No attribute values associated with {}", attribute.getId());
+            return null;
         }
-        return values.get(0).getDisplayValue();
+        return values.get(0);
     }
 }

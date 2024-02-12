@@ -27,13 +27,13 @@ public class AttributeHelperTest {
         ac.setUnfilteredIdPAttributes(CollectionSupport.arrayAsList(a1, a2));
         ac.setIdPAttributes(CollectionSupport.singleton(a1));
 
-        assertEquals(ah.getFirstAttributeValue(prc, "A1"), "A1Value1");
-        assertEquals(ah.getFirstAttributeValue(prc, "A2"), "");
-        assertEquals(ah.getFirstAttributeValue(prc, "A3", "Nothing"), "Nothing");
+        assertEquals(ah.getFirstAttributeDisplayValue(prc, "A1"), "A1Value1");
+        assertEquals(ah.getFirstAttributeDisplayValue(prc, "A2"), "");
+        assertEquals(ah.getFirstAttributeDisplayValue(prc, "A3", "Nothing"), "Nothing");
 
-        assertEquals(ah.getFirstUnfilteredAttributeValue(prc, "A1"), "A1Value1");
-        assertEquals(ah.getFirstUnfilteredAttributeValue(prc, "A2"), "A2Value1");
-        assertEquals(ah.getFirstAttributeValue(prc, "A3"), "");
+        assertEquals(ah.getFirstUnfilteredAttributeDisplayValue(prc, "A1"), "A1Value1");
+        assertEquals(ah.getFirstUnfilteredAttributeDisplayValue(prc, "A2"), "A2Value1");
+        assertEquals(ah.getFirstAttributeDisplayValue(prc, "A3"), "");
 
     }
 }
