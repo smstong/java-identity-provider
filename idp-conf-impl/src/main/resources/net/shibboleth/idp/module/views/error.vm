@@ -73,9 +73,6 @@ $response.addHeader("Content-Security-Policy", "script-src 'none'")
         <footer class="footer">
             <div class="cc">
                 <p>#springMessageText("idp.footer", "Insert your footer text here.")</p>
-                <p>$cspDigester</p>
-                <p>$cspNonce</p>
-                <p>$custom</p>
             </div>
         </footer>
     </body>
