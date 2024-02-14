@@ -49,8 +49,8 @@ $response.addHeader("Content-Security-Policy", "script-src 'none'; base-uri 'non
                     <li><a href="#springMessageText("idp.url.helpdesk", '#')">#springMessageText("idp.login.needHelp", "Need Help?")</a></li>
                 </ul>
                 
-              <!-- If SAML logout, complete the flow by adding a hidden iframe. -->
-              #if ( $profileRequestContext.getProfileId().contains("saml2/logout") )
+              <!-- If required, complete the flow by adding a hidden iframe. -->
+              #if (!$logoutContext.flowComplete)
                   <iframe style="display:none" src="$flowExecutionUrl&_eventId=proceed"></iframe>
               #end
             </section>

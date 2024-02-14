@@ -126,7 +126,7 @@
             <evaluate expression="SaveLogoutContext" />
             <evaluate expression="environment" result="requestScope.environment" />
             <evaluate expression="opensamlProfileRequestContext" result="requestScope.profileRequestContext" />
-            <evaluate expression="opensamlProfileRequestContext.getSubcontext(T(net.shibboleth.idp.session.context.LogoutContext))" result="requestScope.logoutContext" />
+            <evaluate expression="opensamlProfileRequestContext.ensureSubcontext(T(net.shibboleth.idp.session.context.LogoutContext)).setFlowComplete(true)" result="requestScope.logoutContext" />
             <evaluate expression="opensamlProfileRequestContext.getSubcontext(T(net.shibboleth.idp.profile.context.MultiRelyingPartyContext))" result="requestScope.multiRPContext" />
             <evaluate expression="T(net.shibboleth.shared.codec.HTMLEncoder)" result="requestScope.htmlEncoder" />
             <evaluate expression="T(java.net.URLEncoder)" result="requestScope.urlEncoder" />
@@ -145,7 +145,7 @@
             <evaluate expression="WriteAuditLog" />
             <evaluate expression="environment" result="requestScope.environment" />
             <evaluate expression="opensamlProfileRequestContext" result="requestScope.profileRequestContext" />
-            <evaluate expression="opensamlProfileRequestContext.getSubcontext(T(net.shibboleth.idp.session.context.LogoutContext))" result="requestScope.logoutContext" />
+            <evaluate expression="opensamlProfileRequestContext.ensureSubcontext(T(net.shibboleth.idp.session.context.LogoutContext)).setFlowComplete(true)" result="requestScope.logoutContext" />
             <evaluate expression="opensamlProfileRequestContext.getSubcontext(T(net.shibboleth.idp.profile.context.MultiRelyingPartyContext))" result="requestScope.multiRPContext" />
             <evaluate expression="T(net.shibboleth.shared.codec.HTMLEncoder)" result="requestScope.encoder" />
             <evaluate expression="flowRequestContext.getActiveFlow().getApplicationContext().getBean('shibboleth.CSPDigester')" result="requestScope.cspDigester" />

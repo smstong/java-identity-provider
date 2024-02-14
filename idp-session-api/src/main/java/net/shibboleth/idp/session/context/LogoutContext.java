@@ -46,6 +46,9 @@ public final class LogoutContext extends BaseContext {
 
     /** An index of the session objects by an externally assigned key. */
     @Nonnull private final Map<String,SPSession> keyedSessionMap;
+    
+    /** Signal that logout master flow is complete. */
+    private boolean flowComplete;
         
     /** Constructor. */
     public LogoutContext() {
@@ -96,4 +99,29 @@ public final class LogoutContext extends BaseContext {
         return sessionMap.get(id);
     }
     
+    /**
+     * Gets whether the master logout flow has completed or requires further signaling.
+     *
+     *  @return true iff the flow is completed
+     *  
+     *  @since 5.1.0
+     */
+    public boolean isFlowComplete() {
+        return flowComplete;
+    }
+    
+    /**
+     * Sets whether the master logout flow has completed or requires further signaling.
+     * 
+     * @param flag flag to set
+     * 
+     * @return this context
+     * 
+     * @since 5.1.0
+     */
+    @Nonnull public LogoutContext setFlowComplete(final boolean flag) {
+        flowComplete = flag;
+        
+        return this;
+    }
 }
