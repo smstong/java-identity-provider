@@ -31,6 +31,11 @@
         </dependency>
 
         <dependency>
+            <groupId>${shib-shared.groupId}</groupId>
+            <artifactId>shib-spring</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>${spring.groupId}</groupId>
             <artifactId>spring-core</artifactId>
         </dependency>
