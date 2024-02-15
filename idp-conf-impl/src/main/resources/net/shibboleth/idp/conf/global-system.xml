@@ -193,7 +193,9 @@
         p:metricRegistry-ref="shibboleth.metrics.MetricRegistry"
         p:contextLookAsideMap-ref="shibboleth.ContextLookAsideMap" />
 
-    <bean class="net.shibboleth.idp.admin.impl.LogImplementationDetails" c:_0="%{idp.home}" />
+    <bean class="net.shibboleth.idp.admin.impl.LogImplementationDetails"
+        c:_0="%{idp.home}"
+        c:_1="%{idp.duplicateProperties:}"/>
 
     <bean class="net.shibboleth.idp.spring.DeprecatedPropertyBean">
         <property name="deprecatedProperties">

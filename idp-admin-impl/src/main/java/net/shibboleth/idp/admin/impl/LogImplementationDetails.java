@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.slf4j.Logger;
@@ -38,22 +39,28 @@ import net.shibboleth.shared.primitive.LoggerFactory;
  */
 public final class LogImplementationDetails {
 
+    /** Class logger. */
+    @Nonnull private final Logger log = LoggerFactory.getLogger(LogImplementationDetails.class);
+
     /**
-     * Log the IdP version and Java version and vendor at INFO level.
+     * <p>Log the IdP version and Java version and vendor at INFO level.</p>
      * 
-     * Log system properties defined by {@link StandardSystemProperty} at DEBUG level.
+     * <p>Log system properties defined by {@link StandardSystemProperty} at DEBUG level.</p>
+     * 
+     * <p>Log duplicate properties if found at WARN level.</p>
      * 
      * @param idpHomeLocation idp.home property
+     * @param duplicateProperties tracking of duplicated properties
      */
-    public LogImplementationDetails(@Nullable @NotEmpty final String idpHomeLocation) {
+    public LogImplementationDetails(@Nullable @NotEmpty final String idpHomeLocation,
+            @Nullable @NotEmpty final String duplicateProperties) {
         
-        final Logger logger = LoggerFactory.getLogger(LogImplementationDetails.class);
-        logger.info("Shibboleth IdP Version {}", Version.getVersion());
-        logger.info("Java version='{}' vendor='{}'", StandardSystemProperty.JAVA_VERSION.value(),
+        log.info("Shibboleth IdP Version {}", Version.getVersion());
+        log.info("Java version='{}' vendor='{}'", StandardSystemProperty.JAVA_VERSION.value(),
                 StandardSystemProperty.JAVA_VENDOR.value());
-        if (logger.isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
             for (final StandardSystemProperty standardSystemProperty : StandardSystemProperty.values()) {
-                logger.debug("{}", standardSystemProperty);
+                log.debug("{}", standardSystemProperty);
             }
         }
         final List<IdPPlugin> plugins = ServiceLoader.
@@ -62,11 +69,11 @@ public final class LogImplementationDetails {
                 map(e->e.get()).
                 collect(Collectors.toList());
         if (plugins.isEmpty()) {
-            logger.info("No Plugins Loaded");
+            log.info("No Plugins Loaded");
         } else {
-            logger.info("Plugins:");
+            log.info("Plugins:");
             for (final IdPPlugin idpPlugin : plugins) {
-                logger.info("\t\t{} : v{}.{}.{}",  idpPlugin.getPluginId(), idpPlugin.getMajorVersion(),
+                log.info("\t\t{} : v{}.{}.{}",  idpPlugin.getPluginId(), idpPlugin.getMajorVersion(),
                         idpPlugin.getMinorVersion(), idpPlugin.getPatchVersion());
             }
         }
@@ -80,16 +87,21 @@ public final class LogImplementationDetails {
                     filter(f->f.isEnabled(context)).
                     collect(Collectors.toList());
             if (modules.isEmpty()) {
-                logger.info("No Modules Enabled");
+                log.info("No Modules Enabled");
             } else {
-                logger.info("Enabled Modules:");
+                log.info("Enabled Modules:");
                 for (final IdPModule module : modules) {
-                    logger.info("\t\t{}",  module.getName(context));
+                    log.info("\t\t{}",  module.getName(context));
                 }
             }
         } else {
-            logger.warn("Could not enumerate Modules");
+            log.warn("Could not enumerate Modules");
         }
+        
+        if (duplicateProperties != null && !duplicateProperties.isBlank()) {
+            log.warn("Duplicate properties were detected: {}", duplicateProperties);
+        }
+        
     }
-
+    
 }
