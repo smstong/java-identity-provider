@@ -19,42 +19,41 @@ import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import org.slf4j.Logger;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ApplicationObjectSupport;
 
 import com.google.common.base.StandardSystemProperty;
 
 import net.shibboleth.idp.Version;
 import net.shibboleth.idp.module.IdPModule;
 import net.shibboleth.idp.plugin.IdPPlugin;
+import net.shibboleth.idp.spring.IdPPropertiesApplicationContextInitializer;
 import net.shibboleth.profile.module.ModuleContext;
-import net.shibboleth.shared.annotation.constraint.NotEmpty;
 import net.shibboleth.shared.primitive.LoggerFactory;
 
 /**
- * A bean that logs IdP internals when instantiated.
+ * A bean that logs IdP internals when instantiated, and outputs a number of warning conditions.
  * 
  * @since 4.3.0
  */
-public final class LogImplementationDetails {
+public final class LogImplementationDetails extends ApplicationObjectSupport {
 
     /** Class logger. */
     @Nonnull private final Logger log = LoggerFactory.getLogger(LogImplementationDetails.class);
 
-    /**
-     * <p>Log the IdP version and Java version and vendor at INFO level.</p>
-     * 
-     * <p>Log system properties defined by {@link StandardSystemProperty} at DEBUG level.</p>
-     * 
-     * <p>Log duplicate properties if found at WARN level.</p>
-     * 
-     * @param idpHomeLocation idp.home property
-     * @param duplicateProperties tracking of duplicated properties
-     */
-    public LogImplementationDetails(@Nullable @NotEmpty final String idpHomeLocation,
-            @Nullable @NotEmpty final String duplicateProperties) {
-        
+    /** {@inheritDoc} */
+    @Override
+    protected boolean isContextRequired() {
+        return true;
+    }
+
+// Checkstyle: CyclomaticComplexity OFF
+    /** {@inheritDoc} */
+    @Override
+    protected void initApplicationContext(@Nonnull final ApplicationContext context) throws BeansException {
         log.info("Shibboleth IdP Version {}", Version.getVersion());
         log.info("Java version='{}' vendor='{}'", StandardSystemProperty.JAVA_VERSION.value(),
                 StandardSystemProperty.JAVA_VENDOR.value());
@@ -78,30 +77,42 @@ public final class LogImplementationDetails {
             }
         }
         
+        final String idpHomeLocation =
+                context.getEnvironment().getProperty(IdPPropertiesApplicationContextInitializer.IDP_HOME_PROPERTY);
         if (idpHomeLocation != null) {
-            final ModuleContext context = new ModuleContext(idpHomeLocation);
+            final ModuleContext moduleContext = new ModuleContext(idpHomeLocation);
             final List<IdPModule> modules = ServiceLoader.
                     load(IdPModule.class).
                     stream().
                     map(e->e.get()).
-                    filter(f->f.isEnabled(context)).
+                    filter(f->f.isEnabled(moduleContext)).
                     collect(Collectors.toList());
             if (modules.isEmpty()) {
                 log.info("No Modules Enabled");
             } else {
                 log.info("Enabled Modules:");
                 for (final IdPModule module : modules) {
-                    log.info("\t\t{}",  module.getName(context));
+                    log.info("\t\t{}",  module.getName(moduleContext));
                 }
             }
         } else {
             log.warn("Could not enumerate Modules");
         }
         
+        final String duplicateProperties =
+                context.getEnvironment().getProperty(IdPPropertiesApplicationContextInitializer.IDP_DUPLICATE_PROPERTY);
         if (duplicateProperties != null && !duplicateProperties.isBlank()) {
             log.warn("Duplicate properties were detected: {}", duplicateProperties);
         }
         
+        final String autoSearch =
+                context.getEnvironment().getProperty(
+                        IdPPropertiesApplicationContextInitializer.IDP_AUTOSEARCH_PROPERTY);
+        if (!Boolean.valueOf(autoSearch)) {
+            log.warn("{} is false or unset, plugin use may require additional changes to add new property sources",
+                    IdPPropertiesApplicationContextInitializer.IDP_AUTOSEARCH_PROPERTY);
+        }
     }
+// Checkstyle: CyclomaticComplexity ON
     
 }
