@@ -37,7 +37,7 @@
             <evaluate expression="flowRequestContext.getActiveFlow().getApplicationContext().getBean('shibboleth.CSPNonce')" result="requestScope.cspNonce" />
             <evaluate expression="flowRequestContext.getExternalContext().getNativeRequest()" result="requestScope.request" />
             <evaluate expression="flowRequestContext.getExternalContext().getNativeResponse()" result="requestScope.response" />
-            <evaluate expression="flowRequestContext.getActiveFlow().getApplicationContext().getBean('shibboleth.AttributeHelper')" result="viewScope.attributeHelper" />
+            <evaluate expression="flowRequestContext.getActiveFlow().getApplicationContext().getBean('shibboleth.AttributeHelper')" result="requestScope.attributeHelper" />
             <evaluate expression="flowRequestContext.getActiveFlow().getApplicationContext().containsBean('shibboleth.CustomViewContext') ? flowRequestContext.getActiveFlow().getApplicationContext().getBean('shibboleth.CustomViewContext') : null" result="requestScope.custom" />
         </on-entry>
         <exception-handler bean="RethrowingFlowExecutionExceptionHandler"/>
