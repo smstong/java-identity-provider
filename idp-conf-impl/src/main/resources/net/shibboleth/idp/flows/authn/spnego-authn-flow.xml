@@ -56,7 +56,6 @@
         <on-render>
             <evaluate expression="opensamlProfileRequestContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationContext)).addSubcontext(new net.shibboleth.idp.authn.spnego.impl.SPNEGOContext(), true).setKerberosSettings(flowRequestContext.getActiveFlow().getApplicationContext().getBean('shibboleth.authn.SPNEGO.Krb5.Settings'))" />
             <evaluate expression="opensamlProfileRequestContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationContext)).addSubcontext(new net.shibboleth.idp.authn.context.ExternalAuthenticationContext(new net.shibboleth.idp.authn.impl.ExternalAuthenticationImpl()), true).setFlowExecutionUrl(flowExecutionUrl + '&amp;_eventId_proceed=1')" />
-            <evaluate expression="flowRequestContext.getActiveFlow().getApplicationContext().getBean('shibboleth.AttributeHelper')" result="viewScope.attributeHelper" />
         </on-render>
 
         <transition on="proceed" to="ValidateExternalAuthentication" />
