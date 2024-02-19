@@ -13,7 +13,7 @@
  */
 
 /**
- * Helper classes for the UI
+ * Helper classes for the UI.
  */
 @NonnullElements
 package net.shibboleth.idp.ui.helper;
