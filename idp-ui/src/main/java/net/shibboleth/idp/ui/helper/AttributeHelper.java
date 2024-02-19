@@ -38,7 +38,8 @@ public final class AttributeHelper extends AbstractIdentifiableInitializableComp
     /** How to get the AttributeContext we are looking at. */
     @SuppressWarnings("null")
         @Nonnull private Function<ProfileRequestContext,AttributeContext> attributeContextStrategy =
-            new ChildContextLookup<>(AttributeContext.class).compose(new ChildContextLookup<>(RelyingPartyContext.class));
+            new ChildContextLookup<>(AttributeContext.class).compose(
+                    new ChildContextLookup<>(RelyingPartyContext.class));
 
     /** Logger. */
     @Nonnull private final Logger log = LoggerFactory.getLogger(AttributeHelper.class);
@@ -46,8 +47,7 @@ public final class AttributeHelper extends AbstractIdentifiableInitializableComp
     /** Set the way to get the {@link AttributeContext}.
      * @param strategy the strategy to use
      */
-    public void setAttributeContextStrategy(@Nonnull
-            Function<ProfileRequestContext, AttributeContext> strategy) {
+    public void setAttributeContextStrategy(@Nonnull final Function<ProfileRequestContext, AttributeContext> strategy) {
         attributeContextStrategy = Constraint.isNotNull(strategy, "Injected strategy must not be null");
     }
 
@@ -121,10 +121,13 @@ public final class AttributeHelper extends AbstractIdentifiableInitializableComp
     }
 
 
-    /** Return the first (unfiltered) attribute Value from the attribute of that name as a Display String
+    /**
+     * Return the first (unfiltered) attribute Value from the attribute of that name as a Display String.
+     * 
      * @param prc The ProfileRequestContext
      * @param attributeName The attribute name to look up
-     * @param defaultValue What to return if nothing found.
+     * @param defaultValue What to return if nothing found
+     * 
      * @return The default value or the attribute value
      */
     @Nonnull public String getFirstUnfilteredAttributeDisplayValue(final ProfileRequestContext prc,
@@ -150,16 +153,19 @@ public final class AttributeHelper extends AbstractIdentifiableInitializableComp
         return getFirstUnfilteredAttributeDisplayValue(prc, attributeName, "");
     }
 
-    /** Helper method to get the first attribute name from the attribute.
-     * @param Attribute the Attribute or null if there wasn't one
+    /**
+     * Helper method to get the first attribute name from the attribute.
+     * 
+     * @param attribute the Attribute or null if there wasn't one
+     * 
      * @return the first attribute valkue or null
      */
-    @Nullable private IdPAttributeValue getFirstValue(final @Nullable IdPAttribute attribute) {
+    @Nullable private IdPAttributeValue getFirstValue(@Nullable final IdPAttribute attribute) {
         if (attribute == null) {
             log.debug("No attribute found");
             return null;
         }
-        List<IdPAttributeValue> values = attribute.getValues();
+        final List<IdPAttributeValue> values = attribute.getValues();
         if (values == null|| values.size() < 1) {
             log.info("No attribute values associated with {}", attribute.getId());
             return null;
