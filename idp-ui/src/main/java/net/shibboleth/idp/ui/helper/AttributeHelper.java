@@ -56,12 +56,8 @@ public final class AttributeHelper extends AbstractIdentifiableInitializableComp
      * @param attributeName The attribute name to look up
      * @return The attribute value or null
      */
-    @Nullable public IdPAttributeValue getFirstAttributeValue(final ProfileRequestContext prc,
-           final @Nonnull @NotEmpty String attributeName) {
-        if (prc == null) {
-            log.error("Provided ProfileRequestContext was null");
-            return null;
-        }
+    @Nullable public IdPAttributeValue getFirstAttributeValue(@Nonnull final ProfileRequestContext prc,
+           @Nonnull @NotEmpty final String attributeName) {
         Constraint.isNotNull(attributeName, "Attribute Name must be non-niull");
         final AttributeContext context = attributeContextStrategy.apply(prc);
         if (context == null) {
@@ -77,8 +73,8 @@ public final class AttributeHelper extends AbstractIdentifiableInitializableComp
      * @param defaultValue What to return if nothing found.
      * @return The default value or the attribute value
      */
-    @Nonnull public String getFirstAttributeDisplayValue(final ProfileRequestContext prc,
-                final @Nonnull @NotEmpty String attributeName,
+    @Nonnull public String getFirstAttributeDisplayValue(@Nonnull final ProfileRequestContext prc,
+                @Nonnull @NotEmpty final String attributeName,
             final @Nonnull  String defaultValue) {
         Constraint.isNotNull(defaultValue, "Default value must be non-null");
         final IdPAttributeValue value = getFirstAttributeValue(prc, attributeName);
@@ -94,8 +90,8 @@ public final class AttributeHelper extends AbstractIdentifiableInitializableComp
      * @param attributeName The attribute name to look up
      * @return The attribute value or ""
      */
-    @Nonnull public String getFirstAttributeDisplayValue(final ProfileRequestContext prc,
-                final @Nonnull @NotEmpty String attributeName) {
+    @Nonnull public String getFirstAttributeDisplayValue(@Nonnull final ProfileRequestContext prc,
+                @Nonnull @NotEmpty final String attributeName) {
         return getFirstAttributeDisplayValue(prc, attributeName, "");
     }
 
@@ -104,13 +100,9 @@ public final class AttributeHelper extends AbstractIdentifiableInitializableComp
      * @param attributeName The attribute name to look up
      * @return The attribute value or null
      */
-    @Nullable public IdPAttributeValue getFirstUnfilteredAttributeValue(final ProfileRequestContext prc,
-                         final @Nonnull @NotEmpty String attributeName) {
+    @Nullable public IdPAttributeValue getFirstUnfilteredAttributeValue(@Nonnull final ProfileRequestContext prc,
+                         @Nonnull @NotEmpty final String attributeName) {
 
-        if (prc == null) {
-            log.error("Provided ProfileRequestContext was null");
-            return null;
-        }
         Constraint.isNotNull(attributeName, "Attribute Name must be non-niull");
         final AttributeContext context = attributeContextStrategy.apply(prc);
         if (context == null) {
@@ -130,8 +122,8 @@ public final class AttributeHelper extends AbstractIdentifiableInitializableComp
      * 
      * @return The default value or the attribute value
      */
-    @Nonnull public String getFirstUnfilteredAttributeDisplayValue(final ProfileRequestContext prc,
-                         final @Nonnull @NotEmpty String attributeName,
+    @Nonnull public String getFirstUnfilteredAttributeDisplayValue(@Nonnull final ProfileRequestContext prc,
+                         @Nonnull @NotEmpty final String attributeName,
              final @Nonnull String defaultValue) {
 
         Constraint.isNotNull(defaultValue, "Default value must be non-null");
@@ -148,7 +140,7 @@ public final class AttributeHelper extends AbstractIdentifiableInitializableComp
      * @param attributeName The attribute name to look up
      * @return The attribute value or ""
      */
-    @Nonnull public String getFirstUnfilteredAttributeDisplayValue(final ProfileRequestContext prc,
+    @Nonnull public String getFirstUnfilteredAttributeDisplayValue(@Nonnull final ProfileRequestContext prc,
             @Nonnull @NotEmpty final String attributeName) {
         return getFirstUnfilteredAttributeDisplayValue(prc, attributeName, "");
     }
