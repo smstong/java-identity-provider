@@ -83,6 +83,14 @@ public class PasswordErrorMessageLookupFunction extends ApplicationObjectSupport
         return null;
     }
     
+    /**
+     * Get classified message.
+     * 
+     * @param messageSource Spring message source
+     * @param classifiedError classified error event
+     * 
+     * @return mapped message, or null
+     */
     @Nullable private String getClassifiedMessage(@Nonnull final MessageSourceAccessor messageSource,
             @Nonnull final String classifiedError) {
         
@@ -97,6 +105,14 @@ public class PasswordErrorMessageLookupFunction extends ApplicationObjectSupport
         return null;
     }
     
+    /**
+     * Get generic error message or exception message. 
+     * 
+     * @param messageSource Spring message source
+     * @param e exception
+     * 
+     * @return the exception message or the generic message as appropriate
+     */
     @Nullable private String getExceptionMessage(@Nonnull final MessageSourceAccessor messageSource,
             @Nonnull final Exception e) {
         

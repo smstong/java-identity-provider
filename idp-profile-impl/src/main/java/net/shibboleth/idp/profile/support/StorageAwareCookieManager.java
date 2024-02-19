@@ -196,6 +196,14 @@ public class StorageAwareCookieManager extends CookieManager {
         return defValue;
     }
     
+    /**
+     * Get cookie name as partitioned in storage by username.
+     * 
+     * @param cookieName base cookie name
+     * @return the storage key for the cookie
+     * 
+     * @throws IOException if unable to locate username for key
+     */
     @Nonnull protected String getPartitionedCookieName(@Nonnull final String cookieName) throws IOException {
         
         final Object obj = getHttpServletRequest().getAttribute(ProfileRequestContext.BINDING_KEY);
