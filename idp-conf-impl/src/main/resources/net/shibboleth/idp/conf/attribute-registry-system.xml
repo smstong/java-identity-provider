@@ -12,9 +12,6 @@
        default-init-method="initialize"
        default-destroy-method="destroy">
 
-    <!-- Pull in class rewrite rules. -->
-    <bean parent="shibboleth.RelocatedBeanFactoryPostProcessor" />
-
     <bean id="SAML2MetadataNamingStrategy" parent="shibboleth.TagLookupSet"
         p:profileMetadataLookupStrategy-ref="shibboleth.EntityDescriptorLookup.RelyingParty"
         p:propertyName="#{T(net.shibboleth.idp.saml.attribute.transcoding.SAML2AttributeTranscoder).METADATA_TAG_NAME}"

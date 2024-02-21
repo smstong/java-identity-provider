@@ -14,9 +14,6 @@
 
     <context:annotation-config />
 
-    <!-- Pull in class rewrite rules. -->
-    <bean parent="shibboleth.RelocatedBeanFactoryPostProcessor" />
-
     <!-- BeanPostProcessors that auto-install MetadataFilters for internal use. -->
     
     <bean class="net.shibboleth.spring.metadata.ByReferenceFilterBeanPostProcessor"
@@ -52,6 +49,9 @@
     <!-- Metadata Query Protocol (MDQ) artifact support. -->
     <bean id="shibboleth.Metadata.MDQ.URLBuilder.SAMLArtifact" lazy-init="true"
         class="org.opensaml.saml.metadata.resolver.impl.SAMLArtifactURLBuilder" />
+    
+    <bean id="shibboleth.CSPDigester" class="net.shibboleth.utilities.java.support.codec.StringDigester"
+        c:algorithm="SHA256" c:format="BASE64" />
     
     <!-- Wildcard import hook for plugins. -->
     <import resource="classpath*:/META-INF/net/shibboleth/idp/service/saml/metadata/postconfig.xml" />
