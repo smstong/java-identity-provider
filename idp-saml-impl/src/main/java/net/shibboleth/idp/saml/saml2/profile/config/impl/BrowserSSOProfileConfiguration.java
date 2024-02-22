@@ -125,7 +125,7 @@ public class BrowserSSOProfileConfiguration extends AbstractSAML2AssertionProduc
     @Nonnull private Function<ProfileRequestContext,String> authnContextComparisonLookupStrategy;
     
     /** Lookup function to supply default authentication methods. */
-    @Nonnull private Function<ProfileRequestContext,Collection<AuthnContextClassRefPrincipal>>
+    @Nonnull private Function<ProfileRequestContext,Collection<Principal>>
             defaultAuthenticationContextsLookupStrategy;
     
     /** Lookup function to supply authentication flows. */
@@ -815,7 +815,7 @@ public class BrowserSSOProfileConfiguration extends AbstractSAML2AssertionProduc
     /** {@inheritDoc} */
     @Nonnull @NotLive @Unmodifiable public List<Principal> getDefaultAuthenticationMethods(
             @Nullable final ProfileRequestContext profileRequestContext) {
-        final Collection<AuthnContextClassRefPrincipal> methods =
+        final Collection<Principal> methods =
                 defaultAuthenticationContextsLookupStrategy.apply(profileRequestContext);
         if (methods != null) {
             return CollectionSupport.copyToList(methods);
@@ -829,7 +829,7 @@ public class BrowserSSOProfileConfiguration extends AbstractSAML2AssertionProduc
      * @param contexts default authentication contexts to use
      */
     public void setDefaultAuthenticationMethods(
-            @Nullable final Collection<AuthnContextClassRefPrincipal> contexts) {
+            @Nullable final Collection<Principal> contexts) {
         if (contexts != null) {
             defaultAuthenticationContextsLookupStrategy = FunctionSupport.constant(List.copyOf(contexts));
         } else {
@@ -845,7 +845,7 @@ public class BrowserSSOProfileConfiguration extends AbstractSAML2AssertionProduc
      * @since 3.3.0
      */
     public void setDefaultAuthenticationMethodsLookupStrategy(
-            @Nonnull final Function<ProfileRequestContext,Collection<AuthnContextClassRefPrincipal>> strategy) {
+            @Nonnull final Function<ProfileRequestContext,Collection<Principal>> strategy) {
         defaultAuthenticationContextsLookupStrategy = Constraint.isNotNull(strategy, "Lookup strategy cannot be null");
     }
 

@@ -25,6 +25,7 @@ import org.opensaml.profile.context.ProfileRequestContext;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.security.Principal;
 import java.time.Duration;
 import java.util.*;
 
@@ -190,7 +191,7 @@ final BrowserSSOProfileConfiguration config = new BrowserSSOProfileConfiguration
         final BrowserSSOProfileConfiguration config = new BrowserSSOProfileConfiguration();
         Assert.assertTrue(config.getDefaultAuthenticationMethods(null).isEmpty());
 
-        final List<AuthenticationMethodPrincipal> principals = new ArrayList<>();
+        final List<Principal> principals = new ArrayList<>();
         principals.add(new AuthenticationMethodPrincipal("foo"));
         principals.add(new AuthenticationMethodPrincipal("bar"));
 
@@ -202,7 +203,7 @@ final BrowserSSOProfileConfiguration config = new BrowserSSOProfileConfiguration
     public void testIndirectDefaultAuthenticationMethods() {
         final BrowserSSOProfileConfiguration config = new BrowserSSOProfileConfiguration();
 
-        final List<AuthenticationMethodPrincipal> principals = new ArrayList<>();
+        final List<Principal> principals = new ArrayList<>();
         principals.add(new AuthenticationMethodPrincipal("foo"));
         principals.add(new AuthenticationMethodPrincipal("bar"));
 

@@ -20,7 +20,6 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
-import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -58,12 +57,14 @@ import org.testng.annotations.Test;
 
 import net.shibboleth.idp.authn.context.AuthenticationContext;
 import net.shibboleth.idp.authn.context.RequestedPrincipalContext;
+import net.shibboleth.idp.authn.testing.TestPrincipal;
 import net.shibboleth.idp.profile.IdPEventIds;
 import net.shibboleth.idp.profile.context.navigate.WebflowRequestContextProfileRequestContextLookup;
 import net.shibboleth.idp.profile.testing.ActionTestingSupport;
 import net.shibboleth.idp.profile.testing.RequestContextBuilder;
 import net.shibboleth.idp.saml.authn.principal.AuthenticationMethodPrincipal;
 import net.shibboleth.idp.saml.authn.principal.AuthnContextClassRefPrincipal;
+import net.shibboleth.idp.saml.authn.principal.AuthnContextDeclRefPrincipal;
 import net.shibboleth.idp.saml.saml2.profile.config.impl.BrowserSSOProfileConfiguration;
 import net.shibboleth.profile.context.RelyingPartyContext;
 import net.shibboleth.profile.context.navigate.IssuerLookupFunction;
@@ -117,6 +118,7 @@ public class AddAuthnRequestTest extends OpenSAMLInitBaseTestCase {
         action.setAuthenticationContextLookupStrategy(new ParentContextLookup<>(AuthenticationContext.class));
         action.setIssuerLookupStrategy(new IssuerLookupFunction());
         action.setNameIDLookupStrategy(prc -> nameID);
+        action.setConvertUnknownRequestedPrincipals(true);
         action.initialize();
     }
     
@@ -446,7 +448,7 @@ public class AddAuthnRequestTest extends OpenSAMLInitBaseTestCase {
         final RequestedPrincipalContext reqctx = ac.ensureSubcontext(RequestedPrincipalContext.class);
         reqctx.setOperator("exact");
         reqctx.setRequestedPrincipals(
-                Arrays.asList(new AuthnContextClassRefPrincipal(AuthnContext.KERBEROS_AUTHN_CTX),
+                CollectionSupport.listOf(new AuthnContextClassRefPrincipal(AuthnContext.KERBEROS_AUTHN_CTX),
                         new AuthenticationMethodPrincipal(AuthenticationStatement.KERBEROS_AUTHN_METHOD),
                         new AuthnContextClassRefPrincipal(AuthnContext.X509_AUTHN_CTX)));
         
@@ -466,11 +468,12 @@ public class AddAuthnRequestTest extends OpenSAMLInitBaseTestCase {
         assertEquals(rac.getAuthnContextClassRefs().size(), 2);
         assertEquals(rac.getAuthnContextClassRefs().get(0).getURI(), AuthnContext.KERBEROS_AUTHN_CTX);
         assertEquals(rac.getAuthnContextClassRefs().get(1).getURI(), AuthnContext.X509_AUTHN_CTX);
+        
         final BrowserSSOProfileConfiguration bspc = (BrowserSSOProfileConfiguration) rpc.getProfileConfig();
         assert bspc!=null;
         bspc.setAuthnContextComparison(AuthnContextComparisonTypeEnumeration.EXACT);
         bspc.setDefaultAuthenticationMethods(
-                Arrays.asList(new AuthnContextClassRefPrincipal(AuthnContext.KERBEROS_AUTHN_CTX),
+                CollectionSupport.listOf(new AuthnContextClassRefPrincipal(AuthnContext.KERBEROS_AUTHN_CTX),
                         new AuthnContextClassRefPrincipal(AuthnContext.X509_AUTHN_CTX)));
 
         omc.setMessage(null);
@@ -485,6 +488,60 @@ public class AddAuthnRequestTest extends OpenSAMLInitBaseTestCase {
         assertEquals(rac.getAuthnContextClassRefs().size(), 2);
         assertEquals(rac.getAuthnContextClassRefs().get(0).getURI(), AuthnContext.KERBEROS_AUTHN_CTX);
         assertEquals(rac.getAuthnContextClassRefs().get(1).getURI(), AuthnContext.X509_AUTHN_CTX);
+    }
+
+    /** Test that the action maps DeclRefs into RequestedAuthnContext. */
+    @SuppressWarnings("null")
+    @Test public void testDeclRefs() {
+        final RequestedPrincipalContext reqctx = ac.ensureSubcontext(RequestedPrincipalContext.class);
+        reqctx.setOperator("exact");
+        reqctx.setRequestedPrincipals(
+                CollectionSupport.listOf(new AuthnContextDeclRefPrincipal("https://example.org/ac1"),
+                        new AuthnContextDeclRefPrincipal("https://example.org/ac2")));
+        
+        final Event event = action.execute(rc);
+        ActionTestingSupport.assertProceedEvent(event);
+        
+        final MessageContext omc = prc2.getOutboundMessageContext();
+        assert omc!=null;
+        assertNotNull(omc.getMessage());
+        assertTrue(omc.getMessage() instanceof AuthnRequest);
+
+        final AuthnRequest request = (AuthnRequest) omc.getMessage();
+        assert request!=null;
+        final RequestedAuthnContext rac = request.getRequestedAuthnContext();
+        assert rac!=null;
+        assertEquals(rac.getComparison(), AuthnContextComparisonTypeEnumeration.EXACT);
+        assertEquals(rac.getAuthnContextDeclRefs().size(), 2);
+        assertEquals(rac.getAuthnContextDeclRefs().get(0).getURI(), "https://example.org/ac1");
+        assertEquals(rac.getAuthnContextDeclRefs().get(1).getURI(), "https://example.org/ac2");
+    }
+    
+    /** Test that the action maps unrecognized Principals into RequestedAuthnContext. */
+    @SuppressWarnings("null")
+    @Test public void testUnknownPrincipals() {
+        final RequestedPrincipalContext reqctx = ac.ensureSubcontext(RequestedPrincipalContext.class);
+        reqctx.setOperator("exact");
+        reqctx.setRequestedPrincipals(
+                CollectionSupport.listOf(new TestPrincipal("https://example.org/ac1"),
+                        new AuthenticationMethodPrincipal("https://example.org/ac2")));
+        
+        final Event event = action.execute(rc);
+        ActionTestingSupport.assertProceedEvent(event);
+        
+        final MessageContext omc = prc2.getOutboundMessageContext();
+        assert omc!=null;
+        assertNotNull(omc.getMessage());
+        assertTrue(omc.getMessage() instanceof AuthnRequest);
+
+        final AuthnRequest request = (AuthnRequest) omc.getMessage();
+        assert request!=null;
+        final RequestedAuthnContext rac = request.getRequestedAuthnContext();
+        assert rac!=null;
+        assertEquals(rac.getComparison(), AuthnContextComparisonTypeEnumeration.EXACT);
+        assertEquals(rac.getAuthnContextClassRefs().size(), 2);
+        assertEquals(rac.getAuthnContextClassRefs().get(0).getURI(), "https://example.org/ac1");
+        assertEquals(rac.getAuthnContextClassRefs().get(1).getURI(), "https://example.org/ac2");
     }
 
 }

@@ -30,7 +30,6 @@ import org.opensaml.profile.context.ProfileRequestContext;
 
 import net.shibboleth.idp.authn.context.AuthenticationContext;
 import net.shibboleth.idp.authn.context.RequestedPrincipalContext;
-import net.shibboleth.idp.saml.authn.principal.AuthnContextClassRefPrincipal;
 import net.shibboleth.shared.annotation.constraint.NotLive;
 import net.shibboleth.shared.annotation.constraint.Unmodifiable;
 import net.shibboleth.shared.collection.CollectionSupport;
@@ -50,7 +49,7 @@ import net.shibboleth.shared.collection.CollectionSupport;
  * @since 4.0.0
  */
 public class ProxyAwareDefaultAuthenticationMethodsLookupFunction
-        implements Function<ProfileRequestContext,Collection<AuthnContextClassRefPrincipal>> {
+        implements Function<ProfileRequestContext,Collection<Principal>> {
     
     /** Mappings to transform proxied Principals. */
     @Nonnull private Map<Principal,Collection<Principal>> principalMappings;
@@ -78,7 +77,7 @@ public class ProxyAwareDefaultAuthenticationMethodsLookupFunction
     }
     
     /** {@inheritDoc} */
-    @Nonnull @Unmodifiable @NotLive public Collection<AuthnContextClassRefPrincipal> apply(
+    @Nonnull @Unmodifiable @NotLive public Collection<Principal> apply(
             @Nullable final ProfileRequestContext input) {
         if (input != null) {
             final BaseContext parent = input.getParent();
@@ -95,8 +94,6 @@ public class ProxyAwareDefaultAuthenticationMethodsLookupFunction
                                 return CollectionSupport.singletonList(p);
                             })
                             .flatMap(Collection::stream)
-                            .filter(AuthnContextClassRefPrincipal.class::isInstance)
-                            .map(AuthnContextClassRefPrincipal.class::cast)
                             .collect(CollectionSupport.nonnullCollector(Collectors.toUnmodifiableList())).get();
                 }
             }

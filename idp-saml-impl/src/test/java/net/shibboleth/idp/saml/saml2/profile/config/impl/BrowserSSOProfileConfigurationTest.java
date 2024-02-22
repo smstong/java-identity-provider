@@ -14,6 +14,7 @@
 
 package net.shibboleth.idp.saml.saml2.profile.config.impl;
 
+import java.security.Principal;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -229,7 +230,7 @@ final BrowserSSOProfileConfiguration config = new BrowserSSOProfileConfiguration
         final BrowserSSOProfileConfiguration config = new BrowserSSOProfileConfiguration();
         Assert.assertTrue(config.getDefaultAuthenticationMethods(null).isEmpty());
 
-        final List<AuthnContextClassRefPrincipal> principals = new ArrayList<>();
+        final List<Principal> principals = new ArrayList<>();
         principals.add(new AuthnContextClassRefPrincipal("foo"));
         principals.add(new AuthnContextClassRefPrincipal("bar"));
 
@@ -241,7 +242,7 @@ final BrowserSSOProfileConfiguration config = new BrowserSSOProfileConfiguration
     public void testIndirectDefaultAuthenticationMethods() {
         final BrowserSSOProfileConfiguration config = new BrowserSSOProfileConfiguration();
 
-        final List<AuthnContextClassRefPrincipal> principals = new ArrayList<>();
+        final List<Principal> principals = new ArrayList<>();
         principals.add(new AuthnContextClassRefPrincipal("foo"));
         principals.add(new AuthnContextClassRefPrincipal("bar"));
 

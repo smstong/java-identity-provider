@@ -150,6 +150,7 @@
             class="net.shibboleth.idp.saml.saml2.profile.impl.AddAuthnRequest" scope="prototype"
             p:profileContextLookupStrategy-ref="shibboleth.ChildLookup.ProxyProfileRequestContext"
             p:overwriteExisting="true"
+            p:convertUnknownRequestedPrincipals="%{idp.authn.SAML.convertUnknownRequestedPrincipals:false}"
             p:issuerLookupStrategy-ref="shibboleth.IssuerLookup.Simple"
             p:nameIDLookupStrategy="#{getObject('%{idp.authn.SAML.NameIDLookupStrategy:}'.trim())}">
         <property name="identifierGeneratorLookupStrategy">

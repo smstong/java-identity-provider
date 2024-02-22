@@ -27,7 +27,6 @@ import javax.annotation.Nullable;
 import org.opensaml.profile.context.ProfileRequestContext;
 
 import net.shibboleth.idp.authn.config.AuthenticationProfileConfiguration;
-import net.shibboleth.idp.saml.authn.principal.AuthenticationMethodPrincipal;
 import net.shibboleth.profile.config.AttributeResolvingProfileConfiguration;
 import net.shibboleth.saml.profile.config.SAMLAssertionProducingProfileConfiguration;
 import net.shibboleth.shared.annotation.constraint.NonNegative;
@@ -60,7 +59,7 @@ public class BrowserSSOProfileConfiguration extends AbstractSAML1AssertionProduc
     @Nonnull private Predicate<ProfileRequestContext> forceAuthnPredicate;
 
     /** Lookup function to supply default authentication methods. */
-    @Nonnull private Function<ProfileRequestContext,Collection<AuthenticationMethodPrincipal>>
+    @Nonnull private Function<ProfileRequestContext,Collection<Principal>>
             defaultAuthenticationMethodsLookupStrategy;
 
     /** Lookup function to supply authentication flows. */
@@ -172,7 +171,7 @@ public class BrowserSSOProfileConfiguration extends AbstractSAML1AssertionProduc
     /** {@inheritDoc} */
     @Nonnull @NotLive @Unmodifiable public List<Principal> getDefaultAuthenticationMethods(
             @Nullable final ProfileRequestContext profileRequestContext) {
-        final Collection<AuthenticationMethodPrincipal> methods =
+        final Collection<Principal> methods =
                 defaultAuthenticationMethodsLookupStrategy.apply(profileRequestContext);
         if (methods != null) {
             return CollectionSupport.copyToList(methods);
@@ -185,10 +184,11 @@ public class BrowserSSOProfileConfiguration extends AbstractSAML1AssertionProduc
      * 
      * @param methods   default authentication methods to use
      */
-    public void setDefaultAuthenticationMethods(@Nullable final Collection<AuthenticationMethodPrincipal> methods) {
+    public void setDefaultAuthenticationMethods(@Nullable final Collection<Principal> methods) {
 
         if (methods != null) {
-            defaultAuthenticationMethodsLookupStrategy = FunctionSupport.constant(List.copyOf(methods));
+            defaultAuthenticationMethodsLookupStrategy =
+                    FunctionSupport.constant(CollectionSupport.copyToList(methods));
         } else {
             defaultAuthenticationMethodsLookupStrategy = FunctionSupport.constant(null);
         }
@@ -202,7 +202,7 @@ public class BrowserSSOProfileConfiguration extends AbstractSAML1AssertionProduc
      * @since 3.3.0
      */
     public void setDefaultAuthenticationMethodsLookupStrategy(
-            @Nonnull final Function<ProfileRequestContext,Collection<AuthenticationMethodPrincipal>> strategy) {
+            @Nonnull final Function<ProfileRequestContext,Collection<Principal>> strategy) {
         defaultAuthenticationMethodsLookupStrategy = Constraint.isNotNull(strategy, "Lookup strategy cannot be null");
     }
 

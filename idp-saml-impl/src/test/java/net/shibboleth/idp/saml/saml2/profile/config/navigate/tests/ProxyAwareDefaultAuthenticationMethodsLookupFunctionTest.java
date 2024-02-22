@@ -17,7 +17,6 @@ package net.shibboleth.idp.saml.saml2.profile.config.navigate.tests;
 import java.security.Principal;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -57,7 +56,7 @@ public class ProxyAwareDefaultAuthenticationMethodsLookupFunctionTest extends Op
     
     @Test
     public void testEmptyTree() {
-        final Collection<AuthnContextClassRefPrincipal> principals = fn.apply(prc1);
+        final Collection<Principal> principals = fn.apply(prc1);
         Assert.assertTrue(principals.isEmpty());
     }
     
@@ -67,7 +66,7 @@ public class ProxyAwareDefaultAuthenticationMethodsLookupFunctionTest extends Op
                 new AuthnContextClassRefPrincipal("foo"),
                 new AuthnContextClassRefPrincipal("bar")));
         
-        final Collection<AuthnContextClassRefPrincipal> principals = fn.apply(prc1);
+        final Collection<Principal> principals = fn.apply(prc1);
         Assert.assertTrue(principals.isEmpty());
     }
     
@@ -75,9 +74,10 @@ public class ProxyAwareDefaultAuthenticationMethodsLookupFunctionTest extends Op
     public void testPassthrough() {
         rpc.setRequestedPrincipals(CollectionSupport.listOf(
                 new AuthnContextClassRefPrincipal("foo"),
-                new AuthnContextClassRefPrincipal("bar")));
+                new AuthnContextClassRefPrincipal("bar"),
+                new AuthenticationMethodPrincipal("baz")));
         
-        final Collection<AuthnContextClassRefPrincipal> principals = fn.apply(prc2);
+        final Collection<Principal> principals = fn.apply(prc2);
         Assert.assertEquals(principals, rpc.getRequestedPrincipals());
     }
 
@@ -91,15 +91,15 @@ public class ProxyAwareDefaultAuthenticationMethodsLookupFunctionTest extends Op
         final Map<Principal,Collection<Principal>> mappings = new HashMap<>();
         mappings.put(new AuthnContextClassRefPrincipal("foo"), CollectionSupport.emptyList());
         mappings.put(new AuthenticationMethodPrincipal("baz"),
-                List.of(new AuthnContextClassRefPrincipal("frobnitz"),
+                CollectionSupport.listOf(new AuthnContextClassRefPrincipal("frobnitz"),
                         new AuthnContextDeclRefPrincipal("grue"),
                         new AuthnContextClassRefPrincipal("zorkmid")));
         
         fn.setMappings(mappings);
         
-        final Collection<AuthnContextClassRefPrincipal> principals = fn.apply(prc2);
+        final Collection<Principal> principals = fn.apply(prc2);
         Assert.assertEquals(principals.stream().map(p -> p.getName()).collect(Collectors.toUnmodifiableList()),
-                List.of("bar", "frobnitz", "zorkmid"));
+                CollectionSupport.listOf("bar", "frobnitz", "grue", "zorkmid"));
     }
 
 }

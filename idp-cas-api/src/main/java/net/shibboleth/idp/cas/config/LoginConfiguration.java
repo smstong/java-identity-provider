@@ -27,7 +27,6 @@ import javax.annotation.Nullable;
 import org.opensaml.profile.context.ProfileRequestContext;
 
 import net.shibboleth.idp.authn.config.AuthenticationProfileConfiguration;
-import net.shibboleth.idp.saml.authn.principal.AuthnContextClassRefPrincipal;
 import net.shibboleth.shared.annotation.ConfigurationSetting;
 import net.shibboleth.shared.annotation.constraint.NonNegative;
 import net.shibboleth.shared.annotation.constraint.NotEmpty;
@@ -38,7 +37,6 @@ import net.shibboleth.shared.logic.Constraint;
 import net.shibboleth.shared.logic.FunctionSupport;
 import net.shibboleth.shared.logic.PredicateSupport;
 import net.shibboleth.shared.primitive.StringSupport;
-
 
 /**
  * CAS protocol configuration that applies to the <code>/login</code> URI.
@@ -67,7 +65,7 @@ public class LoginConfiguration extends AbstractProtocolConfiguration
     @Nonnull private Function<ProfileRequestContext,Collection<String>> postAuthenticationFlowsLookupStrategy;
 
     /** Lookup function to supply defaultAuthenticationContexts property. */
-    @Nonnull private Function<ProfileRequestContext,Collection<AuthnContextClassRefPrincipal>>
+    @Nonnull private Function<ProfileRequestContext,Collection<Principal>>
             defaultAuthenticationContextsLookupStrategy;
     
     /** Whether to mandate forced authentication for the request. */
@@ -94,7 +92,7 @@ public class LoginConfiguration extends AbstractProtocolConfiguration
     /** {@inheritDoc} */
     @Nonnull @NotLive @Unmodifiable public List<Principal> getDefaultAuthenticationMethods(
             @Nullable final ProfileRequestContext profileRequestContext) {
-        final Collection<AuthnContextClassRefPrincipal> methods =
+        final Collection<Principal> methods =
                 defaultAuthenticationContextsLookupStrategy.apply(profileRequestContext);
         if (methods != null) {
             return CollectionSupport.copyToList(methods);
@@ -107,9 +105,10 @@ public class LoginConfiguration extends AbstractProtocolConfiguration
      * 
      * @param contexts default authentication contexts to use
      */
-    public void setDefaultAuthenticationMethods(@Nullable final Collection<AuthnContextClassRefPrincipal> contexts) {
+    public void setDefaultAuthenticationMethods(@Nullable final Collection<Principal> contexts) {
         if (contexts != null) {
-            defaultAuthenticationContextsLookupStrategy = FunctionSupport.constant(List.copyOf(contexts));
+            defaultAuthenticationContextsLookupStrategy =
+                    FunctionSupport.constant(CollectionSupport.copyToList(contexts));
         } else {
             defaultAuthenticationContextsLookupStrategy = FunctionSupport.constant(null);
         }
@@ -121,7 +120,7 @@ public class LoginConfiguration extends AbstractProtocolConfiguration
      * @param strategy  lookup strategy
      */
     public void setDefaultAuthenticationMethodsLookupStrategy(
-            @Nonnull final Function<ProfileRequestContext,Collection<AuthnContextClassRefPrincipal>> strategy) {
+            @Nonnull final Function<ProfileRequestContext,Collection<Principal>> strategy) {
         defaultAuthenticationContextsLookupStrategy = Constraint.isNotNull(strategy, "Lookup strategy cannot be null");
     }
     

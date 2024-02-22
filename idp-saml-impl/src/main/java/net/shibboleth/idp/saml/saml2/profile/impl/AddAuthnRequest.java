@@ -55,6 +55,7 @@ import org.opensaml.profile.context.navigate.InboundMessageContextLookup;
 import org.opensaml.saml.common.SAMLObjectBuilder;
 import org.opensaml.saml.common.SAMLVersion;
 import org.opensaml.saml.ext.reqattr.RequestedAttributes;
+import org.opensaml.saml.saml2.core.AuthnContextClassRef;
 import org.opensaml.saml.saml2.core.AuthnContextComparisonTypeEnumeration;
 import org.opensaml.saml.saml2.core.AuthnRequest;
 import org.opensaml.saml.saml2.core.Extensions;
@@ -110,6 +111,9 @@ public class AddAuthnRequest extends AbstractAuthenticationAction {
     /** Optional strategy to populate request with a {@link NameID}. */
     @Nullable private Function<ProfileRequestContext,NameID> nameIDLookupStrategy;
     
+    /** Convert requested principals of unknown types into SAML AC classes. */
+    private boolean convertUnknownRequestedPrincipals;
+    
     /** The generator to use. */
     @NonnullBeforeExec private IdentifierGenerationStrategy idGenerator;
     
@@ -140,6 +144,22 @@ public class AddAuthnRequest extends AbstractAuthenticationAction {
                                 new RootContextLookup<>(ProfileRequestContext.class)));
         assert prcls != null;
         proxiedRequesterContextLookupStrategy = prcls;
+    }
+    
+    /**
+     * Sets whether to convert unknown/non-SAML {@link Principal} objects returned for use
+     * in the {@link RequestedAuthnContext} population step into SAML {@link AuthnContextClassRef}
+     * values.
+     * 
+     * <p>Defaults to false.</p>
+     * 
+     * @param flag flag to set
+     * 
+     * @since 5.1.0
+     */
+    public void setConvertUnknownRequestedPrincipals(final boolean flag) {
+        checkSetterPreconditions();
+        convertUnknownRequestedPrincipals = flag;
     }
     
     /**
@@ -353,7 +373,6 @@ public class AddAuthnRequest extends AbstractAuthenticationAction {
         assert omc != null;
         omc.setMessage(object);
     }
-// Checkstyle: MethodLength ON
     
     /**
      * Build a {@link RequestedAuthnContext} if warranted.
@@ -423,8 +442,33 @@ public class AddAuthnRequest extends AbstractAuthenticationAction {
             return rac;
         }
         
+        if (convertUnknownRequestedPrincipals) {
+            final SAMLObjectBuilder<AuthnContextClassRef> classBuilder =
+                    (SAMLObjectBuilder<AuthnContextClassRef>) bf.<AuthnContextClassRef>ensureBuilder(
+                            AuthnContextClassRef.DEFAULT_ELEMENT_NAME);
+            final List<AuthnContextClassRef> unknownPrincipals = principals.stream()
+                    .map(p -> {
+                        final AuthnContextClassRef ref = classBuilder.buildObject();
+                        ref.setURI(p.getName());
+                        return ref;
+                    })
+                    .collect(Collectors.toUnmodifiableList());
+            final RequestedAuthnContext rac = builder.buildObject();
+            rac.getAuthnContextClassRefs().addAll(unknownPrincipals);
+            
+            if (log.isDebugEnabled()) {
+                log.debug("{} Setting RequestedAuthnContext class refs to {}", getLogPrefix(),
+                        principals.stream()
+                            .map(Principal::getName)
+                            .collect(Collectors.toUnmodifiableList()));
+            }
+            
+            return rac;
+        }
+        
         return null;
     }
+// Checkstyle: MethodLength ON
     
     /**
      * Build a {@link Subject} element if necessary.
