@@ -56,7 +56,7 @@
         <entry>
             <key>
                 <bean parent="shibboleth.SAML1AuthenticationMethod"
-                    c:classRef="https://sp.example.org/context" />
+                    c:method="https://sp.example.org/context" />
             </key>
             <list>
                 <bean parent="shibboleth.SAML2AuthnContextClassRef"
@@ -94,7 +94,7 @@
             </key>
             <list>
                 <bean parent="shibboleth.SAML1AuthenticationMethod"
-                    c:classRef="https://sp.example.org/context" />
+                    c:method="https://sp.example.org/context" />
                 <bean parent="shibboleth.SAML2AuthnContextClassRef"
                     c:classRef="https://sp.example.org/context" />
             </list>
@@ -106,7 +106,7 @@
             </key>
             <list>
                 <bean parent="shibboleth.SAML1AuthenticationMethod"
-                    c:classRef="https://sp.example.org/context" />
+                    c:method="https://sp.example.org/context" />
                 <bean parent="shibboleth.SAML2AuthnContextClassRef"
                     c:classRef="https://sp.example.org/context" />
             </list>
