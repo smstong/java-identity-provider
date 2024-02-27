@@ -69,6 +69,8 @@
                     <prop key="saml1.name">urn:oid:1.3.6.1.4.1.25178.1.2.3</prop>
                     <prop key="displayName.en">Date of Birth</prop>
                     <prop key="displayName.de">Geburtsdatum</prop>
+                    <prop key="displayName.fr">Date de naissance</prop>
+                    <prop key="displayName.it">Giorno di nascita</prop>
                     <prop key="description.en">The date of birth of the subject</prop>
                     <prop key="description.de">Geburtsdatum der Person</prop>
                     <prop key="description.fr">Date de naissance au format "YYYYMMJJ"</prop>
