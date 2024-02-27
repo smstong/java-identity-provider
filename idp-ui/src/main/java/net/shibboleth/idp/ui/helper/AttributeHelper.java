@@ -58,7 +58,7 @@ public final class AttributeHelper extends AbstractIdentifiableInitializableComp
      */
     @Nullable public IdPAttributeValue getFirstAttributeValue(@Nonnull final ProfileRequestContext prc,
            @Nonnull @NotEmpty final String attributeName) {
-        Constraint.isNotNull(attributeName, "Attribute Name must be non-niull");
+        Constraint.isNotNull(attributeName, "Attribute Name must be non-null");
         final AttributeContext context = attributeContextStrategy.apply(prc);
         if (context == null) {
             log.error("Attribute Context could not be located");
@@ -103,7 +103,7 @@ public final class AttributeHelper extends AbstractIdentifiableInitializableComp
     @Nullable public IdPAttributeValue getFirstUnfilteredAttributeValue(@Nonnull final ProfileRequestContext prc,
                          @Nonnull @NotEmpty final String attributeName) {
 
-        Constraint.isNotNull(attributeName, "Attribute Name must be non-niull");
+        Constraint.isNotNull(attributeName, "Attribute Name must be non-null");
         final AttributeContext context = attributeContextStrategy.apply(prc);
         if (context == null) {
             log.error("Attribute Context could not be located");
@@ -150,7 +150,7 @@ public final class AttributeHelper extends AbstractIdentifiableInitializableComp
      * 
      * @param attribute the Attribute or null if there wasn't one
      * 
-     * @return the first attribute valkue or null
+     * @return the first attribute value or null
      */
     @Nullable private IdPAttributeValue getFirstValue(@Nullable final IdPAttribute attribute) {
         if (attribute == null) {
