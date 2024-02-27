@@ -109,7 +109,6 @@
                     <prop key="displayName.de">Geburtsort</prop>
                     <prop key="displayName.fr">Lieu de naissance</prop>
                     <prop key="displayName.it">Luogo di nascita</prop>
-                    <prop key="description.en">The place of birth for the subject it is associated with</prop>
                     <prop key="description.en">The place of birth of the subject</prop>
                     <prop key="description.de">Geburtsort der Person</prop>
                     <prop key="description.fr">Lieu de naissance</prop>
