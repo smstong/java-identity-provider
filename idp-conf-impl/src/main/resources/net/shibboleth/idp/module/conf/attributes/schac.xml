@@ -249,7 +249,7 @@
                     <prop key="displayName.de">Land des Wohnsitzes</prop>
                     <prop key="displayName.fr">Pays de résidence</prop>
                     <prop key="displayName.it">Residenza</prop>
-                    <prop key="description.en">The country of residence for the subject</prop>
+                    <prop key="description.en">The country of residence of the subject</prop>
                     <prop key="description.de">Land des Wohnsitzes der Person</prop>
                     <prop key="description.fr">Pays de résidence : fr, es...</prop>
                     <prop key="description.it">Paese di residenza dell'utente</prop>
@@ -284,7 +284,7 @@
                     <prop key="displayName.en">Personal Position</prop>
                     <prop key="displayName.fr">Position/Rôle</prop>
                     <prop key="displayName.it">Ruolo ricoperto</prop>
-                    <prop key="description.en">Personal position of the subject within theie institution</prop>
+                    <prop key="description.en">Personal position of the subject within the institution</prop>
                     <prop key="description.fr">Position/Rôle de la personne au sein d'une institution</prop>
                     <prop key="description.it">Ruolo dell'utente nell'istituzione</prop>
                 </props>
@@ -302,7 +302,7 @@
                     <prop key="displayName.de">Persönlicher eindeutiger Code</prop>
                     <prop key="displayName.fr">Code personnel unique</prop>
                     <prop key="displayName.it">Codice Univoco</prop>
-                    <prop key="description.en">Unique code for the subject it is associated with</prop>
+                    <prop key="description.en">Unique code for the subject</prop>
                     <prop key="description.de">Eindeutiger Code der Person</prop>
                     <prop key="description.fr">"Code unique" pour le sujet auquel il est associé (peut être le numéro d'étudiant, le numéro d'employé, ...)</prop>
                     <prop key="description.it">Codice Univoco legato al soggetto</prop>
@@ -321,7 +321,7 @@
                     <prop key="displayName.de">Eindeutiger persönlicher Identifikator</prop>
                     <prop key="displayName.fr">Identifiant personnel unique</prop>
                     <prop key="displayName.it">ID Legale Univoco</prop>
-                    <prop key="description.en">Unique Legal Identifier of a person</prop>
+                    <prop key="description.en">Personal unique identifier of the subject</prop>
                     <prop key="description.de">Eindeutiger rechtlicher Identifikator der Person</prop>
                     <prop key="description.fr">identifiant unique légal (DNI en espagne)</prop>
                     <prop key="description.it">Identificativo Univoco Legale associato alla persona</prop>

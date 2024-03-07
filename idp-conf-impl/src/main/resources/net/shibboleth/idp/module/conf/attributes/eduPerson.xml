@@ -53,12 +53,12 @@
                     <prop key="saml2.name">urn:oid:1.3.6.1.4.1.5923.1.1.1.11</prop>
                     <prop key="saml1.name">urn:mace:dir:attribute-def:eduPersonAssurance</prop>
                     <prop key="displayName.en">Assurance level</prop>
-                    <prop key="displayName.de">Vertrauensgrad</prop>
+                    <prop key="displayName.de">Vertrauensprofil</prop>
                     <prop key="displayName.fr">Niveau de confiance</prop>
                     <prop key="displayName.it">Livello di garanzia dell'identita'</prop>
                     <prop key="displayName.ja">保証レベル</prop>
                     <prop key="description.en">Set of URIs that assert compliance with specific standards for identity assurance</prop>
-                    <prop key="description.de">URIs die eine gewisse Zusicherung für spezifische Standards des Vertrauens beinhalten</prop>
+                    <prop key="description.de">URIs, die nach bestimmten Standards das Vertrauen in Identitäten bestätigen</prop>
                     <prop key="description.fr">Un ensemble d'URI qui attestent la conformité selon un standard pour les niveaux d'assurance d'identités</prop>
                     <prop key="description.it">Un insieme di URI che asseriscono l'osservanza dei livelli di garanzia dell'identita'</prop>
                     <prop key="description.ja">IDの保証レベルに関して特定の基準に準拠していることを示すURI</prop>
@@ -146,8 +146,10 @@
                     <prop key="saml2.name">urn:oid:1.3.6.1.4.1.5923.1.1.1.16</prop>
                     <prop key="saml1.name">urn:oid:1.3.6.1.4.1.5923.1.1.1.16</prop>
                     <prop key="displayName.en">ORCID</prop>
+                    <prop key="displayName.de">ORCID Identifikator</prop>
                     <prop key="displayName.fr">identifiants ORCID</prop>
                     <prop key="description.en">ORCID researcher identifier(s) belonging to a person</prop>
+                    <prop key="description.de">ORCID-Forscher-Identifikator(en), die zu einer Person gehören</prop>
                     <prop key="description.fr">Identifiant(s) ORCID d'une personne</prop>
                 </props>
             </property>

@@ -31,7 +31,9 @@
                     <prop key="saml2.name">urn:oid:1.3.6.1.4.1.5923.1.6.1.1</prop>
                     <prop key="saml1.name">urn:oid:1.3.6.1.4.1.5923.1.6.1.1</prop>
                     <prop key="displayName.en">Course offering</prop>
+                    <prop key="displayName.de">Kursangebot</prop>
                     <prop key="description.en">Unique identifier for a course offering</prop>
+                    <prop key="description.de">Eindeutige Identifikation für ein Kursangebot</prop>
                 </props>
             </property>
         </bean>
@@ -45,7 +47,9 @@
                     <prop key="saml1.name">urn:oid:1.3.6.1.4.1.5923.1.6.1.2</prop>
                     <prop key="saml1.encodeType">false</prop>
                     <prop key="displayName.en">Course role</prop>
+                    <prop key="displayName.de">Rolle im Kurs</prop>
                     <prop key="description.en">Specifies the person's role within a particular course offering</prop>
+                    <prop key="description.de">Spezifiziert die Rolle der Person innerhalb eines bestimmten Kursangebots</prop>
                 </props>
             </property>
         </bean>
