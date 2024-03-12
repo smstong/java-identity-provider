@@ -181,7 +181,7 @@
                     <prop key="saml2.name">urn:oid:1.3.6.1.4.1.25178.1.2.8</prop>
                     <prop key="saml1.name">urn:oid:1.3.6.1.4.1.25178.1.2.8</prop>
                     <prop key="displayName.en">Personal Title</prop>
-                    <prop key="displayName.en">Persönlicher Titel</prop>
+                    <prop key="displayName.de">Persönlicher Titel</prop>
                     <prop key="displayName.fr">Titre</prop>
                     <prop key="displayName.it">Soprannome</prop>
                     <prop key="description.en">Personal title of the subject</prop>
