@@ -61,7 +61,7 @@ if (Err.Number = 0 ) then
     end if
     if ConfigureAd = "true" then
        AntFile.Writeline "idp.LDAP.credential=" & AdPass
-       AntFile.WriteLine "ldap.merge.properties=ldap.mergeProperties"
+       AntFile.WriteLine "ldap.merge.properties=" & InstallDirJava & "/ldap.mergeProperties"
     end if
     AntFile.WriteLine "#"
     AntFile.WriteLine "# Debug"
