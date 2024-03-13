@@ -236,7 +236,7 @@ public class UpdateIdPCLI extends AbstractIdPHomeAwareCommandLine<UpdateIdPArgum
             getLogger().error("Could not get file name for idp update version {}", version);
             return RC_IO;
         }            
-        final String fileName = baseName + (SystemUtils.IS_OS_WINDOWS? ".zip" : ".tgz");
+        final String fileName = baseName + (SystemUtils.IS_OS_WINDOWS? ".zip" : ".tar.gz");
 
         final URL baseUrl = info.getUpdateURL(version);
         if (baseUrl == null) {
