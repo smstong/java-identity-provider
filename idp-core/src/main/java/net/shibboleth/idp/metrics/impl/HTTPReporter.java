@@ -32,6 +32,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.EntityBuilder;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.HttpClientContext;
@@ -260,13 +261,20 @@ public class HTTPReporter extends ScheduledReporter implements InitializableComp
                 entityBuilder.setBinary(output.toByteArray());
                 httpRequest.setEntity(entityBuilder.build());
 
-                final HttpResponse response = httpClient.execute(httpRequest, httpContext);
-                HttpClientSecuritySupport.checkTLSCredentialEvaluated(httpContext, httpRequest.getURI().getScheme());
+                HttpResponse response = null;
+                try {
+                    response = httpClient.execute(httpRequest, httpContext);
+                    HttpClientSecuritySupport.checkTLSCredentialEvaluated(httpContext, httpRequest.getURI().getScheme());
                 
-                if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                    log.debug("Metrics delivered successfully to collector");
-                } else {
-                    log.error("Collector responded with HTTP status {}", response.getStatusLine().getStatusCode());
+                    if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                        log.debug("Metrics delivered successfully to collector");
+                    } else {
+                        log.error("Collector responded with HTTP status {}", response.getStatusLine().getStatusCode());
+                    }
+                } finally {
+                    if (response instanceof CloseableHttpResponse) {
+                        ((CloseableHttpResponse) response).close();
+                    }
                 }
             } catch (final IOException e) {
                 log.error("Error sending metric registry to collection point {}", collectorURL, e);
@@ -276,9 +284,9 @@ public class HTTPReporter extends ScheduledReporter implements InitializableComp
     
     /** {@inheritDoc} */
     @Override
-    public void report(final SortedMap<String, Gauge> gauges, final SortedMap<String, Counter> counters,
-            final SortedMap<String, Histogram> histograms, final SortedMap<String, Meter> meters,
-            final SortedMap<String, Timer> timers) {
+    public void report(@SuppressWarnings("rawtypes") final SortedMap<String, Gauge> gauges,
+            final SortedMap<String, Counter> counters, final SortedMap<String, Histogram> histograms,
+            final SortedMap<String, Meter> meters, final SortedMap<String, Timer> timers) {
         throw new UnsupportedOperationException("The per-metric report method should never be called.");
     }
 
