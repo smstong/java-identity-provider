@@ -497,7 +497,7 @@ public class SAML1TestResponseValidator {
     public void assertAttributes(@Nullable final List<Attribute> attributes) {
         Assert.assertNotNull(attributes);
         Assert.assertFalse(attributes.isEmpty());
-        Assert.assertEquals(attributes.size(), usedAttributeDesignators ? 2 : 4);
+        Assert.assertEquals(attributes.size(), usedAttributeDesignators ? 2 : 5);
 
         // Ignore attribute ordering
         final Map<String, Attribute> actualAttributes = new HashMap<>();
@@ -516,6 +516,10 @@ public class SAML1TestResponseValidator {
             Assert.assertNotNull(actualEPSAAttribute);
             assertAttribute(actualEPSAAttribute, "urn:mace:dir:attribute-def:eduPersonScopedAffiliation", "member");
         } else {
+            final Attribute actualHomeAttribute = actualAttributes.get("urn:oid:1.3.6.1.4.1.25178.1.2.9");
+            Assert.assertNotNull(actualHomeAttribute);
+            assertAttribute(actualHomeAttribute, "urn:oid:1.3.6.1.4.1.25178.1.2.9", "example.org");
+
             final Attribute actualUidAttribute = actualAttributes.get("urn:mace:dir:attribute-def:uid");
             Assert.assertNotNull(actualUidAttribute);
             assertAttribute(actualUidAttribute, "urn:mace:dir:attribute-def:uid", "jdoe");
