@@ -66,14 +66,13 @@
     </modules>
 
     <properties>
+        <shibboleth.projectName>java-identity-provider</shibboleth.projectName>
         <idwsfconsumer.version>2.1.0</idwsfconsumer.version>
         <java-support.version>8.4.1-SNAPSHOT</java-support.version>
         <opensaml.groupId>org.opensaml</opensaml.groupId>
         <opensaml.version>4.3.1-SNAPSHOT</opensaml.version>
         <spring-extensions.version>6.3.1-SNAPSHOT</spring-extensions.version>
         <checkstyle.configLocation>${project.basedir}/../idp-parent/resources/checkstyle/checkstyle.xml</checkstyle.configLocation>
-        <idp-parent.site.url>${shibboleth.site.deploy.url}java-identity-provider/${project.version}/</idp-parent.site.url>
-        <idp-module.site.url>${idp-parent.site.url}${project.artifactId}</idp-module.site.url>
     </properties>
 
     <dependencies>
@@ -157,19 +156,6 @@
         </dependencies>
     </dependencyManagement>
 
-    <scm>
-        <connection>${shibboleth.scm.connection}java-identity-provider</connection>
-        <developerConnection>${shibboleth.scm.developerConnection}java-identity-provider</developerConnection>
-        <url>${shibboleth.scm.url}java-identity-provider.git</url>
-    </scm>
-
-    <distributionManagement>
-        <site>
-            <id>site</id>
-            <url>scp:${idp-parent.site.url}</url>
-        </site>
-    </distributionManagement>
-
     <build>
         <plugins>
             <plugin>
@@ -181,21 +167,6 @@
                         <link>${javadoc.url}/spring-extensions/${spring-extensions.version}</link>
                         <link>${javadoc.url}/java-opensaml/${opensaml.version}</link>
                     </links>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-site-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-descriptor</id>
-                        <goals>
-                            <goal>attach-descriptor</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <siteDirectory>../idp-parent/src/site</siteDirectory>
                 </configuration>
             </plugin>
 
