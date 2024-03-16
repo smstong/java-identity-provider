@@ -125,31 +125,6 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <!-- Assemble the artifacts. -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-assembly-plugin</artifactId>
-                        <configuration>
-                            <appendAssemblyId>false</appendAssemblyId>
-                            <descriptors>
-                                <descriptor>src/main/assembly/zip.xml</descriptor>
-                            </descriptors>
-			    <!-- Turn off compression -->
-			    <archiverConfig>
-				<compress>false</compress>
-			    </archiverConfig>
-                            <tarLongFileMode>gnu</tarLongFileMode>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>make-assembly</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>single</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
                 </plugins>
             </build>
         </profile>
