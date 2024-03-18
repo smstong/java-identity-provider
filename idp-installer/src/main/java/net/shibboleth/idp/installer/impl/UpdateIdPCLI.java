@@ -164,7 +164,7 @@ public class UpdateIdPCLI extends AbstractIdPHomeAwareCommandLine<UpdateIdPArgum
            final SupportLevel sl = currInfo.getSupportLevel();
            switch (sl) {
                case Current:
-                   getLogger().info("Version {} is current");
+                   getLogger().info("Version {} is current", from);
                    break;
                case Secadv:
                    getLogger().error("Version {} has known security vulnerabilities", from);
