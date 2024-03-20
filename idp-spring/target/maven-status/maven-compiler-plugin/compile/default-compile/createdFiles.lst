@@ -1,0 +1,7 @@
+net/shibboleth/idp/profile/spring/factory/FlowDefinitionResourceFactory.class
+net/shibboleth/idp/profile/spring/factory/BasicX509CredentialFactoryBean.class
+net/shibboleth/idp/profile/spring/factory/package-info.class
+net/shibboleth/idp/profile/spring/factory/FlowDefinitionRegistryFactoryBean.class
+net/shibboleth/idp/profile/spring/factory/FlowRelativeResourceLoader.class
+net/shibboleth/idp/profile/spring/factory/FlowDefinitionRegistryFactoryBean$DefaultFlowRegistry.class
+net/shibboleth/idp/profile/spring/factory/FlowModelFlowBuilder.class

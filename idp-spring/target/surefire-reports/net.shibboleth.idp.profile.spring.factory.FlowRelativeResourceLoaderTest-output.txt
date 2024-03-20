@@ -1,0 +1,22 @@
+21:47:01,796 |-INFO in ch.qos.logback.classic.LoggerContext[default] - This is logback-classic version 1.4.13
+21:47:01,798 |-INFO in ch.qos.logback.classic.util.ContextInitializer@393671df - No custom configurators were discovered as a service.
+21:47:01,798 |-INFO in ch.qos.logback.classic.util.ContextInitializer@393671df - Trying to configure with ch.qos.logback.classic.joran.SerializedModelConfigurator
+21:47:01,800 |-INFO in ch.qos.logback.classic.util.ContextInitializer@393671df - Constructed configurator of type class ch.qos.logback.classic.joran.SerializedModelConfigurator
+21:47:01,810 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Could NOT find resource [logback-test.scmo]
+21:47:01,811 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Could NOT find resource [logback.scmo]
+21:47:01,825 |-INFO in ch.qos.logback.classic.util.ContextInitializer@393671df - ch.qos.logback.classic.joran.SerializedModelConfigurator.configure() call lasted 11 milliseconds. ExecutionStatus=INVOKE_NEXT_IF_ANY
+21:47:01,825 |-INFO in ch.qos.logback.classic.util.ContextInitializer@393671df - Trying to configure with ch.qos.logback.classic.util.DefaultJoranConfigurator
+21:47:01,825 |-INFO in ch.qos.logback.classic.util.ContextInitializer@393671df - Constructed configurator of type class ch.qos.logback.classic.util.DefaultJoranConfigurator
+21:47:01,832 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Found resource [logback-test.xml] at [file:/Users/putmanb/Dev/Git/Shib/java-identity-provider/idp-spring/target/test-classes/logback-test.xml]
+21:47:01,900 |-WARN in ch.qos.logback.classic.joran.action.LevelAction - <level> element is deprecated. Near [level] on line 17
+21:47:01,900 |-WARN in ch.qos.logback.classic.joran.action.LevelAction - Please use "level" attribute within <logger> or <root> elements instead.
+21:47:01,941 |-INFO in ch.qos.logback.classic.model.processor.LoggerModelHandler - Setting level of logger [net.shibboleth.shared.spring.resource] to DEBUG
+21:47:01,941 |-INFO in ch.qos.logback.classic.model.processor.LoggerModelHandler - Setting level of logger [net.shibboleth.idp.profile.spring] to DEBUG
+21:47:01,941 |-INFO in ch.qos.logback.core.model.processor.AppenderModelHandler - Processing appender named [STDOUT]
+21:47:01,941 |-INFO in ch.qos.logback.core.model.processor.AppenderModelHandler - About to instantiate appender of type [ch.qos.logback.core.ConsoleAppender]
+21:47:01,960 |-INFO in ch.qos.logback.classic.model.processor.LevelModelHandler - ROOT level set to INFO
+21:47:01,961 |-INFO in ch.qos.logback.core.model.processor.AppenderRefModelHandler - Attaching appender named [STDOUT] to Logger[ROOT]
+21:47:01,961 |-INFO in ch.qos.logback.core.model.processor.DefaultProcessor@56620197 - End of configuration.
+21:47:01,961 |-INFO in ch.qos.logback.classic.joran.JoranConfigurator@6eda5c9 - Registering current configuration as safe fallback point
+21:47:01,961 |-INFO in ch.qos.logback.classic.util.ContextInitializer@393671df - ch.qos.logback.classic.util.DefaultJoranConfigurator.configure() call lasted 136 milliseconds. ExecutionStatus=DO_NOT_INVOKE_NEXT_IF_ANY
+

@@ -1,0 +1,13 @@
+net/shibboleth/idp/saml/impl/testing/TestSources.class
+net/shibboleth/idp/authn/testing/MockAuthenticationProfileConfiguration.class
+net/shibboleth/idp/saml/profile/testing/ActionTestSupportAction.class
+net/shibboleth/idp/saml/profile/testing/package-info.class
+net/shibboleth/idp/profile/testing/RequestContextBuilder.class
+net/shibboleth/idp/profile/testing/package-info.class
+net/shibboleth/idp/profile/testing/ActionTestingSupport.class
+net/shibboleth/idp/saml/impl/testing/TestSources$StaticDataConnector.class
+net/shibboleth/idp/profile/testing/MockProfileConfiguration.class
+net/shibboleth/idp/authn/testing/package-info.class
+net/shibboleth/idp/saml/impl/testing/TestSources$StaticAttributeDefinition.class
+net/shibboleth/idp/authn/testing/TestPrincipal.class
+net/shibboleth/idp/saml/impl/testing/package-info.class
