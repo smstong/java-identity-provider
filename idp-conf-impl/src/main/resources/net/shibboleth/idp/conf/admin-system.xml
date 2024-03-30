@@ -287,13 +287,13 @@
     
     <bean id="shibboleth.metrics.CoreGaugeSet" class="org.opensaml.core.metrics.impl.CoreGaugeSet" lazy-init="true" />
     
-    <bean id="shibboleth.metrics.ModuleGaugeSet" class="net.shibboleth.idp.module.impl.ModuleGuageSet" lazy-init="true" />
+    <bean id="shibboleth.metrics.ModuleGaugeSet" class="net.shibboleth.idp.module.impl.ModuleGaugeSet" lazy-init="true" />
 
     <bean id="shibboleth.metrics.IdPGaugeSet" class="net.shibboleth.idp.metrics.impl.IdPGaugeSet" lazy-init="true"
         p:exposedProperties="#{getObject('shibboleth.metrics.ExposedProperties')}" />
 
     <bean id="shibboleth.metrics.InstallableComponents"
-        class="net.shibboleth.idp.admin.impl.InstallableComponentGuageSet" lazy-init="true"
+        class="net.shibboleth.idp.admin.impl.InstallableComponentGaugeSet" lazy-init="true"
        p:idpUpdateUrls-ref="%{idp.updateCheck.urls:shibboleth.IdPUpdateCheckUrls}"
        p:httpClient-ref="%{idp.updateCheck.httpClient:shibboleth.InternalHttpClient}"
        p:securityParams="#{ environment.containsProperty('idp.updateCheck.httpSecurityParameters') ? getObject('idp.updateCheck.httpSecurityParameters') :null}"/>

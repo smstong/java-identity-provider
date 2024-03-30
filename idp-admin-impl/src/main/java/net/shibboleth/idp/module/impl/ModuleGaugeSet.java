@@ -42,7 +42,7 @@ import net.shibboleth.shared.primitive.StringSupport;
 /**
  * Guage set to report the Modules' statuses.
  */
-public class ModuleGuageSet extends ApplicationObjectSupport implements MetricSet, MetricFilter {
+public class ModuleGaugeSet extends ApplicationObjectSupport implements MetricSet, MetricFilter {
     
     /** Default prefix for metrics. */
     @Nonnull @NotEmpty private static final String DEFAULT_METRIC_NAME = "net.shibboleth.idp.modules";
@@ -51,7 +51,7 @@ public class ModuleGuageSet extends ApplicationObjectSupport implements MetricSe
     @Nonnull private final Map<String,Metric> gauges = new HashMap<>();
     
     /** Constructor. */
-    public ModuleGuageSet() {
+    public ModuleGaugeSet() {
         gauges.put(MetricRegistry.name(DEFAULT_METRIC_NAME, "list"),
                 new Gauge<Map<String, Boolean>>() {
                     public Map<String, Boolean> getValue() {

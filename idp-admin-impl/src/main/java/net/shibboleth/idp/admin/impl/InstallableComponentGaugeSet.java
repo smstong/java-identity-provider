@@ -59,14 +59,14 @@ import net.shibboleth.shared.primitive.LoggerFactory;
 /**
  * Guage set to report the Plugins' and IdP's installation and update statuses.
  */
-public class InstallableComponentGuageSet extends AbstractIdentifiableInitializableComponent
+public class InstallableComponentGaugeSet extends AbstractIdentifiableInitializableComponent
         implements MetricSet, MetricFilter {
 
     /** Default prefix for metrics. */    
     @Nonnull @NotEmpty private static final String DEFAULT_METRIC_NAME = "net.shibboleth.idp.installation";
     
     /** Logger. */
-    @Nonnull private final Logger log = LoggerFactory.getLogger(InstallableComponentGuageSet.class);
+    @Nonnull private final Logger log = LoggerFactory.getLogger(InstallableComponentGaugeSet.class);
 
     /** The map of gauges. */
     @Nonnull private final Map<String,Metric> gauges = new HashMap<>();
@@ -84,7 +84,7 @@ public class InstallableComponentGuageSet extends AbstractIdentifiableInitializa
     @NonnullAfterInit private InstallableComponentVersion idpVersion;
     
     /** Constructor. */
-    public InstallableComponentGuageSet() {
+    public InstallableComponentGaugeSet() {
         gauges.put(MetricRegistry.name(DEFAULT_METRIC_NAME, "plugins", "list"),
                 new Gauge<Map<String, InstallableComponentVersion>>() {
                     public Map<String, InstallableComponentVersion> getValue() {
