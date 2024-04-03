@@ -333,9 +333,10 @@
 
     <bean id="PopulateDecryptionParameters" parent="NestedWebFlowProfileActionAdaptor" scope="prototype">
         <constructor-arg>
-		    <bean class="org.opensaml.profile.action.impl.PopulateDecryptionParameters"
-		        p:configurationLookupStrategy-ref="shibboleth.DecryptionConfigurationLookup"
-		        p:decryptionParametersResolver-ref="shibboleth.DecryptionParametersResolver" />
+            <bean class="org.opensaml.profile.action.impl.PopulateDecryptionParameters"
+                p:recipientLookupStrategy-ref="shibboleth.IssuerLookup.Simple"
+                p:configurationLookupStrategy-ref="shibboleth.DecryptionConfigurationLookup"
+                p:decryptionParametersResolver-ref="shibboleth.DecryptionParametersResolver" />
         </constructor-arg>
     </bean>
     
