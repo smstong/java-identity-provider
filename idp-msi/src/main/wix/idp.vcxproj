@@ -1,9 +1,9 @@
-<Project Sdk="WixToolset.Sdk/4.0.2">
+<Project Sdk="WixToolset.Sdk/4.0.5">
     <ItemGroup>
-	<PackageReference Include="WixToolset.Util.wixext" Version="4.0.2"/>
-	<PackageReference Include="WixToolset.UI.wixext" Version="4.0.2"/>
-	<PackageReference Include="WixToolset.Firewall.wixext" Version="4.0.2" />
-	<PackageReference Include="WixToolset.Heat" Version="4.0.2" />
+	<PackageReference Include="WixToolset.Util.wixext" Version="4.0.5"/>
+	<PackageReference Include="WixToolset.UI.wixext" Version="4.0.5"/>
+	<PackageReference Include="WixToolset.Firewall.wixext" Version="4.0.5" />
+	<PackageReference Include="WixToolset.Heat" Version="4.0.5" />
     </ItemGroup>
     <PropertyGroup>
 	<IdPVersion>unspecified</IdPVersion>
