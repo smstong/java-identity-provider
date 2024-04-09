@@ -7,7 +7,7 @@
     <parent>
         <groupId>net.shibboleth.idp</groupId>
         <artifactId>idp-parent</artifactId>
-	<!-- DO NO CHANGE VERSION without changing msi.version below -->
+        <!-- DO NO CHANGE VERSION without changing msi.version below -->
         <version>5.1.2-SNAPSHOT</version>
     </parent>
 
@@ -20,11 +20,12 @@
     <properties>
         <!-- where to put the jetty-base we are making -->
         <assemblyDirectory>${project.build.directory}/idp-jetty-base</assemblyDirectory>
-	<!-- msi Version  - CHANGE IN LOCKSTEP WITH THE VERSION ABOVE
-	     99 is shorthand for SNAPSHOT
-	-->
-	<supress.validation>false</supress.validation>
-	<msi.version>5.1.1.99</msi.version>
+        <!-- msi Version  - CHANGE IN LOCKSTEP WITH THE VERSION ABOVE
+             99 is shorthand for SNAPSHOT
+        -->
+        <msi.version>5.1.2.99</msi.version>
+        <supress.validation>false</supress.validation>
+        <maven-gpg-plugin.version>3.2.3</maven-gpg-plugin.version>
     </properties>
 
     <profiles>
@@ -82,7 +83,7 @@
                                     <arguments>
                                         <argument>clean</argument>
                                         <argument>src/main/wix/idp.vcxproj</argument>
-					<argument>/p:SuppressValidation=${supress.validation}</argument>
+                                        <argument>/p:SuppressValidation=${supress.validation}</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
@@ -119,11 +120,87 @@
                                 <configuration>
                                     <target>
                                         <copy file="src/main/wix/obj/Debug/idp.msi"
-					      tofile="${project.build.directory}/shibboleth-identity-provider-${project.version}-x64.msi"/>
+                                              tofile="${project.build.directory}/shibboleth-identity-provider-${project.version}-x64.msi"/>
                                     </target>
                                 </configuration>
                             </execution>
                         </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>sign-and-push-snapshot</id>
+            <build>
+                <plugins>
+                    <!-- Create gnupg-homedir and import secret key from env. -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <executions>
+                            <execution>
+                                <id>create-gnupg-homedir-and-import-secret-key-from-env</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <mkdir dir="${project.basedir}/gnupg" />
+                                        <chmod dir="${project.basedir}/gnupg" perm="700" verbose="true" />
+                                        <copy todir="${project.basedir}/gnupg" file="${env.GPG_SECRET}" verbose="true" />
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Sign artifacts with gnupg homedir and passphrase from env. -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>sign-and-push-msi</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign-and-deploy-file</goal>
+                                </goals>
+                                <configuration>
+                                    <url>https://build.shibboleth.net/nexus-proxy/content/repositories/snapshots</url>
+                                    <repositoryId>snapshot</repositoryId>
+                                    <file>${project.basedir}/target/shibboleth-identity-provider-${project.version}-x64.msi</file>
+                                    <groupId>net.shibboleth.idp</groupId>
+                                    <artifactId>idp-msi</artifactId>
+                                    <version>${project.version}</version>
+                                    <generatePom>false</generatePom>
+                                    <classifier>msi</classifier>
+                                    <homedir>${project.basedir}/gnupg</homedir>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Delete gnupg homedir. -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-clean-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>delete-gnupg-homedir</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>clean</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <excludeDefaultDirectories>true</excludeDefaultDirectories>
+                            <filesets>
+                                <fileset>
+                                    <directory>${project.basedir}/gnupg</directory>
+                                </fileset>
+                            </filesets>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
