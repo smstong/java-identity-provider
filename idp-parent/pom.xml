@@ -8,7 +8,7 @@
     <parent>
         <groupId>net.shibboleth</groupId>
         <artifactId>parent</artifactId>
-        <version>11.3.7</version>
+        <version>11.3.8-SNAPSHOT</version>
     </parent>
 
     <name>Shibboleth Identity Provider</name>
@@ -68,10 +68,10 @@
     <properties>
         <shibboleth.projectName>java-identity-provider</shibboleth.projectName>
         <idwsfconsumer.version>2.1.0</idwsfconsumer.version>
-        <java-support.version>8.4.2</java-support.version>
+        <java-support.version>8.4.3-SNAPSHOT</java-support.version>
         <opensaml.groupId>org.opensaml</opensaml.groupId>
-        <opensaml.version>4.3.2</opensaml.version>
-        <spring-extensions.version>6.3.2</spring-extensions.version>
+        <opensaml.version>4.3.3-SNAPSHOT</opensaml.version>
+        <spring-extensions.version>6.3.3-SNAPSHOT</spring-extensions.version>
         <checkstyle.configLocation>${project.basedir}/../idp-parent/resources/checkstyle/checkstyle.xml</checkstyle.configLocation>
     </properties>
 
