@@ -105,6 +105,9 @@ public class ServiceTicketResponse {
      * @return URL that may be used to redirect to a service with a granted ticket
      */
     @Nonnull public String getRedirectUrl() {
+        // TODO: Get this call out of here, Spring has patched it 3 times and counting.
+        // If the original call doesn't even check for duplicate parameter names in the original URL
+        // I doubt this is even bulletproof, though I don't know the CAS spec enough to say.
         final UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(serviceURL);
         builder.queryParam(getTicketParameterName(), serviceTicket);
         return builder.build().toUriString();
