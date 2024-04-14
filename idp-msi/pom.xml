@@ -25,7 +25,6 @@
         -->
         <msi.version>5.1.2.99</msi.version>
         <supress.validation>false</supress.validation>
-        <maven-gpg-plugin.version>3.2.3</maven-gpg-plugin.version>
     </properties>
 
     <profiles>
@@ -131,6 +130,12 @@
         </profile>
         <profile>
             <id>sign-and-push-snapshot</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+	    <properties>
+		<maven-gpg-plugin.version>3.2.3</maven-gpg-plugin.version>
+	    </properties>
             <build>
                 <plugins>
                     <!-- Create gnupg-homedir and import secret key from env. -->
