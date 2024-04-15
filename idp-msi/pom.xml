@@ -23,7 +23,7 @@
         <!-- msi Version  - CHANGE IN LOCKSTEP WITH THE VERSION ABOVE
              99 is shorthand for SNAPSHOT
         -->
-        <msi.version>5.1.2.99</msi.version>
+        <msi.version>5.1.2.1</msi.version>
         <supress.validation>false</supress.validation>
     </properties>
 
