@@ -158,11 +158,12 @@ public class X509ProxyFilterTest extends BaseAuthenticationContextTest {
         filter.doFilter(
                 request,
                 (ServletResponse) src.getExternalContext().getNativeResponse(),
-                new MockFilterChain());
+                new MockFilterChain()); 
         
-        Assert.assertEquals(1, ((X509Certificate[]) request.getAttribute("jakarta.servlet.request.X509Certificate")).length);
-        Assert.assertEquals("CN=foobar.example.org, O=Internet2",
-                ((X509Certificate[]) request.getAttribute("jakarta.servlet.request.X509Certificate"))[0].getSubjectDN().toString());
+        final X509Certificate[] certs = (X509Certificate[]) request.getAttribute("jakarta.servlet.request.X509Certificate");
+        assert certs != null;
+        Assert.assertEquals(1, certs.length);
+        Assert.assertEquals("CN=foobar.example.org, O=Internet2", certs[0].getSubjectDN().toString());
     }
 
     @SuppressWarnings("deprecation")
@@ -175,11 +176,13 @@ public class X509ProxyFilterTest extends BaseAuthenticationContextTest {
                 request,
                 (ServletResponse) src.getExternalContext().getNativeResponse(),
                 new MockFilterChain());
+
+        final X509Certificate[] certs = (X509Certificate[]) request.getAttribute("jakarta.servlet.request.X509Certificate");
+        assert certs != null;
         
-        Assert.assertEquals(2, ((X509Certificate[]) request.getAttribute("jakarta.servlet.request.X509Certificate")).length);
-        Assert.assertEquals("CN=foobar.example.org, O=Internet2",
-                ((X509Certificate[]) request.getAttribute("jakarta.servlet.request.X509Certificate"))[0].getSubjectDN().toString());
-        Assert.assertEquals("CN=idp.example.org",
-                ((X509Certificate[]) request.getAttribute("jakarta.servlet.request.X509Certificate"))[1].getSubjectDN().toString());
+        Assert.assertEquals(2, certs.length);
+        Assert.assertEquals("CN=foobar.example.org, O=Internet2", certs[0].getSubjectDN().toString());
+        Assert.assertEquals("CN=idp.example.org", certs[1].getSubjectDN().toString());
     }
+
 }
