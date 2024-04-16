@@ -195,7 +195,7 @@ public class IdPInstallerArguments extends AbstractCommandLineArguments {
 
         out.println(String.format("  %-22s %s", "-hc, --http-client",
                 "Bean name for an http client (for Module and Plugin Operations"));
-        out.println(String.format("  %-22s %s", "-hs, --http-securityt",
+        out.println(String.format("  %-22s %s", "-hs, --http-security",
                 "Bean name for http security parameters (for Module and Plugin Operations"));
         out.println();
     }
