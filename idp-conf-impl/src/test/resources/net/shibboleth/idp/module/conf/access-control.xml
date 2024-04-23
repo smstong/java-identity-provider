@@ -41,6 +41,10 @@
             </bean>
         </entry>
         
+        <entry key="AccessByAnyone">
+            <bean parent="shibboleth.PredicateAccessControl" c:_0-ref="shibboleth.Conditions.TRUE" />
+        </entry>
+        
         <!--
         <entry key="AccessByAttribute">
             <bean parent="shibboleth.PredicateAccessControl">
