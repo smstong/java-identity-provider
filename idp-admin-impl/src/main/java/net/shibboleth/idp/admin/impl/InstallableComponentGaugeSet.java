@@ -256,8 +256,8 @@ public class InstallableComponentGaugeSet extends AbstractIdentifiableInitializa
         final String idpVersionStr = Version.getVersion();
         if (idpVersionStr == null) {
             // So things work inside Eclipse.
-            log.warn("Could not find current IdP Version (likely operating inside IDE), assuming V5.0.0");
-            idpVersion = new InstallableComponentVersion(5,0,0);
+            log.warn("Could not find current IdP Version (likely operating inside IDE), assuming V5.1.2");
+            idpVersion = new InstallableComponentVersion(5, 1, 2);
         } else {
             idpVersion = new InstallableComponentVersion(idpVersionStr); 
         }

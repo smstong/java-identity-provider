@@ -35,13 +35,14 @@ public class PluginInfo extends InstallableComponentInfo {
      * @param id the plugin Id to ask about.
      * @param props the properties file to load from
      */
-    public PluginInfo(@Nonnull String id, @Nonnull Properties props) {
+    public PluginInfo(@Nonnull final String id, @Nonnull final Properties props) {
         super(id, props);
     }
 
     /** {@inheritDoc} */
     @Override
-    protected @Nullable InstallableComponentVersion getMaxVersion(@Nonnull Properties props, @Nonnull String version) {
+    protected @Nullable InstallableComponentVersion getMaxVersion(@Nonnull final Properties props,
+            @Nonnull final String version) {
         final String maxVersionInfo = StringSupport.trimOrNull(
                 props.getProperty(getComponentId()  + InstallableComponentSupport.MAX_IDP_VERSION_INTERFIX + version));
         if (maxVersionInfo == null) {
@@ -53,7 +54,8 @@ public class PluginInfo extends InstallableComponentInfo {
     /** {@inheritDoc} */
     @Override
     @Nullable
-    protected InstallableComponentVersion getMinVersion(@Nonnull Properties props, @Nonnull String version) {
+    protected InstallableComponentVersion getMinVersion(@Nonnull final Properties props,
+            @Nonnull final String version) {
         final String minVersionInfo = StringSupport.trimOrNull(
                 props.getProperty(getComponentId() + InstallableComponentSupport.MIN_IDP_VERSION_INTERFIX + version));
         if (minVersionInfo == null) {
