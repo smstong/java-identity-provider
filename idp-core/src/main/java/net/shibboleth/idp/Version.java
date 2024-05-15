@@ -45,6 +45,10 @@ public final class Version {
      * @return version of the IdP
      */
     @Nullable public static String getVersion() {
+        if (VERSION == null) {
+            return "5.1.2";
+        }
         return VERSION;
     }
+
 }

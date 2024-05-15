@@ -41,7 +41,7 @@ public class ReportModuleStatus extends AbstractIdentifiableInitializableCompone
     @Nonnull private final Logger log = LoggerFactory.getLogger(ReportModuleStatus.class);
     
     /** The IdOP Home dir. */
-    @Nonnull private String idpHome="";
+    @Nonnull private String idpHome = "";
 
     /**
      * Sets IdP home location.
@@ -49,7 +49,7 @@ public class ReportModuleStatus extends AbstractIdentifiableInitializableCompone
      * @param input what to set.
      */
     public void setIdpHome(@Nonnull @NotEmpty final String input) {
-        idpHome = Constraint.isNotNull(input, "IdpHome not set");
+        idpHome = Constraint.isNotNull(input, "idp.home property cannot be null");
     }
     
     /**
