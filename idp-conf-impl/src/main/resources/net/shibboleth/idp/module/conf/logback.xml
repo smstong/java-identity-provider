@@ -30,7 +30,7 @@
     <variable name="idp.loglevel.httpclient" value="${idp.loglevel.httpclient:-INFO}" />
     
     <!-- Don't turn these up unless you want a *lot* of noise. -->
-    <variable name="idp.loglevel.spring" value="${idp.loglevel.spring:-ERROR}" />
+    <variable name="idp.loglevel.spring" value="${idp.loglevel.spring:-WARN}" />
     <variable name="idp.loglevel.container" value="${idp.loglevel.container:-ERROR}" />
     <variable name="idp.loglevel.xmlsec" value="${idp.loglevel.xmlsec:-INFO}" />
 
