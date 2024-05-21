@@ -15,10 +15,12 @@
 package net.shibboleth.idp.authn.impl;
 
 import java.util.Enumeration;
+import java.util.function.Function;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.opensaml.messaging.context.navigate.ChildContextLookup;
 import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
@@ -34,6 +36,7 @@ import net.shibboleth.shared.annotation.constraint.NotEmpty;
 import net.shibboleth.shared.codec.Base64Support;
 import net.shibboleth.shared.codec.DecodingException;
 import net.shibboleth.shared.collection.Pair;
+import net.shibboleth.shared.logic.Constraint;
 import net.shibboleth.shared.primitive.LoggerFactory;
 import net.shibboleth.shared.primitive.StringSupport;
 
@@ -56,14 +59,37 @@ public class ExtractUsernamePasswordFromBasicAuth extends AbstractExtractionActi
     /** Class logger. */
     @Nonnull private final Logger log = LoggerFactory.getLogger(ExtractUsernamePasswordFromBasicAuth.class);
     
+    /** Creation strategy for UsernamePasswordContext. */
+    @Nonnull private Function<ProfileRequestContext,UsernamePasswordContext> contextCreationStrategy;
+    
+    /** Constructor. */
+    @SuppressWarnings("null")
+    public ExtractUsernamePasswordFromBasicAuth() {
+        contextCreationStrategy = new ChildContextLookup<>(UsernamePasswordContext.class, true).compose(
+                new ChildContextLookup<>(AuthenticationContext.class));
+    }
+    
+    /**
+     * Sets the creation strategy for the {@link UsernamePasswordContext}.
+     * 
+     * @param strategy creation strategy
+     * 
+     * @since 5.1.3
+     */
+    public void setUsernamePasswordContextCreationStrategy(
+            @Nonnull final Function<ProfileRequestContext,UsernamePasswordContext> strategy) {
+        checkSetterPreconditions();
+        
+        contextCreationStrategy = Constraint.isNotNull(strategy,
+                "UsernamePasswordContext creation strategy cannot be null");
+    }
+    
     /** {@inheritDoc} */
-    // CheckStyle: ReturnCount OFF
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
 
-        final UsernamePasswordContext upCtx =
-                authenticationContext.ensureSubcontext(UsernamePasswordContext.class);
+        final UsernamePasswordContext upCtx = contextCreationStrategy.apply(profileRequestContext);
         upCtx.setUsername(null);
         upCtx.setPassword(null);
         
@@ -89,7 +115,6 @@ public class ExtractUsernamePasswordFromBasicAuth extends AbstractExtractionActi
         upCtx.setUsername(applyTransforms(profileRequestContext, decodedCredentials.getFirst()))
             .setPassword(decodedCredentials.getSecond());
     }
-    // CheckStyle: ReturnCount ON
 
     /**
      * Gets the encoded credentials passed in via the {@link HttpHeaders#AUTHORIZATION} header. This method checks to
