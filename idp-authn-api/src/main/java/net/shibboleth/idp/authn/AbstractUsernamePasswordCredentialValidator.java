@@ -58,7 +58,7 @@ public abstract class AbstractUsernamePasswordCredentialValidator extends Abstra
     @Nonnull private final Logger log = LoggerFactory.getLogger(AbstractUsernamePasswordCredentialValidator.class);
 
     /** Lookup strategy for UP context. */
-    @Nonnull private Function<AuthenticationContext,UsernamePasswordContext> usernamePasswordContextLookupStrategy;
+    @Nonnull private Function<ProfileRequestContext,UsernamePasswordContext> usernamePasswordContextLookupStrategy;
     
     /** Whether to save the password in the Java Subject's private credentials. */
     private boolean savePasswordToCredentialSet;
@@ -79,8 +79,10 @@ public abstract class AbstractUsernamePasswordCredentialValidator extends Abstra
     private boolean trim;
     
     /** Constructor. */
+    @SuppressWarnings("null")
     public AbstractUsernamePasswordCredentialValidator() {
-        usernamePasswordContextLookupStrategy = new ChildContextLookup<>(UsernamePasswordContext.class);
+        usernamePasswordContextLookupStrategy = new ChildContextLookup<>(UsernamePasswordContext.class).compose(
+                new ChildContextLookup<>(AuthenticationContext.class));
 
         transforms = CollectionSupport.emptyList();
         
@@ -95,7 +97,7 @@ public abstract class AbstractUsernamePasswordCredentialValidator extends Abstra
      * @param strategy lookup strategy
      */
     public void setUsernamePasswordContextLookupStrategy(
-            @Nonnull final Function<AuthenticationContext,UsernamePasswordContext> strategy) {
+            @Nonnull final Function<ProfileRequestContext,UsernamePasswordContext> strategy) {
         checkSetterPreconditions();
         usernamePasswordContextLookupStrategy = Constraint.isNotNull(strategy,
                 "UsernamePasswordContextLookupStrategy cannot be null");
@@ -191,7 +193,7 @@ public abstract class AbstractUsernamePasswordCredentialValidator extends Abstra
             @Nullable final ErrorHandler errorHandler) throws Exception {
         checkComponentActive();
         
-        final UsernamePasswordContext upContext = usernamePasswordContextLookupStrategy.apply(authenticationContext);
+        final UsernamePasswordContext upContext = usernamePasswordContextLookupStrategy.apply(profileRequestContext);
         if (upContext == null) {
             log.debug("{} No UsernamePasswordContext available", getLogPrefix());
             if (errorHandler != null) {
