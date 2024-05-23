@@ -26,6 +26,8 @@ import net.shibboleth.shared.annotation.constraint.NotEmpty;
 import net.shibboleth.shared.logic.Constraint;
 import net.shibboleth.shared.logic.FunctionSupport;
 import net.shibboleth.shared.logic.PredicateSupport;
+import net.shibboleth.shared.primitive.DeprecationSupport;
+import net.shibboleth.shared.primitive.DeprecationSupport.ObjectType;
 
 import org.opensaml.messaging.context.MessageContext;
 import org.opensaml.profile.context.ProfileRequestContext;
@@ -112,7 +114,7 @@ public abstract class AbstractSAMLProfileConfiguration extends AbstractIntercept
     public Function<MessageContext,Exception> getMessageHandler(@Nullable final MessageContext messageContext) {
         return messageHandlerLookupStrategy.apply(messageContext);
     }
-    
+
     /**
      * Set a handler for the SAML message.
      * 
@@ -120,8 +122,24 @@ public abstract class AbstractSAMLProfileConfiguration extends AbstractIntercept
      * 
      * @since 5.0.0
      */
-    public void setMessageDecorator(@Nullable final Function<MessageContext,Exception> handler) {
+    public void setMessageHandler(@Nullable final Function<MessageContext,Exception> handler) {
         messageHandlerLookupStrategy = FunctionSupport.constant(handler);
+    }
+
+    /**
+     * Set a handler for the SAML message.
+     * 
+     * @param handler message handler
+     * 
+     * @since 5.0.0
+     * 
+     * @deprecated
+     */
+    @Deprecated(forRemoval=true, since="5.0.0")
+    public void setMessageDecorator(@Nullable final Function<MessageContext,Exception> handler) {
+        DeprecationSupport.warn(ObjectType.METHOD, "SAMLProfileConfiguration.setMessageDecorator", "relying-party.xml",
+                "SAMLProfileConfiguration.setMessageHandler");
+        setMessageHandler(handler);
     }
     
     /**
