@@ -120,7 +120,7 @@ public abstract class AbstractProfileAction extends AbstractConditionalProfileAc
         final ProfileRequestContext profileRequestContext =
                 profileContextLookupStrategy.apply(springRequestContext);
         if (profileRequestContext == null) {
-            log.error("{} IdP profile request context is not available", getLogPrefix());
+            log.error("{} ProfileEequestContext is not available", getLogPrefix());
             return ActionSupport.buildEvent(this, EventIds.INVALID_PROFILE_CTX);
         }
 
