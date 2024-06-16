@@ -33,3 +33,20 @@ mail: paul.principal@shibboleth.net
 mail: paulprincipal@shibboleth.net
 description: test principal
 
+# dn: cn=Raphaël Weiß,ou=people,dc=shibboleth,dc=net
+dn:: Y249UmFwaGHDq2wgV2Vpw58sb3U9cGVvcGxlLGRjPXNoaWJib2xldGgsZGM9bmV0
+objectclass: inetOrgPerson
+# cn: Raphaël_Weiß
+cn:: UmFwaGHDq2wgV2Vpw58=
+# sn: Weiß
+sn:: V2Vpw58=
+# uid: RAPHAËL_WEIß
+uid:: UkFQSEHDi0xfV0VJw58=
+userpassword: changeit
+homephone: 555-111-4444
+# mail: raphaël.weiß@shibboleth.net
+mail:: cmFwaGHDq2wud2Vpw59Ac2hpYmJvbGV0aC5uZXQ=
+# mail: raphaëlweiß@shibboleth.net
+mail:: cmFwaGHDq2x3ZWnDn0BzaGliYm9sZXRoLm5ldA==
+# description: März Äpfel
+description:: TcOkcnogw4RwZmVs

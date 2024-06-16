@@ -437,30 +437,14 @@ public class LDAPCredentialValidatorTest extends BaseAuthenticationContextTest {
         doExtract();
 
         final Event event = action.execute(src);
-        AuthenticationResult result = ac.getAuthenticationResult();
-        LDAPResponseContext lrc = ac.getSubcontext(LDAPResponseContext.class);
-        assert lrc != null;
-        final AuthenticationResponse lar = lrc.getAuthenticationResponse();
-        assert lar != null;
-        Assert.assertEquals(lar.getAuthenticationResultCode(),
-                AuthenticationResultCode.AUTHENTICATION_HANDLER_SUCCESS);
 
-        final AuthenticationErrorContext aec = ac.getSubcontext(AuthenticationErrorContext.class);
-        Assert.assertNull(aec);
+        assertAuthSuccess(ac, "PETER_THE_PRINCIPAL");
+
         final AuthenticationWarningContext awc = ac.getSubcontext(AuthenticationWarningContext.class);
-        assert awc != null && result != null;
-
+        assert awc != null;
         ActionTestingSupport.assertEvent(event, "ExpiredPassword");
         Assert.assertEquals(awc.getClassifiedWarnings().size(), 1);
         Assert.assertTrue(awc.isClassifiedWarning("ExpiredPassword"));
-
-        final UsernamePrincipal up = result.getSubject().getPrincipals(UsernamePrincipal.class).iterator().next();
-        Assert.assertNotNull(up);
-        Assert.assertEquals(up.getName(), "PETER_THE_PRINCIPAL");
-        final LdapPrincipal lp = result.getSubject().getPrincipals(LdapPrincipal.class).iterator().next();
-        Assert.assertNotNull(lp);
-        Assert.assertEquals(lp.getName(), "PETER_THE_PRINCIPAL");
-        Assert.assertNotNull(lp.getLdapEntry());
     }
 
     @Test public void testExpiringPassword() throws ComponentInitializationException {
@@ -484,32 +468,13 @@ public class LDAPCredentialValidatorTest extends BaseAuthenticationContextTest {
 
         final Event event = action.execute(src);
 
-        final AuthenticationErrorContext aec = ac.getSubcontext(AuthenticationErrorContext.class);
-        Assert.assertNull(aec);
-
-        final AuthenticationResult result = ac.getAuthenticationResult();
-        Assert.assertNotNull(result);
-        final LDAPResponseContext lrc = ac.getSubcontext(LDAPResponseContext.class);
-        assert lrc != null;
-        final AuthenticationResponse lar = lrc.getAuthenticationResponse();
-        assert lar != null;
-        Assert.assertEquals(lar.getAuthenticationResultCode(),
-                AuthenticationResultCode.AUTHENTICATION_HANDLER_SUCCESS);
+        assertAuthSuccess(ac, "PETER_THE_PRINCIPAL");
 
         ActionTestingSupport.assertEvent(event, "ExpiringPassword");
-
         final AuthenticationWarningContext awc = ac.getSubcontext(AuthenticationWarningContext.class);
-        assert awc != null && result != null;
+        assert awc != null;
         Assert.assertEquals(awc.getClassifiedWarnings().size(), 1);
         Assert.assertTrue(awc.isClassifiedWarning("ExpiringPassword"));
-
-        final UsernamePrincipal up = result.getSubject().getPrincipals(UsernamePrincipal.class).iterator().next();
-        Assert.assertNotNull(up);
-        Assert.assertEquals(up.getName(), "PETER_THE_PRINCIPAL");
-        final LdapPrincipal lp = result.getSubject().getPrincipals(LdapPrincipal.class).iterator().next();
-        Assert.assertNotNull(lp);
-        Assert.assertEquals(lp.getName(), "PETER_THE_PRINCIPAL");
-        Assert.assertNotNull(lp.getLdapEntry());
     }
 
     @Test public void testAuthorized() throws ComponentInitializationException {
@@ -529,26 +494,8 @@ public class LDAPCredentialValidatorTest extends BaseAuthenticationContextTest {
 
         final Event event = action.execute(src);
         ActionTestingSupport.assertProceedEvent(event);
-        
-        final AuthenticationErrorContext aec = ac.getSubcontext(AuthenticationErrorContext.class);
-        Assert.assertNull(aec);
 
-        final AuthenticationResult result = ac.getAuthenticationResult();
-        assert result != null;
-        final LDAPResponseContext lrc = ac.getSubcontext(LDAPResponseContext.class);
-        assert lrc != null;
-        final AuthenticationResponse lar = lrc.getAuthenticationResponse();
-        assert lar != null;
-        Assert.assertEquals(lar.getAuthenticationResultCode(),
-                AuthenticationResultCode.AUTHENTICATION_HANDLER_SUCCESS);
-
-        final UsernamePrincipal up = result.getSubject().getPrincipals(UsernamePrincipal.class).iterator().next();
-        Assert.assertNotNull(up);
-        Assert.assertEquals(up.getName(), "PETER_THE_PRINCIPAL");
-        final LdapPrincipal lp = result.getSubject().getPrincipals(LdapPrincipal.class).iterator().next();
-        Assert.assertNotNull(lp);
-        Assert.assertEquals(lp.getName(), "PETER_THE_PRINCIPAL");
-        Assert.assertNotNull(lp.getLdapEntry());
+        assertAuthSuccess(ac, "PETER_THE_PRINCIPAL");
     }
 
     @Test public void testComputedAndAuthorized() throws ComponentInitializationException {
@@ -578,26 +525,8 @@ public class LDAPCredentialValidatorTest extends BaseAuthenticationContextTest {
 
         final Event event = action.execute(src);
         ActionTestingSupport.assertProceedEvent(event);
-        
-        final AuthenticationErrorContext aec = ac.getSubcontext(AuthenticationErrorContext.class);
-        Assert.assertNull(aec);
 
-        final AuthenticationResult result = ac.getAuthenticationResult();
-        assert result != null;
-        final LDAPResponseContext lrc = ac.getSubcontext(LDAPResponseContext.class);
-        assert lrc != null;
-        final AuthenticationResponse lar = lrc.getAuthenticationResponse();
-        assert lar != null;
-        Assert.assertEquals(lar.getAuthenticationResultCode(),
-                AuthenticationResultCode.AUTHENTICATION_HANDLER_SUCCESS);
-
-        final UsernamePrincipal up = result.getSubject().getPrincipals(UsernamePrincipal.class).iterator().next();
-        Assert.assertNotNull(up);
-        Assert.assertEquals(up.getName(), "PETER_THE_PRINCIPAL");
-        final LdapPrincipal lp = result.getSubject().getPrincipals(LdapPrincipal.class).iterator().next();
-        Assert.assertNotNull(lp);
-        Assert.assertEquals(lp.getName(), "PETER_THE_PRINCIPAL");
-        Assert.assertNotNull(lp.getLdapEntry());
+        assertAuthSuccess(ac, "PETER_THE_PRINCIPAL");
     }
 
     @Test public void testDefaultFilterSyntax() throws ComponentInitializationException {
@@ -623,28 +552,92 @@ public class LDAPCredentialValidatorTest extends BaseAuthenticationContextTest {
         final Event event = action.execute(src);
         ActionTestingSupport.assertProceedEvent(event);
 
-        final AuthenticationErrorContext aec = ac.getSubcontext(AuthenticationErrorContext.class);
-        Assert.assertNull(aec);
-
-        final AuthenticationResult result = ac.getAuthenticationResult();
-        assert result != null;
-        final LDAPResponseContext lrc = ac.getSubcontext(LDAPResponseContext.class);
-        assert lrc != null;
-        final AuthenticationResponse lar = lrc.getAuthenticationResponse();
-        assert lar != null;
-        Assert.assertEquals(lar.getAuthenticationResultCode(),
-                AuthenticationResultCode.AUTHENTICATION_HANDLER_SUCCESS);
-
-        final UsernamePrincipal up = result.getSubject().getPrincipals(UsernamePrincipal.class).iterator().next();
-        Assert.assertNotNull(up);
-        Assert.assertEquals(up.getName(), "PETER_THE_PRINCIPAL");
-        final LdapPrincipal lp = result.getSubject().getPrincipals(LdapPrincipal.class).iterator().next();
-        Assert.assertNotNull(lp);
-        Assert.assertEquals(lp.getName(), "PETER_THE_PRINCIPAL");
-        Assert.assertNotNull(lp.getLdapEntry());
+        assertAuthSuccess(ac, "PETER_THE_PRINCIPAL");
     }
 
-    @Test public void testCombinedFilterSyntax() throws ComponentInitializationException {
+    @Test public void testDefaultFilterSyntaxMultiByte() throws ComponentInitializationException {
+        final TemplateSearchDnResolver testResolver = new TemplateSearchDnResolver(
+          new DefaultConnectionFactory("ldap://localhost:10389"), VelocityEngine.newVelocityEngine(), "(uid={user})");
+        testResolver.setBaseDn("ou=people,dc=shibboleth,dc=net");
+
+
+        final Authenticator defaultFilterAuthenticator = new Authenticator(testResolver, authHandler);
+        getMockHttpServletRequest(action).addParameter("username", "RAPHAËL_WEIß");
+        getMockHttpServletRequest(action).addParameter("password", "changeit");
+
+        final AuthenticationContext ac = prc.getSubcontext(AuthenticationContext.class);
+        assert ac != null;
+        ac.setAttemptedFlow(authenticationFlows.get(0));
+        validator.setAuthenticator(defaultFilterAuthenticator);
+        validator.initialize();
+
+        action.initialize();
+
+        doExtract();
+
+        final Event event = action.execute(src);
+        ActionTestingSupport.assertProceedEvent(event);
+
+        assertAuthSuccess(ac, "RAPHAËL_WEIß");
+    }
+
+    @Test public void testVelocityFilterSyntax() throws ComponentInitializationException {
+        final TemplateSearchDnResolver testResolver = new TemplateSearchDnResolver(
+          new DefaultConnectionFactory("ldap://localhost:10389"),
+          VelocityEngine.newVelocityEngine(),
+          "(uid=$usernamePasswordContext.username)");
+        testResolver.setBaseDn("ou=people,dc=shibboleth,dc=net");
+
+
+        final Authenticator defaultFilterAuthenticator = new Authenticator(testResolver, authHandler);
+        getMockHttpServletRequest(action).addParameter("username", "PETER_THE_PRINCIPAL");
+        getMockHttpServletRequest(action).addParameter("password", "changeit");
+
+        final AuthenticationContext ac = prc.getSubcontext(AuthenticationContext.class);
+        assert ac != null;
+        ac.setAttemptedFlow(authenticationFlows.get(0));
+        validator.setAuthenticator(defaultFilterAuthenticator);
+        validator.initialize();
+
+        action.initialize();
+
+        doExtract();
+
+        final Event event = action.execute(src);
+        ActionTestingSupport.assertProceedEvent(event);
+
+        assertAuthSuccess(ac, "PETER_THE_PRINCIPAL");
+    }
+
+    @Test public void testVelocityFilterSyntaxMultiByte() throws ComponentInitializationException {
+        final TemplateSearchDnResolver testResolver = new TemplateSearchDnResolver(
+          new DefaultConnectionFactory("ldap://localhost:10389"),
+          VelocityEngine.newVelocityEngine(),
+          "(uid=$usernamePasswordContext.username)");
+        testResolver.setBaseDn("ou=people,dc=shibboleth,dc=net");
+
+
+        final Authenticator defaultFilterAuthenticator = new Authenticator(testResolver, authHandler);
+        getMockHttpServletRequest(action).addParameter("username", "RAPHAËL_WEIß");
+        getMockHttpServletRequest(action).addParameter("password", "changeit");
+
+        final AuthenticationContext ac = prc.getSubcontext(AuthenticationContext.class);
+        assert ac != null;
+        ac.setAttemptedFlow(authenticationFlows.get(0));
+        validator.setAuthenticator(defaultFilterAuthenticator);
+        validator.initialize();
+
+        action.initialize();
+
+        doExtract();
+
+        final Event event = action.execute(src);
+        ActionTestingSupport.assertProceedEvent(event);
+
+        assertAuthSuccess(ac, "RAPHAËL_WEIß");
+    }
+
+    @Test public void testCombinedVelocityFilterSyntax() throws ComponentInitializationException {
         final TemplateSearchDnResolver testResolver = new TemplateSearchDnResolver(
                 new DefaultConnectionFactory("ldap://localhost:10389"),
                 VelocityEngine.newVelocityEngine(), "(|(mail=$usernamePasswordContext.username)(uid={user}))");
@@ -668,25 +661,62 @@ public class LDAPCredentialValidatorTest extends BaseAuthenticationContextTest {
         final Event event = action.execute(src);
         ActionTestingSupport.assertProceedEvent(event);
 
-        final AuthenticationErrorContext aec = ac.getSubcontext(AuthenticationErrorContext.class);
-        Assert.assertNull(aec);
+        assertAuthSuccess(ac, "PETER_THE_PRINCIPAL");
+    }
 
-        final AuthenticationResult result = ac.getAuthenticationResult();
-        assert result != null;
-        final LDAPResponseContext lrc = ac.getSubcontext(LDAPResponseContext.class);
-        assert lrc != null;
-        final AuthenticationResponse lar = lrc.getAuthenticationResponse();
-        assert lar != null;
-        Assert.assertEquals(lar.getAuthenticationResultCode(),
-                AuthenticationResultCode.AUTHENTICATION_HANDLER_SUCCESS);
+    @Test public void testCombinedVelocityFilterSyntaxMultiByte() throws ComponentInitializationException {
+        final TemplateSearchDnResolver testResolver = new TemplateSearchDnResolver(
+          new DefaultConnectionFactory("ldap://localhost:10389"),
+          VelocityEngine.newVelocityEngine(), "(&(mail=$usernamePasswordContext.username)(description=März Äpfel))");
+        testResolver.setBaseDn("ou=people,dc=shibboleth,dc=net");
 
-        final UsernamePrincipal up = result.getSubject().getPrincipals(UsernamePrincipal.class).iterator().next();
-        Assert.assertNotNull(up);
-        Assert.assertEquals(up.getName(), "PETER_THE_PRINCIPAL");
-        final LdapPrincipal lp = result.getSubject().getPrincipals(LdapPrincipal.class).iterator().next();
-        Assert.assertNotNull(lp);
-        Assert.assertEquals(lp.getName(), "PETER_THE_PRINCIPAL");
-        Assert.assertNotNull(lp.getLdapEntry());
+
+        final Authenticator defaultFilterAuthenticator = new Authenticator(testResolver, authHandler);
+        getMockHttpServletRequest(action).addParameter("username", "raphaël.weiß@shibboleth.net");
+        getMockHttpServletRequest(action).addParameter("password", "changeit");
+
+        final AuthenticationContext ac = prc.getSubcontext(AuthenticationContext.class);
+        assert ac != null;
+        ac.setAttemptedFlow(authenticationFlows.get(0));
+        validator.setAuthenticator(defaultFilterAuthenticator);
+        validator.initialize();
+
+        action.initialize();
+
+        doExtract();
+
+        final Event event = action.execute(src);
+        ActionTestingSupport.assertProceedEvent(event);
+
+        assertAuthSuccess(ac, "raphaël.weiß@shibboleth.net");
+    }
+
+    @Test public void testCombinedVelocityFilterSyntaxMultiByteEscaped() throws ComponentInitializationException {
+        final TemplateSearchDnResolver testResolver = new TemplateSearchDnResolver(
+          new DefaultConnectionFactory("ldap://localhost:10389"),
+          VelocityEngine.newVelocityEngine(),
+          "(&(uid=$usernamePasswordContext.username)(description=M\\C3\\A4rz \\C3\\84pfel))");
+        testResolver.setBaseDn("ou=people,dc=shibboleth,dc=net");
+
+
+        final Authenticator defaultFilterAuthenticator = new Authenticator(testResolver, authHandler);
+        getMockHttpServletRequest(action).addParameter("username", "RAPHAËL_WEIß");
+        getMockHttpServletRequest(action).addParameter("password", "changeit");
+
+        final AuthenticationContext ac = prc.getSubcontext(AuthenticationContext.class);
+        assert ac != null;
+        ac.setAttemptedFlow(authenticationFlows.get(0));
+        validator.setAuthenticator(defaultFilterAuthenticator);
+        validator.initialize();
+
+        action.initialize();
+
+        doExtract();
+
+        final Event event = action.execute(src);
+        ActionTestingSupport.assertProceedEvent(event);
+
+        assertAuthSuccess(ac, "RAPHAËL_WEIß");
     }
 
     @Test public void testMatchAndAuthorized() throws ComponentInitializationException {
@@ -708,24 +738,7 @@ public class LDAPCredentialValidatorTest extends BaseAuthenticationContextTest {
         final Event event = action.execute(src);
         ActionTestingSupport.assertProceedEvent(event);
         
-        final AuthenticationErrorContext aec = ac.getSubcontext(AuthenticationErrorContext.class);
-        Assert.assertNull(aec);
-        final AuthenticationResult result = ac.getAuthenticationResult();
-        assert result != null ;
-        final LDAPResponseContext lrc = ac.getSubcontext(LDAPResponseContext.class);
-        assert lrc != null;
-        final AuthenticationResponse lar = lrc.getAuthenticationResponse();
-        assert lar != null;
-        Assert.assertEquals(lar.getAuthenticationResultCode(),
-                AuthenticationResultCode.AUTHENTICATION_HANDLER_SUCCESS);
-
-        final UsernamePrincipal up = result.getSubject().getPrincipals(UsernamePrincipal.class).iterator().next();
-        Assert.assertNotNull(up);
-        Assert.assertEquals(up.getName(), "PETER_THE_PRINCIPAL");
-        final LdapPrincipal lp = result.getSubject().getPrincipals(LdapPrincipal.class).iterator().next();
-        Assert.assertNotNull(lp);
-        Assert.assertEquals(lp.getName(), "PETER_THE_PRINCIPAL");
-        Assert.assertNotNull(lp.getLdapEntry());
+        assertAuthSuccess(ac, "PETER_THE_PRINCIPAL");
     }
 
     @Test public void testAuthorizedAndKeepContext() throws ComponentInitializationException {
@@ -745,6 +758,27 @@ public class LDAPCredentialValidatorTest extends BaseAuthenticationContextTest {
 
         final Event event = action.execute(src);
         ActionTestingSupport.assertProceedEvent(event);
+    }
+
+    private void assertAuthSuccess(final AuthenticationContext authContext, final String principalName) {
+        final AuthenticationErrorContext aec = authContext.getSubcontext(AuthenticationErrorContext.class);
+        Assert.assertNull(aec);
+        final AuthenticationResult result = authContext.getAuthenticationResult();
+        assert result != null;
+        final LDAPResponseContext lrc = authContext.getSubcontext(LDAPResponseContext.class);
+        assert lrc != null;
+        final AuthenticationResponse lar = lrc.getAuthenticationResponse();
+        assert lar != null;
+        Assert.assertEquals(lar.getAuthenticationResultCode(),
+          AuthenticationResultCode.AUTHENTICATION_HANDLER_SUCCESS);
+
+        final UsernamePrincipal up = result.getSubject().getPrincipals(UsernamePrincipal.class).iterator().next();
+        Assert.assertNotNull(up);
+        Assert.assertEquals(up.getName(), principalName);
+        final LdapPrincipal lp = result.getSubject().getPrincipals(LdapPrincipal.class).iterator().next();
+        Assert.assertNotNull(lp);
+        Assert.assertEquals(lp.getName(), principalName);
+        Assert.assertNotNull(lp.getLdapEntry());
     }
 
     private void doExtract() throws ComponentInitializationException {
