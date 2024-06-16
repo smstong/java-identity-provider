@@ -14,6 +14,7 @@
 
 package net.shibboleth.idp.authn;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -43,7 +44,7 @@ public abstract class AbstractTemplateSearchDnResolver extends SearchDnResolver 
     @Nonnull private final Template template;
 
     /** Event handler used for escaping. */
-    private ReferenceInsertionEventHandler eventHandler = new EscapingReferenceInsertionEventHandler();
+    private final ReferenceInsertionEventHandler eventHandler = new EscapingReferenceInsertionEventHandler();
 
     /**
      * Creates a new abstract template search DN resolver.
@@ -55,7 +56,7 @@ public abstract class AbstractTemplateSearchDnResolver extends SearchDnResolver 
      */
     public AbstractTemplateSearchDnResolver(@Nonnull final VelocityEngine engine,
             @Nonnull @NotEmpty final String filter) throws VelocityException {
-        template = Template.fromTemplate(engine, filter);
+        template = Template.fromTemplate(engine, filter, StandardCharsets.UTF_8);
         setUserFilter(filter);
     }
 
