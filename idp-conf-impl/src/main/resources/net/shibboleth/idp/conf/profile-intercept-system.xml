@@ -14,7 +14,7 @@
 
     <import resource="conditional:${idp.home}/conf/intercept/profile-intercept.xml" />
 
-    <!-- Management bean to collect and expose AuthenticationFlowDescriptors. -->
+    <!-- Management bean to collect and expose ProfileInterceptorFlowDescriptor. -->
     
     <bean id="shibboleth.ProfileInterceptorFlowDescriptorManager"
         class="net.shibboleth.idp.profile.interceptor.impl.ProfileInterceptorFlowDescriptorManager"
