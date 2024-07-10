@@ -14,6 +14,10 @@
 
 package net.shibboleth.idp.installer.impl;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -128,6 +132,15 @@ public final class CopyDistribution {
         final Path dist = installerProps.getTargetDir().resolve("dist");
         assert dist!=null;
         InstallerSupport.createDirectory(dist);
+        final File donottouch = dist.resolve("DONOTTOUCH").toFile();
+        try (final Writer w = new FileWriter(donottouch)) {
+            w.write("\t\tWARNING\n\nContent of this folder is controlled by the install programs\n"
+                  + "If you add, delete or modify any file inside this directory\n"
+                  + "or its subdirectories you will find that things stop working\n"
+                  + "at some future date.\n");
+		} catch (final IOException e) {
+            log.error("Could not write {}, continuing", donottouch, e);
+		}
         final Path src = installerProps.getSourceDir();
         if (!Files.exists(src)) {
             log.error("Source distribution {} not found.", src);
