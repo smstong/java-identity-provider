@@ -155,7 +155,7 @@ public final class CurrentInstallState extends AbstractInitializableComponent {
         idpPropertiesPresent = Files.exists(targetDir.resolve("conf").resolve("idp.properties"));
         ldapPropertiesPresent = Files.exists(targetDir.resolve("conf").resolve("ldap.properties"));
         if (Files.exists(targetDir.resolve("system"))) {
-            log.error("'system' folder exists emove this and make appropriate changes to web.xml before proceeding");
+            log.error("'system' folder exists remove this and make appropriate changes to web.xml before proceeding");
             log.error("see https://shibboleth.atlassian.net/wiki/spaces/IDP5/pages/3199500925/Upgrading");
             throw new ComponentInitializationException("'systems folder exists");
         }
