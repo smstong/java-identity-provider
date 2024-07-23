@@ -59,7 +59,15 @@ public class RollbackTester {
         final Path to = Files.createTempFile(parent, "renamed", "file");
         final Path mc = Files.createTempDirectory(parent, "mod");
         final Path from = parent.resolve("fromFile");
-        final Pair<Path, Path> renamed = new Pair<>(from, to);
+
+        // simulate a rename followed by a create
+        final Path fromDir =Files.createTempDirectory(parent, "fromDir");
+        final Path toDir =Files.createTempDirectory(parent, "toDir");
+        final Path toDirChild = Files.createTempFile(toDir, "toDir", "child");
+        final Path fromDirChild = fromDir.resolve(toDir.relativize(toDirChild));
+
+        final Pair<Path, Path> renamedFiles = new Pair<>(from, to);
+        final Pair<Path, Path> renamedDirs = new Pair<>(fromDir, toDir);
         final IdPModule enabled1 = new TestModule("enabled1", null, null);
         final IdPModule enabled2 = new TestModule("enabled2", null, new ModuleException()); 
         final IdPModule disabled1 = new TestModule("disabled1", null, null);
@@ -74,6 +82,11 @@ public class RollbackTester {
             assertTrue(to.toFile().exists());
             assertTrue(copied.toFile().exists());
             
+            assertTrue(fromDir.toFile().exists());
+            assertFalse(fromDirChild.toFile().exists());
+            assertTrue(toDir.toFile().exists());
+            assertTrue(toDirChild.toFile().exists());
+
             enabled1.enable(ctx);
             assertTrue(enabled1.isEnabled(ctx));
             
@@ -85,7 +98,8 @@ public class RollbackTester {
             
             try (final RollbackPluginInstall rp = new RollbackPluginInstall(new ModuleContext(parentString), new HashMap<>())) {
                 rp.getFilesCopied().add(copied);
-                rp.getFilesRenamedAway().add(renamed);
+                rp.getFilesRenamedAway().add(renamedFiles);
+                rp.getFilesRenamedAway().add(renamedDirs);
                 rp.getModulesDisabled().add(disabled1);
                 rp.getModulesDisabled().add(disabled2);
                 rp.getModulesEnabled().add(enabled1);
@@ -102,7 +116,12 @@ public class RollbackTester {
                 assertFalse(disabled2.isEnabled(ctx));
                 assertFalse(from.toFile().exists());
                 assertTrue(to.toFile().exists());
-                assertTrue(copied.toFile().exists());            
+                assertTrue(copied.toFile().exists());
+                assertTrue(fromDir.toFile().exists());
+                assertFalse(fromDirChild.toFile().exists());
+                assertTrue(toDir.toFile().exists());
+                assertTrue(toDirChild.toFile().exists());
+
             } else {
                 assertFalse(enabled1.isEnabled(ctx));
                 assertTrue(enabled2.isEnabled(ctx)); // threw instead
@@ -112,7 +131,12 @@ public class RollbackTester {
                 assertTrue(from.toFile().exists()); //copied to
                 assertTrue(to.toFile().exists()); // copied from
                 
-                assertFalse(copied.toFile().exists()); //deleted                        
+                assertTrue(fromDir.toFile().exists()); // renamed to
+                assertTrue(fromDirChild.toFile().exists());
+                assertFalse(toDir.toFile().exists());
+                assertFalse(toDirChild.toFile().exists());
+
+                assertFalse(copied.toFile().exists()); //deleted 
             }
         } finally {
             deleteIt(copied);
