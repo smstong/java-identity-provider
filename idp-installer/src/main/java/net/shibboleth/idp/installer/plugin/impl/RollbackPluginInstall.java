@@ -16,6 +16,7 @@ package net.shibboleth.idp.installer.plugin.impl;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -31,6 +32,7 @@ import javax.annotation.Nonnull;
 
 import org.slf4j.Logger;
 
+import net.shibboleth.idp.installer.InstallerSupport;
 import net.shibboleth.idp.module.IdPModule;
 import net.shibboleth.idp.plugin.IdPPlugin;
 import net.shibboleth.profile.module.Module.ModuleResource;
@@ -174,17 +176,36 @@ public class RollbackPluginInstall implements AutoCloseable {
         }
         for (int i = filesRenamedAway.size()-1; i >=0; i--) {
             final Pair<Path, Path> filePair = filesRenamedAway.get(i);
-            final Path from = filePair.getFirst();
-            final Path to = filePair.getSecond();
-            assert from != null && to != null;
-            try (final InputStream in = new BufferedInputStream(
-                         new FileInputStream(to.toFile()));
-                 final OutputStream out = new BufferedOutputStream(
-                         new FileOutputStream(from.toFile()))) {
-                log.trace("Copying {} to {}", filePair.getSecond());
-                in.transferTo(out);
-            } catch (final Throwable t) {
-                log.error("Could not copy {} to {}, continuing ", filePair.getSecond(), filePair.getFirst(), t);
+            //
+            // "from" and "to" in the following are the what was done.  So what we need to undo
+            //
+            final Path fromPath = filePair.getFirst();
+            final Path toPath = filePair.getSecond();
+            assert fromPath != null && toPath != null;
+            final File from = fromPath.toFile();
+            final File to = toPath.toFile();
+
+            if (to.isDirectory()) {
+                if (from.exists()) {
+                	//
+                	// Something else been put there.  remove it
+                	//
+                    InstallerSupport.deleteTree(fromPath);
+                }
+                try {
+                	log.trace("Moving {} to {}", toPath, fromPath);
+                    Files.move(toPath, fromPath);
+                } catch (final Throwable t) {
+                    log.error("Could not move {} to {}, continuing.", toPath, fromPath, t);
+                }
+            } else {
+	            try (final InputStream in = new BufferedInputStream(new FileInputStream(to));
+	                 final OutputStream out = new BufferedOutputStream(new FileOutputStream(from))) {
+	                log.trace("Copying {} to {}", toPath, fromPath);
+	                in.transferTo(out);
+	            } catch (final Throwable t) {
+	                log.error("Could not copy {} to {}, continuing.", toPath, fromPath, t);
+	            }
             }
         }
         return true;        
