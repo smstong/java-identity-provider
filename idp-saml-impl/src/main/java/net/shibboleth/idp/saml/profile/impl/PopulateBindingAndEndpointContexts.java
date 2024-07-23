@@ -52,7 +52,6 @@ import org.opensaml.saml.saml2.metadata.RoleDescriptor;
 import org.slf4j.Logger;
 
 import net.shibboleth.idp.profile.AbstractProfileAction;
-import net.shibboleth.idp.saml.profile.config.SAMLProfileConfiguration;
 import net.shibboleth.idp.saml.saml2.profile.config.BrowserSSOProfileConfiguration;
 import net.shibboleth.profile.context.RelyingPartyContext;
 import net.shibboleth.saml.profile.config.SAMLArtifactAwareProfileConfiguration;
@@ -346,25 +345,16 @@ public class PopulateBindingAndEndpointContexts extends AbstractProfileAction {
         if (rpContext != null) {
             relyingPartyId = rpContext.getRelyingPartyId();
             verified = rpContext.isVerified();
-            if (rpContext.getProfileConfig() != null
-                    && rpContext.getProfileConfig() instanceof SAMLProfileConfiguration) {
-                final SAMLProfileConfiguration profileConfiguration =
-                        (SAMLProfileConfiguration) rpContext.getProfileConfig();
-                if (profileConfiguration instanceof SAMLArtifactAwareProfileConfiguration) {
-                    artifactConfiguration =
-                            ((SAMLArtifactAwareProfileConfiguration) profileConfiguration).getArtifactConfiguration(
-                                    profileRequestContext);
-                }
-                if (profileConfiguration instanceof BrowserSSOProfileConfiguration) {
-                    final BrowserSSOProfileConfiguration ssoConfig =
-                            (BrowserSSOProfileConfiguration) profileConfiguration;
-                    skipValidationSinceSigned =
-                            inboundMessage instanceof AuthnRequest
-                            && ssoConfig.isSkipEndpointValidationWhenSigned(profileRequestContext)
-                            && !ssoConfig.isIgnoreRequestSignatures(profileRequestContext)
-                            && SAMLBindingSupport.isMessageSigned(
-                                    Constraint.isNotNull(imc, "No Inboud Message Context")); 
-                }
+            if (rpContext.getProfileConfig() instanceof SAMLArtifactAwareProfileConfiguration artpc) {
+                artifactConfiguration = artpc.getArtifactConfiguration(profileRequestContext);
+            }
+            if (rpContext.getProfileConfig() instanceof BrowserSSOProfileConfiguration ssoConfig) {
+                skipValidationSinceSigned =
+                        inboundMessage instanceof AuthnRequest
+                        && ssoConfig.isSkipEndpointValidationWhenSigned(profileRequestContext)
+                        && !ssoConfig.isIgnoreRequestSignatures(profileRequestContext)
+                        && SAMLBindingSupport.isMessageSigned(
+                                Constraint.isNotNull(imc, "No Inboud Message Context")); 
             }
         }
         
@@ -384,7 +374,6 @@ public class PopulateBindingAndEndpointContexts extends AbstractProfileAction {
         return true;
     }
 
-//CheckStyle: ReturnCount OFF
     /** {@inheritDoc} */
     @Override protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
         
@@ -498,7 +487,7 @@ public class PopulateBindingAndEndpointContexts extends AbstractProfileAction {
             }            
         }
     }
-// Checkstyle: CyclomaticComplexity|MethodLength|ReturnCount ON
+// Checkstyle: CyclomaticComplexity|MethodLength ON
     
     /**
      * Check for an inbound request binding that is synchronous and handle appropriately.
