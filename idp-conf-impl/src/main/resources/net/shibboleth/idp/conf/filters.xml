@@ -88,6 +88,7 @@
     <bean class="net.shibboleth.shared.spring.servlet.URLPrefix" c:_0="/profile/SAML2/POST-SimpleSign/SSO" />
     <bean class="net.shibboleth.shared.spring.servlet.URLPrefix" c:_0="/profile/SAML2/Artifact/SSO" />
     <bean class="net.shibboleth.shared.spring.servlet.URLPrefix" c:_0="/profile/cas/login" />
+    <bean class="net.shibboleth.shared.spring.servlet.URLPrefix" c:_0="/profile/Authn/" />
     <bean class="net.shibboleth.shared.spring.servlet.URLPrefix" c:_0="/Authn/" />
 
 </beans>
