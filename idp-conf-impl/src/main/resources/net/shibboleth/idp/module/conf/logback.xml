@@ -26,6 +26,7 @@
     <variable name="idp.loglevel.messages" value="${idp.loglevel.messages:-INFO}" />
     <variable name="idp.loglevel.encryption" value="${idp.loglevel.encryption:-INFO}" />
     <variable name="idp.loglevel.opensaml" value="${idp.loglevel.opensaml:-INFO}" />
+    <variable name="idp.loglevel.shared" value="${idp.loglevel.shared:-INFO}" />
     <variable name="idp.loglevel.props" value="${idp.loglevel.props:-INFO}" />
     <variable name="idp.loglevel.httpclient" value="${idp.loglevel.httpclient:-INFO}" />
     
@@ -43,6 +44,9 @@
 
     <!-- Logs OpenSAML, but not IdP, messages -->
     <logger name="org.opensaml.saml" level="${idp.loglevel.opensaml}"/>
+
+    <!-- Logs supporting code. -->
+    <logger name="net.shibboleth.shared" level="${idp.loglevel.shared}"/>
     
     <!-- Logs LDAP related messages -->
     <logger name="org.ldaptive" level="${idp.loglevel.ldap}"/>
