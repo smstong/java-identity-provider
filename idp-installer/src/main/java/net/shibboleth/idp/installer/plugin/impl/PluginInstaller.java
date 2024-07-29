@@ -55,7 +55,7 @@ import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
-import org.apache.commons.compress.utils.IOUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.tools.ant.BuildException;
 import org.opensaml.security.httpclient.HttpClientSecurityContextHandler;
@@ -755,7 +755,7 @@ public final class PluginInstaller extends AbstractInitializableComponent implem
             
             final Path fullName = base.resolve(fileName);
             assert fullName!=null;
-            try (final ArchiveInputStream inStream = getStreamFor(fullName, isZip(fileName))) {
+            try (final ArchiveInputStream<?> inStream = getStreamFor(fullName, isZip(fileName))) {
                 
                 ArchiveEntry entry = null;
                 while ((entry = inStream.getNextEntry()) != null) {
@@ -827,7 +827,7 @@ public final class PluginInstaller extends AbstractInitializableComponent implem
      * @return the the appropriate  {@link ArchiveInputStream} 
      * @throws IOException  if we trip over an unpack
      */
-    @Nonnull private ArchiveInputStream getStreamFor(@Nonnull final Path fullName, final boolean isZip)
+    @Nonnull private ArchiveInputStream<?> getStreamFor(@Nonnull final Path fullName, final boolean isZip)
             throws IOException {
         final InputStream inStream = new BufferedInputStream(new FileInputStream(fullName.toFile()));
         if (isZip) {
