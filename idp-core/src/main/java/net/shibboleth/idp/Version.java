@@ -46,7 +46,7 @@ public final class Version {
      */
     @Nullable public static String getVersion() {
         if (VERSION == null) {
-            return "5.1.2";
+            return "5.1.3";
         }
         return VERSION;
     }
