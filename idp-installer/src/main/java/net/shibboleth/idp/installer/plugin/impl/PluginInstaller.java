@@ -742,19 +742,48 @@ public final class PluginInstaller extends AbstractInitializableComponent implem
         }
     }
 
-    /** Method to unpack a zip or tgz file into out {{@link #unpackDirectory}.
+    /** Helper Method for unpacking the distribution.
+     * Populates {@link #unpackDirectory} and{@link #distribution}
      * @param base Where the zip/tgz file is
      * @param fileName the name.
      * @throws BuildException if badness is detected.
      */
-    // CheckStyle:  CyclomaticComplexity OFF
     private void unpack(@Nonnull final Path base, @Nonnull final String fileName) throws BuildException {
+        final Path fullName = base.resolve(fileName);
+        assert fullName!=null;
+
         Constraint.isNull(unpackDirectory, "cannot unpack multiple times");
         try {
             unpackDirectory = Files.createTempDirectory("plugin-installer-unpack");
-            
-            final Path fullName = base.resolve(fileName);
-            assert fullName!=null;
+            assert unpackDirectory != null;
+            unpack(unpackDirectory, fullName, fileName);
+            try (final DirectoryStream<Path> unpackDirStream = Files.newDirectoryStream(unpackDirectory)) {
+                final Iterator<Path> contents = unpackDirStream.iterator();
+                if (!contents.hasNext()) {
+                    LOG.error("No contents unpacked from {}", fullName);
+                    throw new BuildException("Distro was empty");
+                }
+                final Path next = contents.next();
+                assert next != null;
+                distribution  = InstallerSupport.canonicalPath(next);
+                if (contents.hasNext()) {
+                    LOG.error("Too many packages in distributions {}", fullName);
+                    throw new BuildException("Too many packages in distributions");
+                }
+            }
+        } catch (final IOException e) {
+            throw new BuildException(e);
+        }
+    }
+    
+    /** Method to unpack a zip or tgz file into our {{@link #unpackDirectory}.
+     * @param unpackTo Where to unpack to
+     * @param The 
+     * @param fileName the name.
+     * @throws BuildException if badness is detected.
+     */
+    private static void unpack(@Nonnull final Path unpackTo, @Nonnull final Path fullName, @Nonnull final String fileName) throws BuildException {
+        try {    
             try (final ArchiveInputStream<?> inStream = getStreamFor(fullName, isZip(fileName))) {
                 
                 ArchiveEntry entry = null;
@@ -763,7 +792,7 @@ public final class PluginInstaller extends AbstractInitializableComponent implem
                         LOG.warn("Could not read next entry from {}", inStream);
                         continue;
                     }
-                    final File output = unpackDirectory.resolve(entry.getName()).toFile();
+                    final File output = unpackTo.resolve(entry.getName()).toFile();
                     LOG.trace("Unpacking {} to {}", entry.getName(), output);
                     if (entry.isDirectory()) {
                         if (!output.isDirectory() && !output.mkdirs()) {
@@ -782,20 +811,6 @@ public final class PluginInstaller extends AbstractInitializableComponent implem
                     }
                 }
             }
-            try (final DirectoryStream<Path> unpackDirStream = Files.newDirectoryStream(unpackDirectory)) {
-                final Iterator<Path> contents = unpackDirStream.iterator();
-                if (!contents.hasNext()) {
-                    LOG.error("No contents unpacked from {}", fullName);
-                    throw new BuildException("Distro was empty");
-                }
-                final Path next = contents.next();
-                assert next != null;
-                distribution = InstallerSupport.canonicalPath(next);
-                if (contents.hasNext()) {
-                    LOG.error("Too many packages in distributions {}", fullName);
-                    throw new BuildException("Too many packages in distributions");
-                }
-            }
         } catch (final IOException e) {
             throw new BuildException(e);
         }
@@ -807,7 +822,7 @@ public final class PluginInstaller extends AbstractInitializableComponent implem
      * @return true if it ends with .zip
      * @throws BuildException if the name is too short
      */
-    private boolean isZip(@Nonnull final String fileName) throws BuildException {
+    private static boolean isZip(@Nonnull final String fileName) throws BuildException {
         if (fileName.length() <= 7) {
             LOG.error("Improbably small file name: {}", fileName);
             throw new BuildException("Improbably small file name");
@@ -827,7 +842,7 @@ public final class PluginInstaller extends AbstractInitializableComponent implem
      * @return the the appropriate  {@link ArchiveInputStream} 
      * @throws IOException  if we trip over an unpack
      */
-    @Nonnull private ArchiveInputStream<?> getStreamFor(@Nonnull final Path fullName, final boolean isZip)
+    @Nonnull private static ArchiveInputStream<?> getStreamFor(@Nonnull final Path fullName, final boolean isZip)
             throws IOException {
         final InputStream inStream = new BufferedInputStream(new FileInputStream(fullName.toFile()));
         if (isZip) {
