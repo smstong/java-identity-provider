@@ -103,7 +103,7 @@ public class InstalledMetadataParameters extends AbstractInitializableComponent
     @Nonnull private final List<Pair<String, String>> ssoServices = CollectionSupport.listOf(
             new Pair<>("SimpleSign/","/idp/profile/SAML2/POST-SimpleSign/SSO"),
             new Pair<>("Redirect/","/idp/profile/SAML2/Redirect/SSO"),
-            new Pair<>("POST/","idp/profile/SAML2/POST/SSO"));
+            new Pair<>("POST/","/idp/profile/SAML2/POST/SSO"));
 
     /** artifact services. */
     @Nonnull private final List<Pair<String, String>> artifactServices = CollectionSupport.emptyList();
