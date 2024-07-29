@@ -56,6 +56,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.tools.ant.BuildException;
 import org.opensaml.security.httpclient.HttpClientSecurityContextHandler;
@@ -73,6 +74,7 @@ import net.shibboleth.profile.module.Module.ResourceResult;
 import net.shibboleth.profile.installablecomponent.InstallableComponentVersion;
 import net.shibboleth.profile.module.ModuleContext;
 import net.shibboleth.profile.module.ModuleException;
+import net.shibboleth.profile.plugin.Plugin.Package;
 import net.shibboleth.shared.annotation.constraint.NonnullAfterInit;
 import net.shibboleth.shared.annotation.constraint.NotEmpty;
 import net.shibboleth.shared.collection.CollectionSupport;
@@ -312,6 +314,7 @@ public final class PluginInstaller extends AbstractInitializableComponent implem
             uninstallOld(rollBack);
 
             checkRequiredModules(loadedModules);
+            handlePackages(rollBack);
             installNew(rollBack);
             reEnableModules(loadedModules);
 
@@ -507,6 +510,44 @@ public final class PluginInstaller extends AbstractInitializableComponent implem
         }
     }
 
+    /** Deploy any required packages.
+     *
+     * @param rollback Roll Back Context
+     * @throws BuildException if badness is detected.
+     */
+    private void handlePackages(@Nonnull final RollbackPluginInstall rollback) throws BuildException {
+        final Path renameTarget = workspacePath.resolve("dirRollback");
+        assert renameTarget!= null;
+        for (final Package pack: getDescription().getPackages()) {
+
+            if (SystemUtils.IS_OS_WINDOWS && !pack.isWindows()) {
+                LOG.debug("Package: skipping non-Windows resource {}", pack.getDestinationName());
+                continue;
+            }
+            if (!SystemUtils.IS_OS_WINDOWS && !pack.isNonWindows()) {
+                LOG.debug("Package: skipping Windows resource {}", pack.getDestinationName());
+                continue;
+            }
+
+            try {
+                final Path to = idpHome.resolve(pack.getDestinationName());
+                assert to != null;
+                if (Files.exists(to)) {
+                    InstallerSupport.renameToTree(getIdpHome(),
+                                                  renameTarget,
+                                                  CollectionSupport.singletonList(to),
+                                                  rollback.getFilesRenamedAway());
+                }
+                final Path fromPackage = distribution.resolve(pack.getSourceName());
+                assert fromPackage != null;
+                unpack(to, fromPackage, isZip(pack.getSourceName()), pack.isStripTopLevelDir());
+            } catch (final IOException e) {
+                LOG.error("Unable to handle package : {} ", pack.getDestinationName(), e);
+                throw new BuildException(e);
+            }
+        }
+    }
+
     /** Copy the webapp folder from the distribution to the per plugin
      * location inside dist.
      * @param rollBack Roll Back Context
@@ -617,8 +658,6 @@ public final class PluginInstaller extends AbstractInitializableComponent implem
         LOG.error("Could no infer IDPHOME from previous contents");
         return null;
     }
-
-
 
     /** Load the contents for this plugin from the properties file used during
      * installation.
@@ -754,10 +793,10 @@ public final class PluginInstaller extends AbstractInitializableComponent implem
 
         Constraint.isNull(unpackDirectory, "cannot unpack multiple times");
         try {
-            unpackDirectory = Files.createTempDirectory("plugin-installer-unpack");
-            assert unpackDirectory != null;
-            unpack(unpackDirectory, fullName, fileName);
-            try (final DirectoryStream<Path> unpackDirStream = Files.newDirectoryStream(unpackDirectory)) {
+            final Path upDir = unpackDirectory = Files.createTempDirectory("plugin-installer-unpack");
+            assert upDir != null;
+            unpack(upDir, fullName, isZip(fileName), false);
+            try (final DirectoryStream<Path> unpackDirStream = Files.newDirectoryStream(upDir)) {
                 final Iterator<Path> contents = unpackDirStream.iterator();
                 if (!contents.hasNext()) {
                     LOG.error("No contents unpacked from {}", fullName);
@@ -778,36 +817,45 @@ public final class PluginInstaller extends AbstractInitializableComponent implem
     
     /** Method to unpack a zip or tgz file into our {{@link #unpackDirectory}.
      * @param unpackTo Where to unpack to
-     * @param The 
-     * @param fileName the name.
+     * @param fullName what to unzip
+     * @param isZip is this a zip file?
+     * @param stripFirst do we remove the first "directory" in the path (allows install in place)
      * @throws BuildException if badness is detected.
      */
-    private static void unpack(@Nonnull final Path unpackTo, @Nonnull final Path fullName, @Nonnull final String fileName) throws BuildException {
-        try {    
-            try (final ArchiveInputStream<?> inStream = getStreamFor(fullName, isZip(fileName))) {
-                
-                ArchiveEntry entry = null;
-                while ((entry = inStream.getNextEntry()) != null) {
-                    if (!inStream.canReadEntryData(entry)) {
-                        LOG.warn("Could not read next entry from {}", inStream);
-                        continue;
+    private static void unpack(@Nonnull final Path unpackTo, @Nonnull final Path fullName, final boolean isZip, boolean stripFirst) throws BuildException {
+        LOG.debug("Unpacking {} to {}", fullName, unpackTo);
+
+        try (final ArchiveInputStream<?> inStream = getStreamFor(fullName, isZip)) {
+            ArchiveEntry entry = null;
+            while ((entry = inStream.getNextEntry()) != null) {
+                if (!inStream.canReadEntryData(entry)) {
+                    LOG.warn("Could not read next entry from {}", inStream);
+                    continue;
+                }
+                Path fromPath = unpackTo;
+                if (stripFirst) {
+                    final String names[] = entry.getName().split("/");
+                    for (int i = 1; i < names.length; i++) {
+                        fromPath = fromPath.resolve(names[i]);
                     }
-                    final File output = unpackTo.resolve(entry.getName()).toFile();
-                    LOG.trace("Unpacking {} to {}", entry.getName(), output);
-                    if (entry.isDirectory()) {
-                        if (!output.isDirectory() && !output.mkdirs()) {
-                            LOG.error("Failed to create directory {}", output);
-                            throw new BuildException("failed to create unpacked directory");
-                        }
-                    } else {
-                        final File parent = output.getParentFile();
-                        if (!parent.isDirectory() && !parent.mkdirs()) {
-                            LOG.error("Failed to create parent directory {}", parent);
-                            throw new BuildException("failed to create unpacked directory");
-                        }
-                        try (OutputStream outStream = Files.newOutputStream(output.toPath())) {
-                            IOUtils.copy(inStream, outStream);
-                        }
+                } else {
+                    fromPath = fromPath.resolve(entry.getName());
+                }
+                final File output = unpackTo.resolve(fromPath).toFile();
+                LOG.trace("Unpacking {} to {}", entry.getName(), output);
+                if (entry.isDirectory()) {
+                    if (!output.isDirectory() && !output.mkdirs()) {
+                        LOG.error("Failed to create directory {}", output);
+                        throw new BuildException("failed to create unpacked directory");
+                    }
+                } else {
+                    final File parent = output.getParentFile();
+                    if (!parent.isDirectory() && !parent.mkdirs()) {
+                        LOG.error("Failed to create parent directory {}", parent);
+                        throw new BuildException("failed to create unpacked directory");
+                    }
+                    try (OutputStream outStream = Files.newOutputStream(output.toPath())) {
+                        IOUtils.copy(inStream, outStream);
                     }
                 }
             }
@@ -815,7 +863,6 @@ public final class PluginInstaller extends AbstractInitializableComponent implem
             throw new BuildException(e);
         }
     }
-    // CheckStyle:  CyclomaticComplexity ON
     
     /** does the file name end in .zip?
      * @param fileName the name to consider
