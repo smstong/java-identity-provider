@@ -126,9 +126,11 @@ public class LDAPCredentialValidator extends AbstractUsernamePasswordCredentialV
     /** {@inheritDoc} */
     @Override
     protected void doDestroy() {
+        /* authenticator is closed by LDAPAuthenticationFactoryBean#destroyInstance
         if (authenticator != null) {
             authenticator.close();
         }
+        */
         super.doDestroy();
     }
 
