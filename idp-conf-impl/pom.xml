@@ -7,7 +7,7 @@
     <parent>
         <groupId>net.shibboleth.idp</groupId>
         <artifactId>idp-parent</artifactId>
-        <version>5.1.3-SNAPSHOT</version>
+        <version>5.1.3</version>
     </parent>
 
     <name>Shibboleth IdP :: System Configuration</name>
