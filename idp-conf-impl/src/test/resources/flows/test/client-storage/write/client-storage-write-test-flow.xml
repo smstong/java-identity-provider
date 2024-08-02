@@ -30,7 +30,12 @@
         <transition on="proceed" to="Done" />
     </action-state>
 
-    <end-state id="Done" />
+    <!-- Display a response to trigger n.s.shared.spring.servlet.impl.CookieBufferingFilter to write the cookie. -->
+    <end-state id="Done" >
+        <on-entry>
+            <evaluate expression="flowRequestContext.getExternalContext().getNativeResponse().getWriter().println('OK')" />
+        </on-entry>
+    </end-state>
 
     <bean-import resource="../client-storage-test-beans.xml" />
 
