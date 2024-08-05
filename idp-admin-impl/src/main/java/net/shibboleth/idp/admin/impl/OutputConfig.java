@@ -17,6 +17,7 @@ package net.shibboleth.idp.admin.impl;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.security.Principal;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
@@ -34,8 +35,12 @@ import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.springframework.core.annotation.AnnotationUtils;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import net.shibboleth.idp.profile.AbstractProfileAction;
@@ -171,8 +176,11 @@ public class OutputConfig extends AbstractProfileAction {
             }
             
             final ObjectMapper mapper = new ObjectMapper();
-            
             mapper.registerModule(new JavaTimeModule());
+            final SimpleModule principalModule = new SimpleModule();
+            principalModule.addSerializer(new PrincipalSerializer());
+            mapper.registerModule(principalModule);
+            
             // These don't do much of anything, except the first one I think.
             mapper.configure(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS, false);
             mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
@@ -283,6 +291,32 @@ public class OutputConfig extends AbstractProfileAction {
                 || o instanceof String
                 || o instanceof Duration
                 || o instanceof Instant;
+    }
+    
+    /**
+     * Custom serializer for {@link Principal} objects in config.
+     */
+    private static class PrincipalSerializer extends StdSerializer<Principal> {
+
+        private static final long serialVersionUID = 8948390099419865058L;
+
+        /**
+         * Constructor.
+         */
+        protected PrincipalSerializer() {
+            super(Principal.class);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void serialize(final Principal value, final JsonGenerator gen, final SerializerProvider provider)
+                throws IOException {
+            gen.writeStartObject();
+            gen.writeStringField("type", value.getClass().getName());
+            gen.writeStringField("value", value.getName());
+            gen.writeEndObject();
+            
+        }
     }
     
 }
