@@ -532,6 +532,11 @@ public final class PluginInstaller extends AbstractInitializableComponent implem
             try {
                 final Path to = idpHome.resolve(pack.getDestinationName());
                 assert to != null;
+                if (!to.startsWith(idpHome.toString())) {
+                    LOG.error("Package {} attempted to create file outside of IdP installation: {}", pack.getDestinationName(), to);
+                    throw new BuildException("Plugin package asked to create file outside of IdP installation");
+                }
+                
                 if (Files.exists(to)) {
                     InstallerSupport.renameToTree(getIdpHome(),
                                                   renameTarget,
