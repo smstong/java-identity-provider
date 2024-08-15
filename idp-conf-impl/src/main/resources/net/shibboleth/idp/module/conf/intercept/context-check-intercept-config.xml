@@ -50,7 +50,7 @@
             <value>
             <![CDATA[
             var event = "proceed";
-            if (!custom.apply(input)) {
+            if (!custom.test(input)) {
                 event = "ContextCheckDenied";
             }
             event;
