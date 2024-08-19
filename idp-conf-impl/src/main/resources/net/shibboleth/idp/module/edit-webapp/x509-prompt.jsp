@@ -4,8 +4,8 @@
 <%@ page import="org.opensaml.profile.context.ProfileRequestContext" %>
 <%@ page import="net.shibboleth.idp.authn.ExternalAuthentication" %>
 <%@ page import="net.shibboleth.idp.authn.context.AuthenticationContext" %>
-<%@ page import="net.shibboleth.idp.profile.context.RelyingPartyContext" %>
 <%@ page import="net.shibboleth.idp.ui.context.RelyingPartyUIContext" %>
+<%@ page import="net.shibboleth.profile.context.RelyingPartyContext" %>
 
 <%
 final Cookie[] cookies = request.getCookies();
