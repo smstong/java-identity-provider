@@ -16,6 +16,8 @@ package net.shibboleth.idp.authn.impl;
 
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.function.Function;
 
 import javax.annotation.Nonnull;
@@ -124,12 +126,13 @@ public class X509CertificateCredentialValidator extends AbstractCredentialValida
             try {
                 final BasicX509Credential cred = new BasicX509Credential((X509Certificate) cert);
                 if (!certContext.getIntermediates().isEmpty()) {
-                    cred.getEntityCertificateChain().add((X509Certificate) certContext.getCertificate());
-                    for (final Certificate extra : certContext.getIntermediates()) {
-                        if (extra instanceof X509Certificate) {
-                            cred.getEntityCertificateChain().add((X509Certificate) extra);
-                        }
-                    }
+                    final Collection<X509Certificate> chain = new ArrayList<>();
+                    chain.add((X509Certificate) cert);
+                    certContext.getIntermediates().stream()
+                        .filter(X509Certificate.class::isInstance)
+                        .map(X509Certificate.class::cast)
+                        .forEach(chain::add);
+                    cred.setEntityCertificateChain(chain);
                 }
                 assert trustEngine != null;
                 if (trustEngine.validate(cred, new CriteriaSet())) {
