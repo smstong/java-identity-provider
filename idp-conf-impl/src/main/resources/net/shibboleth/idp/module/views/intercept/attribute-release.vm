@@ -83,13 +83,14 @@ $response.addHeader("Content-Security-Policy", "script-src 'none'")
                 #parse("csrf/csrf.vm")
                 <div class="boxed">
                     <h2>#springMessageText("idp.attribute-release.attributesHeader", "Information to be Provided to Service")</h2>
-
                     #foreach ($attribute in $attributeReleaseContext.getConsentableAttributes().values())
                         #if ($attributeReleaseFlowDescriptor.perAttributeConsentEnabled)
                             <fieldset>
-                            <legend><p>$encoder.encodeForHTML($attributeDisplayNameFunction.apply($attribute))</p></legend>
+                                <input id="$attribute.id" type="checkbox" name="_shib_idp_consentIds" value="$encoder.encodeForHTML($attribute.id)" checked>
+                                <label for="$attribute.id">$encoder.encodeForHTML($attributeDisplayNameFunction.apply($attribute))</label>
                         #else
                             <p>$encoder.encodeForHTML($attributeDisplayNameFunction.apply($attribute))</p>
+                            <input id="$attribute.id" type="hidden" name="_shib_idp_consentIds" value="$encoder.encodeForHTML($attribute.id)">
                         #end
                         #foreach ($value in $attribute.values)
                             #if ($replaceDollarWithNewline)
@@ -97,21 +98,12 @@ $response.addHeader("Content-Security-Policy", "script-src 'none'")
                             #else
                                 #set ($encodedValue = $encoder.encodeForHTML($value.getDisplayValue()))
                             #end
-                            <p>
-                            #if ($attributeReleaseFlowDescriptor.perAttributeConsentEnabled)
-                                <input id="$attribute.id" type="checkbox" name="_shib_idp_consentIds" value="$encoder.encodeForHTML($attribute.id)" checked>
-                                <label for="$attribute.id"><strong>$encodedValue</strong></label>
-                            #else
-                                <strong>$encodedValue</strong>
-                                <input id="$attribute.id" type="hidden" name="_shib_idp_consentIds" value="$encoder.encodeForHTML($attribute.id)" checked>
-                            #end
-                            </p>
+                            <p><strong>$encodedValue</strong></p>
                         #end
                         #if ($attributeReleaseFlowDescriptor.perAttributeConsentEnabled)
                             </fieldset>
                         #end
                     #end
-                    </fieldset>
                 </div>
 
                 <p>#springMessageText("idp.attribute-release.confirmationQuestion", "The information above would be shared with the service if you proceed. Do you agree to release this information to the service every time you access it?")</p>
