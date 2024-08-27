@@ -156,6 +156,10 @@
         class="net.shibboleth.idp.consent.flow.impl.ExtractConsent" scope="prototype"
         p:httpServletRequestSupplier-ref="shibboleth.HttpServletRequestSupplier" />
 
+    <bean id="ValidatedExtractedConsent"
+        class="net.shibboleth.idp.consent.flow.ar.impl.ValidatedExtractedConsent" scope="prototype"
+        p:httpServletRequestSupplier-ref="shibboleth.HttpServletRequestSupplier" />
+
     <bean id="CreateResult"
         class="net.shibboleth.idp.consent.flow.storage.impl.CreateResult" scope="prototype"
         p:storageKeyLookupStrategy-ref="shibboleth.consent.UserAndRelyingPartyStorageKey" 

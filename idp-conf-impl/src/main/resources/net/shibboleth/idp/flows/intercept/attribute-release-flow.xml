@@ -196,6 +196,7 @@
 
     <action-state id="ExtractConsent">
         <evaluate expression="ExtractConsent" />
+        <evaluate expression="ValidatedExtractedConsent" />
         <evaluate expression="'AttributeReleaseConsent'" />
         
         <transition on="AttributeReleaseConsent" to="AttributeReleaseConsent" />
