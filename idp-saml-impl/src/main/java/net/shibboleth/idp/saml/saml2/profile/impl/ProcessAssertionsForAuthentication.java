@@ -244,7 +244,7 @@ public class ProcessAssertionsForAuthentication extends AbstractAuthenticationAc
      * The default response resolver function. NOTE: this is relative to the nested profile request context.
      * Need to compose with other lookup function against the main/outer profile request context.
      */
-    private class DefaultResponseResolver implements Function<ProfileRequestContext, Response> {
+    private final class DefaultResponseResolver implements Function<ProfileRequestContext, Response> {
 
         /** {@inheritDoc} */
         @Nullable public Response apply(@Nullable final ProfileRequestContext profileContext) {
@@ -263,7 +263,7 @@ public class ProcessAssertionsForAuthentication extends AbstractAuthenticationAc
     /**
      * Predicate for valid assertions.
      */
-    private class AssertionIsValid implements Predicate<Assertion> {
+    private final class AssertionIsValid implements Predicate<Assertion> {
 
         /** {@inheritDoc} */
         public boolean test(@Nullable final Assertion assertion) {
@@ -285,7 +285,7 @@ public class ProcessAssertionsForAuthentication extends AbstractAuthenticationAc
     /**
      * Predicate for assertions containing at least 1 AuthenticationStatement.
      */
-    private class AssertionContainsAuthenticationStatement implements Predicate<Assertion> {
+    private final class AssertionContainsAuthenticationStatement implements Predicate<Assertion> {
 
         /** {@inheritDoc} */
         public boolean test(@Nullable final Assertion assertion) {
@@ -301,7 +301,7 @@ public class ProcessAssertionsForAuthentication extends AbstractAuthenticationAc
     /**
      * Predicate for assertions which have been validated and have a confirmed Subject.
      */
-    private class AssertionContainsConfirmedSubject implements Predicate<Assertion> {
+    private final class AssertionContainsConfirmedSubject implements Predicate<Assertion> {
 
         /** {@inheritDoc} */
         @SuppressWarnings("unused")
