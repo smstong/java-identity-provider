@@ -315,8 +315,6 @@
                             p:httpServletRequestSupplier-ref="shibboleth.HttpServletRequestSupplier"
                             p:parser-ref="shibboleth.ParserPool"
                             p:keyInfoResolver-ref="shibboleth.KeyInfoCredentialResolver" />
-                        <bean class="org.opensaml.messaging.handler.impl.CheckMandatoryIssuer" scope="prototype"
-                            p:issuerLookupStrategy-ref="InboundEntityIDLookup" />
                         <bean class="org.opensaml.messaging.handler.impl.CheckExpectedIssuer" scope="prototype"
                             p:issuerLookupStrategy-ref="InboundEntityIDLookup"
                             p:expectedIssuerLookupStrategy-ref="OutboundEntityIDLookup" />
