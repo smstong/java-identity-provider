@@ -19,6 +19,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -26,9 +27,11 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.opensaml.core.xml.XMLObject;
 import org.opensaml.messaging.context.MessageContext;
 import org.opensaml.messaging.context.navigate.ChildContextLookup;
 import org.opensaml.profile.action.ActionSupport;
+import org.opensaml.profile.action.EventIds;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.opensaml.saml.common.assertion.ValidationContext;
 import org.opensaml.saml.common.assertion.ValidationProcessingData;
@@ -37,6 +40,7 @@ import org.opensaml.saml.saml2.assertion.SAML2AssertionValidationParameters;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.AuthnStatement;
 import org.opensaml.saml.saml2.core.Response;
+import org.opensaml.saml.saml2.core.Subject;
 import org.slf4j.Logger;
 
 import net.shibboleth.idp.authn.AbstractAuthenticationAction;
@@ -48,7 +52,17 @@ import net.shibboleth.shared.primitive.LoggerFactory;
 
 /**
  * Perform processing of a SAML 2 Response's Assertions that have been validated by earlier actions
- * for use in finalization of SAML-based authentication by later actions. 
+ * for use in finalization of SAML-based authentication by later actions.
+ * 
+ * <p>The result of this action is to strip any invalid assertions from the response, and to preserve
+ * the "best"/selected {@link AuthnStatement} and any other content required in a pluggable manner.</p>
+ * 
+ * <p>The default behavior is to store the statement and the related {@link Subject} in a {@link SAMLAuthnContext}
+ * located by a lookup strategy.</p>
+ * 
+ * @event {@link EventIds#PROCEED_EVENT_ID}
+ * @event {@link EventIds#INVALID_MESSAGE}
+ * @post the selected statement is passed into the supplied {@link BiConsumer}
  */
 public class ProcessAssertionsForAuthentication extends AbstractAuthenticationAction {
     
@@ -61,6 +75,9 @@ public class ProcessAssertionsForAuthentication extends AbstractAuthenticationAc
     /** Lookup strategy to locate the SAML context. */
     @Nonnull private Function<ProfileRequestContext,SAMLAuthnContext> samlContextLookupStrategy;
     
+    /** "Sink" for preserving SAML objects. */
+    @Nonnull private BiConsumer<ProfileRequestContext,AuthnStatement> samlConsumer;
+    
     /** Selection strategy for multiple valid authn Assertions. */
     @Nonnull private Function<List<Assertion>,Assertion> authnAssertionSelectionStrategy;
     
@@ -69,9 +86,6 @@ public class ProcessAssertionsForAuthentication extends AbstractAuthenticationAc
     
     /** The Response to process. */
     @NonnullBeforeExec private Response response;
-    
-    /** The SAML authentication context. */
-    @NonnullBeforeExec private SAMLAuthnContext samlAuthnContext;
     
     /**
      * Constructor.
@@ -90,6 +104,8 @@ public class ProcessAssertionsForAuthentication extends AbstractAuthenticationAc
                         new ChildContextLookup<>(AuthenticationContext.class));
         assert scls!= null;
         samlContextLookupStrategy = scls;
+        
+        samlConsumer = new DefaultSAMLConsumer();
         
         // Get the Assertion containing the earliest child AuthnStatement#SessionNotOnOrAfter,
         // with null values converted to Instant.MAX and therefore having the lowest precedence.
@@ -155,6 +171,19 @@ public class ProcessAssertionsForAuthentication extends AbstractAuthenticationAc
         checkSetterPreconditions();
         samlContextLookupStrategy = Constraint.isNotNull(strategy, "SAMLAuthnContext lookup strategy cannot be null");
     }
+    
+    /**
+     * Set the {@link BiConsumer} used to save off the SAML statemen and any related objects as a result of this action.
+     * 
+     * <p>This insulates the actiion from the specific context in which it may be used. The supplied consumer
+     * <strong>MUST</strong> establish any non-successful event via the supplied context if it fails.</p>
+     * 
+     * @param consumer consumer to set
+     */
+    public void setSAMLConsumer(@Nonnull final BiConsumer<ProfileRequestContext,AuthnStatement> consumer) {
+        checkSetterPreconditions();
+        samlConsumer = Constraint.isNotNull(consumer, "BiConsumer cannot be null");
+    }
 
     /** {@inheritDoc} */
     protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext,
@@ -168,13 +197,6 @@ public class ProcessAssertionsForAuthentication extends AbstractAuthenticationAc
         if (response == null || response.getAssertions() == null || response.getAssertions().isEmpty()) {
             log.info("{} Profile context contained no candidate Assertions to process. Skipping further processing",
                     getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.INVALID_CREDENTIALS);
-            return false;
-        }
-        
-        samlAuthnContext = samlContextLookupStrategy.apply(profileRequestContext);
-        if (samlAuthnContext == null) {
-            log.info("{} No SAMLAuthnContext available within authentication context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.INVALID_CREDENTIALS);
             return false;
         }
@@ -237,7 +259,7 @@ public class ProcessAssertionsForAuthentication extends AbstractAuthenticationAc
             }
         }
         
-        samlAuthnContext.setAuthnStatement(authnStatement).setSubject(authnAssertion.getSubject());
+        samlConsumer.accept(profileRequestContext, authnStatement);
     }
 
     /**
@@ -261,6 +283,36 @@ public class ProcessAssertionsForAuthentication extends AbstractAuthenticationAc
     }
     
     /**
+     * Default implementation of a "sink" for the SAML objects preserved by this action.
+     */
+    private final class DefaultSAMLConsumer implements BiConsumer<ProfileRequestContext,AuthnStatement> {
+
+        /** {@inheritDoc} */
+        public void accept(@Nullable final ProfileRequestContext profileRequestContext,
+                @Nullable final AuthnStatement statement) {
+            
+            if (profileRequestContext == null || statement == null) {
+                log.error("{} Inputs were null", getLogPrefix());
+                return;
+            }
+            
+            final SAMLAuthnContext samlAuthnContext = samlContextLookupStrategy.apply(profileRequestContext);
+            if (samlAuthnContext == null) {
+                log.info("{} No SAMLAuthnContext available within authentication context", getLogPrefix());
+                ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.INVALID_CREDENTIALS);
+                return;
+            }
+
+            samlAuthnContext.setAuthnStatement(statement);
+            
+            final XMLObject parent = statement.getParent();
+            if (parent instanceof Assertion assertion) {
+                samlAuthnContext.setSubject(assertion.getSubject());
+            }
+        }
+    }
+    
+    /**
      * Predicate for valid assertions.
      */
     private final class AssertionIsValid implements Predicate<Assertion> {
@@ -281,7 +333,7 @@ public class ProcessAssertionsForAuthentication extends AbstractAuthenticationAc
         }
         
     }
-    
+        
     /**
      * Predicate for assertions containing at least 1 AuthenticationStatement.
      */
