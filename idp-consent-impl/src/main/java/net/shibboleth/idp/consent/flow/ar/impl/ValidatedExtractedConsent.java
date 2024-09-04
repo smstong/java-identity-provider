@@ -46,7 +46,8 @@ public class ValidatedExtractedConsent extends AbstractAttributeReleaseAction {
     @Override protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final ProfileInterceptorContext interceptorContext) {
 
-        if (!getAttributeReleaseFlowDescriptor().isPerAttributeConsentEnabled()) {
+        final AttributeReleaseFlowDescriptor flow = getAttributeReleaseFlowDescriptor();
+        if (flow == null || !flow.isPerAttributeConsentEnabled()) {
             final ConsentContext consentContext = getConsentContext();
             assert consentContext != null;
             final Map<String, Consent> currentConsents = consentContext.getCurrentConsents();
@@ -59,4 +60,5 @@ public class ValidatedExtractedConsent extends AbstractAttributeReleaseAction {
             log.debug("{} Consent context '{}'", getLogPrefix(), consentContext);
         }
     }
+
 }
