@@ -92,6 +92,7 @@
         p:maskStorageFailure="%{idp.session.maskStorageFailure:false}"
         p:trackSPSessions="%{idp.session.trackSPSessions:false}"
         p:secondaryServiceIndex="%{idp.session.secondaryServiceIndex:false}"
+        p:storageServiceThreshold="%{idp.session.sizeThreshold:1048576}"
         p:IDGenerator-ref="shibboleth.SessionIDGenerator"
         p:SPSessionSerializerRegistry="#{getObject('shibboleth.SPSessionSerializerRegistry') ?: getObject('shibboleth.DefaultSPSessionSerializerRegistry')}" />
 
