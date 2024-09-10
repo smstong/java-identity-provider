@@ -69,15 +69,16 @@ import net.shibboleth.idp.installer.impl.BuildWar;
 import net.shibboleth.idp.installer.plugin.impl.TrustStore.Signature;
 import net.shibboleth.idp.module.IdPModule;
 import net.shibboleth.idp.plugin.IdPPlugin;
+import net.shibboleth.profile.installablecomponent.InstallableComponentVersion;
 import net.shibboleth.profile.module.Module.ModuleResource;
 import net.shibboleth.profile.module.Module.ResourceResult;
-import net.shibboleth.profile.installablecomponent.InstallableComponentVersion;
 import net.shibboleth.profile.module.ModuleContext;
 import net.shibboleth.profile.module.ModuleException;
 import net.shibboleth.profile.plugin.Plugin.Package;
 import net.shibboleth.shared.annotation.constraint.NonnullAfterInit;
 import net.shibboleth.shared.annotation.constraint.NotEmpty;
 import net.shibboleth.shared.collection.CollectionSupport;
+import net.shibboleth.shared.collection.Pair;
 import net.shibboleth.shared.component.AbstractInitializableComponent;
 import net.shibboleth.shared.component.ComponentInitializationException;
 import net.shibboleth.shared.logic.Constraint;
@@ -483,8 +484,56 @@ public final class PluginInstaller extends AbstractInitializableComponent implem
         for (final String moduleId: getDescription().getRequiredModules()) {
             if (!loadedModules.contains(moduleId)) {
                 LOG.warn("Required module {} is missing or not enabled ", moduleId);
+                final Pair<String, String> pluginInfo = getModulePluginInfo(moduleId);
+                if (pluginInfo != null) {
+                    LOG.warn("Module {} provided by plugin {} version {}", moduleId, pluginInfo.getFirst(), pluginInfo.getSecond());
+                }
                 throw new BuildException("One or more required modules are not enabled");
             }
+        }
+    }
+
+    /** If we have the information, get the Plugin Id and version which supplies the module id.
+     * @param moduleId The module ID
+     * @return a Pair of string the first being the plugin ID and the second its version
+     */
+    private Pair<String, String> getModulePluginInfo(final String moduleId) throws BuildException {
+        try {
+            final List<URL> sources = description.getModuleInfoSources();
+            Properties props = null;
+            for (final URL url : sources) {
+                LOG.debug("Loading info from {}", url);
+                if (url == null) {
+                    continue;
+                }
+                try {
+                    final HTTPResource httpResource = new HTTPResource(httpClient, url);
+                    final HttpClientSecurityContextHandler handler = new HttpClientSecurityContextHandler();
+                    handler.setHttpClientSecurityParameters(securityParams);
+                    handler.initialize();
+                    httpResource.setHttpClientContextHandler(handler);
+                    props = new Properties();
+                    props.load(httpResource.getInputStream());
+                    LOG.debug("Loaded {} properties", props.size());
+                    break;
+                } catch (final IOException e) {
+                    LOG.error("Could not open Module Resource at {} :", url, e);
+                    continue;
+                }
+            }
+            //
+            // We got properties or we didn't
+            //
+            if (props == null || props.isEmpty()) {
+                return null;
+            }
+            final String version = props.getProperty(moduleId + ".version");
+            final String plugin =  props.getProperty(moduleId + ".plugin");
+            LOG.debug("Looked up {}, found {}, {}", moduleId, version, plugin);
+            return new Pair<>(plugin, version);
+        } catch (final IOException | ComponentInitializationException  e) {
+            LOG.error("Could not lookup up infomationa about {}, continuing", moduleId, e);
+            return null;
         }
     }
 

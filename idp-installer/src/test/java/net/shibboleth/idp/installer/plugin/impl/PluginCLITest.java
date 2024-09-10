@@ -40,22 +40,26 @@ public class PluginCLITest extends BasePluginTest {
     private final static boolean RunInstallTests = false;
     
     private final String PLUGIN_DISTRO = "http://test.shibboleth.net/downloads/identity-provider/plugins/oidc-common/3.1.0/oidc-common-dist-3.1.0.tar.gz";
-    
-    private final String PLUGIN_ID = "net.shibboleth.oidc.common";
+
+    private final String PLUGIN_IDS[] = { "net.shibboleth.oidc.common", "net.shibboleth.idp.plugin.jettybase","net.shibboleth.idp.plugin.authn.oidc.rp"};
+
+    private final String PLUGIN_ID = PLUGIN_IDS[1];
 
     @BeforeSuite public void setUp() throws IOException
     {
         System.setProperty("idp.home",getIdpHome().toString());
-        final Path credentials = getIdpHome().resolve("credentials").resolve(PLUGIN_ID);
-        Files.createDirectories(credentials);
-        //
-        // Populate the new key store
-        //
-        final Path trustStorePath = credentials.resolve("truststore.asc");
-        final Resource from = new ClassPathResource("credentials/truststore.asc");
-        try (final InputStream in = from.getInputStream();
-             final OutputStream out = new ProgressReportingOutputStream(new FileOutputStream(trustStorePath.toFile(), true))) {
-            in.transferTo(out);
+        for (final String id :PLUGIN_IDS) {
+            final Path credentials = getIdpHome().resolve("credentials").resolve(id);
+            Files.createDirectories(credentials);
+            //
+            // Populate the new key store
+            //
+            final Path trustStorePath = credentials.resolve("truststore.asc");
+            final Resource from = new ClassPathResource("credentials/truststore.asc");
+            try (final InputStream in = from.getInputStream();
+                 final OutputStream out = new ProgressReportingOutputStream(new FileOutputStream(trustStorePath.toFile(), true))) {
+                in.transferTo(out);
+            }
         }
     }
 

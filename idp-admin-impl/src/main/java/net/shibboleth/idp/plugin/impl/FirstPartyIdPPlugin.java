@@ -60,4 +60,16 @@ public class FirstPartyIdPPlugin extends PropertyDrivenIdPPlugin {
         }
     }
 
+    /** {@inheritDoc} */
+    @Override
+    @Nonnull @Unmodifiable @NotLive public List<URL> getDefaultModuleInfoSources() throws PluginException {
+        try {
+            // The second location is a backup CNAME pointing into AWS S3 at present.
+            return CollectionSupport.listOf(
+                    new URL("https://shibboleth.net/downloads/identity-provider/plugins/modules.properties"),
+                    new URL("http://plugins.shibboleth.net/modules.properties"));
+        } catch (final MalformedURLException e) {
+            throw new PluginException(e);
+        }
+    }
 }
