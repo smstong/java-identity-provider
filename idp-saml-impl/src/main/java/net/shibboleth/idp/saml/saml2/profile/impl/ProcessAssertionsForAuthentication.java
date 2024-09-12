@@ -62,6 +62,7 @@ import net.shibboleth.shared.primitive.LoggerFactory;
  * 
  * @event {@link EventIds#PROCEED_EVENT_ID}
  * @event {@link EventIds#INVALID_MESSAGE}
+ * @event {@link AuthnEventIds#INVALID_CREDENTIALS}
  * @post the selected statement is passed into the supplied {@link BiConsumer}
  */
 public class ProcessAssertionsForAuthentication extends AbstractAuthenticationAction {
