@@ -306,8 +306,7 @@ public class ProcessAssertionsForAuthentication extends AbstractAuthenticationAc
 
             samlAuthnContext.setAuthnStatement(statement);
             
-            final XMLObject parent = statement.getParent();
-            if (parent instanceof Assertion assertion) {
+            if (statement.getParent() instanceof Assertion assertion) {
                 samlAuthnContext.setSubject(assertion.getSubject());
             }
         }
