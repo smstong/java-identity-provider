@@ -849,7 +849,11 @@ public final class PluginInstaller extends AbstractInitializableComponent implem
         try {
             final Path upDir = unpackDirectory = Files.createTempDirectory("plugin-installer-unpack");
             assert upDir != null;
-            unpack(upDir, fullName, isZip(fileName), false);
+            final boolean isZip = isZip(fileName);
+            if (isZip) {
+                DeprecationSupport.warnOnce(ObjectType.CLI_OPTION, "zip Plugin Distributions", null, "tar.gz distribution");
+            }
+            unpack(upDir, fullName, isZip, false);
             try (final DirectoryStream<Path> unpackDirStream = Files.newDirectoryStream(upDir)) {
                 final Iterator<Path> contents = unpackDirStream.iterator();
                 if (!contents.hasNext()) {
@@ -947,7 +951,6 @@ public final class PluginInstaller extends AbstractInitializableComponent implem
             throws IOException {
         final InputStream inStream = new BufferedInputStream(new FileInputStream(fullName.toFile()));
         if (isZip) {
-            DeprecationSupport.warnOnce(ObjectType.CLI_OPTION, "zip Plugin Distributions", null, "tar.gz distribution");
             return new ZipArchiveInputStream(inStream);
         }
         return new TarArchiveInputStream(new GzipCompressorInputStream(inStream));
