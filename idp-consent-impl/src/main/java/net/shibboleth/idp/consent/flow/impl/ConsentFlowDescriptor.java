@@ -31,7 +31,7 @@ public class ConsentFlowDescriptor extends ProfileInterceptorFlowDescriptor {
     /** Whether consent equality includes comparing consent values. */
     private boolean compareValues;
 
-    /** Time to expire consent storage records. Default value: 1 year. */
+    /** Time to expire consent storage records. Default value: null/infinite. */
     @Nullable private Duration lifetime;
 
     /** Maximum number of records stored in the storage service. */
