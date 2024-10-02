@@ -127,6 +127,7 @@ public class TrustStoreTest {
             assert badSigStream!= null && sigStream != null;
             final Signature badSig = TrustStore.signatureOf(badSigStream);
             assertTrue(ts.contains(badSig));
+            assert dataStream != null && dataStream2 != null;
             assertFalse(ts.checkSignature(dataStream, badSig));
             assertTrue(ts.checkSignature(dataStream2, TrustStore.signatureOf(sigStream)));
          }
