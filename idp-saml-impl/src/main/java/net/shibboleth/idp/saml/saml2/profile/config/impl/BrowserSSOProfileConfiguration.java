@@ -26,11 +26,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import net.shibboleth.idp.authn.config.AuthenticationProfileConfiguration;
-import net.shibboleth.idp.saml.authn.principal.AuthnContextClassRefPrincipal;
 import net.shibboleth.idp.saml.profile.config.logic.ProxyAwareForceAuthnPredicate;
 import net.shibboleth.idp.saml.saml2.profile.config.navigate.ProxyAwareAuthnContextComparisonLookupFunction;
 import net.shibboleth.idp.saml.saml2.profile.config.navigate.ProxyAwareDefaultAuthenticationMethodsLookupFunction;
-import net.shibboleth.profile.config.AttributeResolvingProfileConfiguration;
 import net.shibboleth.shared.annotation.constraint.NonNegative;
 import net.shibboleth.shared.annotation.constraint.NotEmpty;
 import net.shibboleth.shared.annotation.constraint.NotLive;
@@ -52,7 +50,7 @@ import org.opensaml.saml.saml2.metadata.RequestedAttribute;
 
 /** Configuration support for IdP and proxied SAML 2.0 Browser SSO. */
 public class BrowserSSOProfileConfiguration extends AbstractSAML2AssertionProducingProfileConfiguration
-        implements AuthenticationProfileConfiguration, AttributeResolvingProfileConfiguration,
+        implements AuthenticationProfileConfiguration,
             net.shibboleth.idp.saml.saml2.profile.config.BrowserSSOProfileConfiguration {
     
     /** Name of profile counter. */

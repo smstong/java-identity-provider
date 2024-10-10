@@ -22,7 +22,6 @@ import javax.annotation.Nullable;
 import org.opensaml.profile.context.ProfileRequestContext;
 
 import net.shibboleth.idp.authn.config.AuthenticationProfileConfiguration;
-import net.shibboleth.profile.config.AttributeResolvingProfileConfiguration;
 import net.shibboleth.saml.profile.config.SAMLAssertionProducingProfileConfiguration;
 import net.shibboleth.shared.annotation.constraint.NotLive;
 import net.shibboleth.shared.annotation.constraint.Unmodifiable;
@@ -33,7 +32,7 @@ import net.shibboleth.shared.annotation.constraint.Unmodifiable;
  * <p>Adds settings specific to the issuer role that are cross-version.</p>
  */
 public interface BrowserSSOProfileConfiguration extends AuthenticationProfileConfiguration,
-        AttributeResolvingProfileConfiguration, SAMLAssertionProducingProfileConfiguration {
+        SAMLAssertionProducingProfileConfiguration {
 
     /**
      * Get whether responses to the authentication request should include an attribute statement.

@@ -24,7 +24,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import net.shibboleth.idp.authn.config.AuthenticationProfileConfiguration;
-import net.shibboleth.profile.config.AttributeResolvingProfileConfiguration;
 import net.shibboleth.shared.annotation.ConfigurationSetting;
 import net.shibboleth.shared.annotation.constraint.NonNegative;
 import net.shibboleth.shared.annotation.constraint.NotLive;
@@ -43,7 +42,7 @@ import org.opensaml.saml.saml2.core.AuthnContext;
 public interface BrowserSSOProfileConfiguration
         extends net.shibboleth.saml.saml2.profile.config.BrowserSSOProfileConfiguration,
             net.shibboleth.idp.saml.profile.config.BrowserSSOProfileConfiguration,
-            AuthenticationProfileConfiguration, AttributeResolvingProfileConfiguration {
+            AuthenticationProfileConfiguration {
     
     /** Default maximum delegation chain length. */
     @Nonnull static final Long DEFAULT_DELEGATION_CHAIN_LENGTH = 1L;

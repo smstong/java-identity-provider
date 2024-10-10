@@ -27,8 +27,6 @@ import javax.annotation.Nullable;
 import org.opensaml.profile.context.ProfileRequestContext;
 
 import net.shibboleth.idp.authn.config.AuthenticationProfileConfiguration;
-import net.shibboleth.profile.config.AttributeResolvingProfileConfiguration;
-import net.shibboleth.saml.profile.config.SAMLAssertionProducingProfileConfiguration;
 import net.shibboleth.shared.annotation.constraint.NonNegative;
 import net.shibboleth.shared.annotation.constraint.NotEmpty;
 import net.shibboleth.shared.annotation.constraint.NotLive;
@@ -43,8 +41,7 @@ import net.shibboleth.shared.primitive.StringSupport;
 public class BrowserSSOProfileConfiguration extends AbstractSAML1AssertionProducingProfileConfiguration
         implements net.shibboleth.saml.saml1.profile.config.BrowserSSOProfileConfiguration,
             net.shibboleth.idp.saml.profile.config.BrowserSSOProfileConfiguration,
-            AuthenticationProfileConfiguration, AttributeResolvingProfileConfiguration,
-            SAMLAssertionProducingProfileConfiguration {
+            AuthenticationProfileConfiguration {
 
     /** Name of profile counter. */
     @Nonnull @NotEmpty public static final String PROFILE_COUNTER = "net.shibboleth.idp.profiles.saml1.sso.browser";
