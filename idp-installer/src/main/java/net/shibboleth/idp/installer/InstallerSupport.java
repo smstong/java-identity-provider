@@ -18,12 +18,16 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -455,6 +459,76 @@ public final class InstallerSupport {
         }
         pathsCopied.addAll(visitor.getCopiedList());
     }
+
+    /**
+     * Is this address named?
+     *
+     * <p>Helper method for {@link #getBestHostName()}.</p>
+     *
+     * @param addr what to look at
+     * @return true unless the name is the canonical name
+     */
+    private static boolean hasHostName(final InetAddress addr) {
+        return !addr.getHostAddress().equals(addr.getCanonicalHostName());
+    }
+
+
+    /**
+     * Find the most apposite network connector, taken from Ant.
+     *
+     * @return the best name we can work out
+     */
+    // CheckStyle: CyclomaticComplexity OFF
+    @Nonnull public static String getBestHostName() {
+        InetAddress bestSoFar = null;
+        try {
+            for (final NetworkInterface netInterface : Collections.list(NetworkInterface.getNetworkInterfaces())) {
+                for (final InetAddress address : Collections.list(netInterface.getInetAddresses())) {
+                    if (bestSoFar == null) {
+                        // none selected so far, so this one is better.
+                        bestSoFar = address;
+                    } else if (address == null || address.isLoopbackAddress()) {
+                        // definitely not better than the previously selected address.
+                    } else if (address.isLinkLocalAddress()) {
+                        // link local considered better than loopback
+                        if (bestSoFar.isLoopbackAddress()) {
+                            bestSoFar = address;
+                        }
+                    } else if (address.isSiteLocalAddress()) {
+                        // site local considered better than link local (and loopback)
+                        // address with hostname resolved considered better than
+                        // address without hostname
+                        if (bestSoFar.isLoopbackAddress()
+                                || bestSoFar.isLinkLocalAddress()
+                                || (bestSoFar.isSiteLocalAddress() && !hasHostName(bestSoFar))) {
+                            bestSoFar = address;
+                        }
+                    } else {
+                        // current is a "Global address", considered better than
+                        // site local (and better than link local, loopback)
+                        // address with hostname resolved considered better than
+                        // address without hostname
+                        if (bestSoFar.isLoopbackAddress()
+                                || bestSoFar.isLinkLocalAddress()
+                                || bestSoFar.isSiteLocalAddress()
+                                || !hasHostName(bestSoFar)) {
+                            bestSoFar = address;
+                        }
+                    }
+                }
+            }
+        } catch (final SocketException e) {
+            LoggerFactory.getLogger(InstallerSupport.class).error("Could not get host information", e);
+        }
+        if (bestSoFar == null) {
+            return "localhost.localdomain";
+        }
+        final String result = bestSoFar.getCanonicalHostName();
+        assert result!=null;
+        return result;
+    }
+    // CheckStyle: CyclomaticComplexity ON
+
 
     /**
      * A @{link {@link FileVisitor} which detects (and logs) whether a copy would overwrite.

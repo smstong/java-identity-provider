@@ -17,15 +17,11 @@ package net.shibboleth.idp.installer.impl;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
@@ -39,6 +35,7 @@ import org.apache.tools.ant.input.InputHandler;
 import org.apache.tools.ant.input.InputRequest;
 import org.slf4j.Logger;
 
+import net.shibboleth.idp.installer.InstallerSupport;
 import net.shibboleth.shared.annotation.constraint.NonnullAfterInit;
 import net.shibboleth.shared.annotation.constraint.NotEmpty;
 import net.shibboleth.shared.annotation.constraint.NotLive;
@@ -366,84 +363,16 @@ public class InstallerProperties  {
     }
 
     /**
-     * Is this address named?
-     * 
-     * <p>Helper method for {@link #bestHostName()}.</p>
-     * 
-     * @param addr what to look at
-     * @return true unless the name is the canonical name
-     */
-    private boolean hasHostName(final InetAddress addr) {
-        return !addr.getHostAddress().equals(addr.getCanonicalHostName());
-    }
-
-    /**
-     * Find the most apposite network connector, taken from Ant.
-     * 
-     * @return the best name we can work out
-     */
-// CheckStyle: CyclomaticComplexity OFF
-    @Nonnull private String bestHostName() {
-        InetAddress bestSoFar = null;
-        try {
-            for (final NetworkInterface netInterface : Collections.list(NetworkInterface.getNetworkInterfaces())) {
-                for (final InetAddress address : Collections.list(netInterface.getInetAddresses())) {
-                    if (bestSoFar == null) {
-                        // none selected so far, so this one is better.
-                        bestSoFar = address;
-                    } else if (address == null || address.isLoopbackAddress()) {
-                        // definitely not better than the previously selected address.
-                    } else if (address.isLinkLocalAddress()) {
-                        // link local considered better than loopback
-                        if (bestSoFar.isLoopbackAddress()) {
-                            bestSoFar = address;
-                        }
-                    } else if (address.isSiteLocalAddress()) {
-                        // site local considered better than link local (and loopback)
-                        // address with hostname resolved considered better than
-                        // address without hostname
-                        if (bestSoFar.isLoopbackAddress()
-                                || bestSoFar.isLinkLocalAddress()
-                                || (bestSoFar.isSiteLocalAddress() && !hasHostName(bestSoFar))) {
-                            bestSoFar = address;
-                        }
-                    } else {
-                        // current is a "Global address", considered better than
-                        // site local (and better than link local, loopback)
-                        // address with hostname resolved considered better than
-                        // address without hostname
-                        if (bestSoFar.isLoopbackAddress()
-                                || bestSoFar.isLinkLocalAddress()
-                                || bestSoFar.isSiteLocalAddress()
-                                || !hasHostName(bestSoFar)) {
-                            bestSoFar = address;
-                        }
-                    }
-                }
-            }
-        } catch (final SocketException e) {
-            log.error("Could not get host information", e);
-        }
-        if (bestSoFar == null) {
-            return "localhost.localdomain";
-        }
-        final String result = bestSoFar.getCanonicalHostName();
-        assert result!=null;
-        return result;
-    }
-// CheckStyle: CyclomaticComplexity ON
-
-    /**
      * Get the host name for this install.
-     * 
+     *
      * <p>Defaults to information pulled from the network.</p>
-     * 
+     *
      * @return the host name.
      */
     @Nonnull public String getHostName() {
         String result = hostname;
         if (result == null) {
-            result = hostname = getValue(HOST_NAME, "Host Name:", () -> bestHostName());
+            result = hostname = getValue(HOST_NAME, "Host Name:", () -> InstallerSupport.getBestHostName());
         }
         return result;
     }
