@@ -57,6 +57,7 @@
         p:connectionTimeout="%{idp.httpclient.connectionTimeout:PT1M}"
         p:connectionRequestTimeout="%{idp.httpclient.connectionRequestTimeout:PT1M}"
         p:socketTimeout="%{idp.httpclient.socketTimeout:PT1M}" 
+        p:responseTimeout="%{idp.httpclient.responseTimeout:PT0S}" 
         p:maxConnectionsTotal="%{idp.httpclient.maxConnectionsTotal:100}"
         p:maxConnectionsPerRoute="%{idp.httpclient.maxConnectionsPerRoute:100}" />
 
