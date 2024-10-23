@@ -35,6 +35,7 @@ import org.apache.tools.ant.input.InputHandler;
 import org.apache.tools.ant.input.InputRequest;
 import org.slf4j.Logger;
 
+import net.shibboleth.idp.installer.InstallerProperties;
 import net.shibboleth.idp.installer.InstallerSupport;
 import net.shibboleth.shared.annotation.constraint.NonnullAfterInit;
 import net.shibboleth.shared.annotation.constraint.NotEmpty;
@@ -55,66 +56,9 @@ import net.shibboleth.shared.primitive.StringSupport;
 */
 public class InstallerPropertiesImpl  {
 
-    /** The name of a property file to fill in some or all of the above. This file is deleted after processing. */
-    @Nonnull @NotEmpty public static final String PROPERTY_SOURCE_FILE = "idp.property.file";
-
-    /** The name of a property file to merge with idp.properties. */
-    @Nonnull @NotEmpty public static final String IDP_PROPERTIES_MERGE = "idp.merge.properties";
-
-    /** The name of a property file to merge with ldap.properties. */
-    @Nonnull @NotEmpty public static final String LDAP_PROPERTIES_MERGE = "ldap.merge.properties";
-
-    /** The LDAP Password (usually associated with a username in ldap.properties). */
-    @Nonnull @NotEmpty public static final String LDAP_PASSWORD = "idp.LDAP.credential";
-
-    /** Where to install to.  Default is basedir */
-    @Nonnull @NotEmpty public static final String TARGET_DIR = "idp.target.dir";
-
-    /** The entity ID. */
-    @Nonnull @NotEmpty public static final String ENTITY_ID = "idp.entityID";
-
-    /** Do we  cause a failure rather than a prompt. */
-    @Nonnull @NotEmpty public static final String NO_PROMPT = "idp.noprompt";
-
-    /** What is the installer host name?  */
-    @Nonnull @NotEmpty public static final String HOST_NAME = "idp.host.name";
-
-    /** The scope to assert.  */
-    @Nonnull @NotEmpty public static final String SCOPE = "idp.scope";
-
-    /** The keystore password to use.  */
-    @Nonnull @NotEmpty public static final String KEY_STORE_PASSWORD = "idp.keystore.password";
-
-    /** The sealer password to use.  */
-    @Nonnull @NotEmpty public static final String SEALER_PASSWORD = "idp.sealer.password";
-
-    /** The sealer alias to use.  */
-    @Nonnull @NotEmpty public static final String SEALER_ALIAS = "idp.sealer.alias";
-
-    /** The keysize for the sealer.  */
-    @Nonnull @NotEmpty public static final String SEALER_KEYSIZE = "idp.sealer.keysize";
-
-    /** The the key size to generate.  */
-    @Nonnull @NotEmpty public static final String KEY_SIZE = "idp.keysize";
-
-    /** Mode to set on credential *key files. */
-    @Nonnull @NotEmpty public static final String MODE_CREDENTIAL_KEYS = "idp.conf.credentials.filemode";
-
-    /** Group to set on files in the credential and conf directories. */
-    @Nonnull @NotEmpty public static final String GROUP_CONF_CREDENTIALS = "idp.conf.credentials.group";
-
-    /** Do we do any chgrp/chmod work? */
-    @Nonnull @NotEmpty public static final String PERFORM_SET_MODE = "idp.conf.setmode";
-
-    /** Whether to tidy up after ourselves. */
-    @Nonnull @NotEmpty public static final String NO_TIDY = "idp.no.tidy";
-
     /** Which modules to enable on initial install.
      * @since 4.1.0 */
     @Nonnull @NotEmpty public static final String INITIAL_INSTALL_MODULES = "idp.initial.modules";
-
-    /** Whether to tidy up after ourselves. */
-    public static final int DEFAULT_KEY_SIZE = 3072;
 
     /** Those modules which are "core". */
     @Nonnull public static final Set<String> CORE_MODULES =
@@ -211,7 +155,7 @@ public class InstallerPropertiesImpl  {
         }
         log.debug("Source dir {}", srcDir);
 
-        final Path propertyFile = getMergeFile(PROPERTY_SOURCE_FILE);
+        final Path propertyFile = getMergeFile(InstallerProperties.ENTITY_ID);
         if (propertyFile != null) {
             /* The file specified in the system file idp.property.file (if present). */
             final File idpPropertyFile = propertyFile.toFile();
@@ -226,19 +170,19 @@ public class InstallerPropertiesImpl  {
             }
         }
 
-        final String noTidy = installerProperties.getProperty(NO_TIDY);
+        final String noTidy = installerProperties.getProperty(InstallerProperties.NO_TIDY);
         tidy = noTidy == null;
-        final String setModeString = installerProperties.getProperty(PERFORM_SET_MODE);
+        final String setModeString = installerProperties.getProperty(InstallerProperties.PERFORM_SET_MODE);
         if (setModeString != null) {
             setGroupAndMode = Boolean.valueOf(setModeString);
         }
 
-        String value = installerProperties.getProperty(NO_PROMPT);
+        String value = installerProperties.getProperty(InstallerProperties.NO_PROMPT);
         noPrompt = value != null;
 
-        value = installerProperties.getProperty(KEY_SIZE);
+        value = installerProperties.getProperty(InstallerProperties.KEY_SIZE);
         if (value == null) {
-            keySize = DEFAULT_KEY_SIZE;
+            keySize = InstallerProperties.DEFAULT_KEY_SIZE;
         } else {
             keySize = Integer.parseInt(value);
         }
@@ -325,7 +269,7 @@ public class InstallerPropertiesImpl  {
             return targetDir;
         }
         final Path td = targetDir =
-                Path.of(getValue(TARGET_DIR, "Installation Directory:", () -> "/opt/shibboleth-idp"));
+                Path.of(getValue(InstallerProperties.TARGET_DIR, "Installation Directory:", () -> "/opt/shibboleth-idp"));
         assert td != null;
         return td;
     }
@@ -348,7 +292,7 @@ public class InstallerPropertiesImpl  {
         String result = entityID;
         if (result == null) {
             entityID = result =
-                    getValue(ENTITY_ID, "SAML EntityID:", () -> "https://" + getHostName() + "/idp/shibboleth");
+                    getValue(InstallerProperties.ENTITY_ID, "SAML EntityID:", () -> "https://" + getHostName() + "/idp/shibboleth");
         }
         return result;
     }
@@ -372,7 +316,7 @@ public class InstallerPropertiesImpl  {
     @Nonnull public String getHostName() {
         String result = hostname;
         if (result == null) {
-            result = hostname = getValue(HOST_NAME, "Host Name:", () -> InstallerSupport.getBestHostName());
+            result = hostname = getValue(InstallerProperties.HOST_NAME, "Host Name:", () -> InstallerSupport.getBestHostName());
         }
         return result;
     }
@@ -387,7 +331,7 @@ public class InstallerPropertiesImpl  {
         if (result != null) {
             return result;
         }
-        result = credentialsKeyFileMode = installerProperties.getProperty(MODE_CREDENTIAL_KEYS, "600");
+        result = credentialsKeyFileMode = installerProperties.getProperty(InstallerProperties.MODE_CREDENTIAL_KEYS, "600");
         assert result != null;
         return result;
     }
@@ -398,7 +342,7 @@ public class InstallerPropertiesImpl  {
     * @return the mode or null if none to be set
     */
     @Nullable public String getCredentialsGroup() {
-        return installerProperties.getProperty(GROUP_CONF_CREDENTIALS);
+        return installerProperties.getProperty(InstallerProperties.GROUP_CONF_CREDENTIALS);
     }
 
     /**
@@ -434,7 +378,7 @@ public class InstallerPropertiesImpl  {
     @Nonnull public String getScope() {
         String result = scope;
         if (result  == null) {
-            result = scope = getValue(SCOPE, "Attribute Scope:", () -> defaultScope());
+            result = scope = getValue(InstallerProperties.SCOPE, "Attribute Scope:", () -> defaultScope());
         }
         return result;
     }
@@ -446,7 +390,7 @@ public class InstallerPropertiesImpl  {
     * @throws BuildException  if badness happens
     */
     @Nullable public String getLDAPPassword() throws BuildException {
-        return installerProperties.getProperty(LDAP_PASSWORD);
+        return installerProperties.getProperty(InstallerProperties.LDAP_PASSWORD);
     }
 
     /**
@@ -466,7 +410,7 @@ public class InstallerPropertiesImpl  {
     @Nonnull public String getKeyStorePassword() {
         String result = keyStorePassword;
         if (keyStorePassword == null) {
-            result = keyStorePassword = getPassword(KEY_STORE_PASSWORD, "Backchannel PKCS12 Password:");
+            result = keyStorePassword = getPassword(InstallerProperties.KEY_STORE_PASSWORD, "Backchannel PKCS12 Password:");
         }
         assert result != null;
         return result;
@@ -480,7 +424,7 @@ public class InstallerPropertiesImpl  {
     @Nonnull public String getSealerPassword() {
         String result = sealerPassword;
         if (result == null) {
-            result = sealerPassword = getPassword(SEALER_PASSWORD, "Cookie Encryption Key Password:");
+            result = sealerPassword = getPassword(InstallerProperties.SEALER_PASSWORD, "Cookie Encryption Key Password:");
         }
         return result;
     }
@@ -526,7 +470,7 @@ public class InstallerPropertiesImpl  {
      * @throws BuildException if the size was not an integer 
      */
     @Nullable Integer getSealerKeySize() throws BuildException {
-        final String val = installerProperties.getProperty(SEALER_KEYSIZE);
+        final String val = installerProperties.getProperty(InstallerProperties.SEALER_KEYSIZE);
         if (val == null) {
             return null;
         }
@@ -535,7 +479,7 @@ public class InstallerPropertiesImpl  {
             result = Integer.valueOf(val);
         }
         catch (final NumberFormatException e) {
-            log.error("Provided value for property {} ({}') was not an integer", SEALER_ALIAS, val);
+            log.error("Provided value for property {} ({}') was not an integer", InstallerProperties.SEALER_ALIAS, val);
             throw new BuildException(e);
         }
         return result;
@@ -549,7 +493,7 @@ public class InstallerPropertiesImpl  {
     @Nonnull public String getSealerAlias() {
         String result = sealerAlias;
         if (result == null) {
-            result = sealerAlias = installerProperties.getProperty(SEALER_ALIAS);
+            result = sealerAlias = installerProperties.getProperty(InstallerProperties.SEALER_ALIAS);
         }
         if (result == null) {
             result = sealerAlias = "secret";
@@ -607,7 +551,7 @@ public class InstallerPropertiesImpl  {
     * @throws BuildException if badness happens
     */
     @Nullable public Path getIdPMergeProperties() throws BuildException {
-        return getMergeFile(IDP_PROPERTIES_MERGE);
+        return getMergeFile(InstallerProperties.IDP_PROPERTIES_MERGE);
     }
 
     /**
@@ -618,7 +562,7 @@ public class InstallerPropertiesImpl  {
     * @throws BuildException  if badness happens
     */
     @Nullable public Path getLDAPMergeProperties() throws BuildException {
-        return getMergeFile(LDAP_PROPERTIES_MERGE);
+        return getMergeFile(InstallerProperties.LDAP_PROPERTIES_MERGE);
     }
 
 }
