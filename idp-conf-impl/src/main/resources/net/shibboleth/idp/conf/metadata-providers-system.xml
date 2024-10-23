@@ -14,12 +14,13 @@
 
     <context:annotation-config />
 
-    <!-- BeanPostProcessors that auto-install MetadataFilters for internal use. -->
-    
+    <!-- Stand alone post-processor to auto-attach the ByReference filter bridge. -->
     <bean class="net.shibboleth.spring.metadata.ByReferenceFilterBeanPostProcessor"
         p:enabled="%{idp.service.metadata.enableByReferenceFilters:true}" />
     
-    <bean class="net.shibboleth.spring.metadata.NodeProcessingAttachingBeanPostProcessor"
+    <!-- Reserved bean ID that is auto-attached to all metadata resolvers by Spring parser. -->
+    <bean id="shibboleth.AutoWiredNodeProcessingMetadataFilter"
+        class="net.shibboleth.spring.metadata.filter.AutoWiredNodeProcessingMetadataFilter"
         p:nodeProcessors="#{getObject('shibboleth.MetadataNodeProcessors')}" />
 
     <!-- Default NodeProcessors to auto-wire. -->
