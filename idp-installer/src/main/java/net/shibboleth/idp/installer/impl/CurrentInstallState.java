@@ -84,7 +84,7 @@ public final class CurrentInstallState extends AbstractInitializableComponent {
     /** Constructor.
      * @param installerProps the installer situation.
      */
-    public CurrentInstallState(final InstallerProperties installerProps) {
+    public CurrentInstallState(final InstallerPropertiesImpl installerProps) {
         targetDir = installerProps.getTargetDir();
         enabledModules = CollectionSupport.emptySet();
     }

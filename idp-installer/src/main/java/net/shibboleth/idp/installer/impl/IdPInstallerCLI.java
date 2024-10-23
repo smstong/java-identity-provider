@@ -113,19 +113,19 @@ public class IdPInstallerCLI extends AbstractCommandLine<IdPInstallerArguments> 
         }
 
         if (args.isUnattended()) {
-            System.setProperty(InstallerProperties.NO_PROMPT, "true");
+            System.setProperty(InstallerPropertiesImpl.NO_PROMPT, "true");
         }
 
-        setIfNotNull(args.getPropertyFile(), InstallerProperties.PROPERTY_SOURCE_FILE);
-        setIfNotNull(args.getTargetDirectory(), InstallerProperties.TARGET_DIR);
-        setIfNotNull(args.getHostName(), InstallerProperties.HOST_NAME);
-        setIfNotNull(args.getScope(), InstallerProperties.SCOPE);
-        setIfNotNull(args.getEntityID(), InstallerProperties.ENTITY_ID);
-        setIfNotNull(args.getKeystorePassword(), InstallerProperties.KEY_STORE_PASSWORD);
-        setIfNotNull(args.getSealerPassword(), InstallerProperties.SEALER_PASSWORD);
+        setIfNotNull(args.getPropertyFile(), InstallerPropertiesImpl.PROPERTY_SOURCE_FILE);
+        setIfNotNull(args.getTargetDirectory(), InstallerPropertiesImpl.TARGET_DIR);
+        setIfNotNull(args.getHostName(), InstallerPropertiesImpl.HOST_NAME);
+        setIfNotNull(args.getScope(), InstallerPropertiesImpl.SCOPE);
+        setIfNotNull(args.getEntityID(), InstallerPropertiesImpl.ENTITY_ID);
+        setIfNotNull(args.getKeystorePassword(), InstallerPropertiesImpl.KEY_STORE_PASSWORD);
+        setIfNotNull(args.getSealerPassword(), InstallerPropertiesImpl.SEALER_PASSWORD);
 
         try {
-            final InstallerProperties ip = new InstallerProperties(source);
+            final InstallerPropertiesImpl ip = new InstallerPropertiesImpl(source);
             ip.doInitialize();
             final CurrentInstallState ic = new CurrentInstallState(ip);
             ic.initialize();

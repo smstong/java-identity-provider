@@ -17,7 +17,7 @@ package net.shibboleth.idp.installer;
 import org.testng.annotations.Test;
 
 import net.shibboleth.idp.installer.impl.IdPInstallerCLI;
-import net.shibboleth.idp.installer.impl.InstallerProperties;
+import net.shibboleth.idp.installer.impl.InstallerPropertiesImpl;
 import net.shibboleth.idp.installer.impl.UpdateIdPCLI;
 //import net.shibboleth.idp.installer.impl.UpdateIdPCLI;
 /**
@@ -27,7 +27,7 @@ public class TestInstallerCLI {
 
     @Test(enabled = false)
     public void install() {
-        System.setProperty(InstallerProperties.HOST_NAME, "machine.org.uk");
+        System.setProperty(InstallerPropertiesImpl.HOST_NAME, "machine.org.uk");
         IdPInstallerCLI.runMain(new String[] {
                 "-t", "h:\\downloads\\idp",
                 "-s",

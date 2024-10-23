@@ -53,7 +53,7 @@ import net.shibboleth.shared.primitive.StringSupport;
  NOTE Updated to this properties should be reflected in the "PropertyDriverInstallation" wiki page."/
 
 */
-public class InstallerProperties  {
+public class InstallerPropertiesImpl  {
 
     /** The name of a property file to fill in some or all of the above. This file is deleted after processing. */
     @Nonnull @NotEmpty public static final String PROPERTY_SOURCE_FILE = "idp.property.file";
@@ -125,7 +125,7 @@ public class InstallerProperties  {
             CollectionSupport.setOf("idp.authn.Password", "idp.admin.Hello");
 
     /** Class logger. */
-    @Nonnull private final Logger log = LoggerFactory.getLogger(InstallerProperties.class);
+    @Nonnull private final Logger log = LoggerFactory.getLogger(InstallerPropertiesImpl.class);
 
     /** The properties driving the install. */
     @NonnullAfterInit private Properties installerProperties;
@@ -177,7 +177,7 @@ public class InstallerProperties  {
      * 
      * @param sourceDir Where the *source* installation is
      */
-    public InstallerProperties(@Nonnull final Path sourceDir) {
+    public InstallerPropertiesImpl(@Nonnull final Path sourceDir) {
         srcDir = sourceDir;
         inputHandler = getInputHandler();
     }
@@ -493,7 +493,7 @@ public class InstallerProperties  {
     @Nonnull @NotLive @Unmodifiable public Set<String> getModulesToEnable() {
         String prop = StringSupport.trimOrNull(installerProperties.getProperty(INITIAL_INSTALL_MODULES));
         if (prop == null) {
-            return InstallerProperties.DEFAULT_MODULES;
+            return InstallerPropertiesImpl.DEFAULT_MODULES;
         }
         final boolean additive = prop.startsWith("+");
         if (additive) {
@@ -505,8 +505,8 @@ public class InstallerProperties  {
             final Set<String> result = CollectionSupport.copyToSet(CollectionSupport.arrayAsList(modules));
             return result;
         }
-        final Set<String> result = new HashSet<>(modules.length + InstallerProperties.DEFAULT_MODULES.size());
-        result.addAll(InstallerProperties.DEFAULT_MODULES);
+        final Set<String> result = new HashSet<>(modules.length + InstallerPropertiesImpl.DEFAULT_MODULES.size());
+        result.addAll(InstallerPropertiesImpl.DEFAULT_MODULES);
         result.addAll(Arrays.asList(modules));
         return CollectionSupport.copyToSet(result);
     }
@@ -515,7 +515,7 @@ public class InstallerProperties  {
      * @return the modules
      */
     @Nonnull @NotLive @Unmodifiable public Set<String> getCoreModules() {
-        return InstallerProperties.CORE_MODULES;
+        return InstallerPropertiesImpl.CORE_MODULES;
     }
 
     /** 

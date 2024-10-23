@@ -79,7 +79,7 @@ public class V5Install {
     @Nonnull private final Logger log = LoggerFactory.getLogger(V5Install.class);
 
     /** Installer Properties. */
-    @Nonnull private final InstallerProperties installerProps;
+    @Nonnull private final InstallerPropertiesImpl installerProps;
 
     /** Current Install. */
     @Nonnull private final CurrentInstallState currentState;
@@ -100,7 +100,7 @@ public class V5Install {
      * @param securityParams {@link HttpClientSecurityParameters} to use on any Plugin operations
      *
      */
-    public V5Install(@Nonnull final InstallerProperties props, @Nonnull final CurrentInstallState installState,
+    public V5Install(@Nonnull final InstallerPropertiesImpl props, @Nonnull final CurrentInstallState installState,
             @Nonnull final HttpClient client, @Nullable final HttpClientSecurityParameters securityParams) {
         if (!installState.isInitialized()) {
             throw new UninitializedComponentException("Installer State not Initialized");

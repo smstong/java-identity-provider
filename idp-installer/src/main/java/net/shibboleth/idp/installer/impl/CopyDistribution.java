@@ -41,12 +41,12 @@ public final class CopyDistribution {
     @Nonnull private final Logger log = LoggerFactory.getLogger(CopyDistribution.class);
 
     /** Properties for the job. */
-    @Nonnull private final InstallerProperties installerProps;
+    @Nonnull private final InstallerPropertiesImpl installerProps;
 
     /** Constructor.
      * @param props The environment for the work.
      */
-    public CopyDistribution(@Nonnull final InstallerProperties props) {
+    public CopyDistribution(@Nonnull final InstallerPropertiesImpl props) {
         installerProps = props;
     }
 
