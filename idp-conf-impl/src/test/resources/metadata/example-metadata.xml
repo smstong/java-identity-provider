@@ -20,6 +20,10 @@
                 <saml:AttributeValue>attribute-release</saml:AttributeValue>
             </saml:Attribute>
             -->
+            <saml:Attribute Name="http://shibboleth.net/ns/profiles/saml1/sso/browser/includeAttributeStatement"
+                NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+                <saml:AttributeValue>true</saml:AttributeValue>
+            </saml:Attribute>
             <saml:Attribute Name="http://shibboleth.net/ns/profiles/saml2/sso/browser/encryptAssertions"
                 NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
                 <saml:AttributeValue>true</saml:AttributeValue>
