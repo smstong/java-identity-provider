@@ -39,6 +39,11 @@ public class SAML1UnsolicitedSSOFlowTest extends AbstractSAML1FlowTest {
      */
     @Test public void testSAML1UnsolicitedSSOFlow() throws Exception {
 
+        // NOTE: This test can fail for a subtle reason involving the use of attribute push with SAML 1.1
+        // We are triggering that setting by relying on a ByReference metadata filter to attach a
+        // profile setting to the test metadata, so it fails for reasons that can be non-obvious if that
+        // mechanism breaks, and will fail on the attribute statement checking step.
+        
         buildRequest();
 
         overrideEndStateOutput(FLOW_ID);

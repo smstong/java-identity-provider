@@ -14,8 +14,9 @@
 
     <context:annotation-config />
 
-    <!-- Stand alone post-processor to auto-attach the ByReference filter bridge. -->
-    <bean class="net.shibboleth.spring.metadata.ByReferenceFilterBeanPostProcessor"
+    <!-- Reserved bean ID that is auto-attached to all metadata resolvers by Spring parser. -->
+    <bean id="shibboleth.ByReferenceMetadataFilterBridge"
+        class="net.shibboleth.idp.saml.metadata.impl.ByReferenceMetadataFilterBridge"
         p:enabled="%{idp.service.metadata.enableByReferenceFilters:true}" />
     
     <!-- Reserved bean ID that is auto-attached to all metadata resolvers by Spring parser. -->

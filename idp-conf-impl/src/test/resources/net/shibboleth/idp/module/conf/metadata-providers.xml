@@ -27,7 +27,7 @@
 	<!-- Example metadata provider. -->
 
     <MetadataProvider id="URLMD" xsi:type="ResourceBackedMetadataProvider" maxRefreshDelay="PT5M" indexesRef="testbed.MetadataIndexes" resourceRef="exampleMetadata">
-        <MetadataFilter xsi:type="SignatureValidation" requireSignedRoot="false"> <!-- TODO -->
+        <MetadataFilter xsi:type="SignatureValidation" requireSignedRoot="false">
             <PublicKey>
                 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxg0TyQAP/tIvOH89EtaX
                 uRRn8SYzTj7W1TbNY4VvBmobjkRmSkki4hH9x4sQpi635wn6WtXTN/FNNmkTK3N/
@@ -56,12 +56,10 @@
 
     <MetadataProvider id="SP123MD" xsi:type="ResourceBackedMetadataProvider" maxRefreshDelay="PT5M" indexesRef="testbed.MetadataIndexes" resourceRef="exampleMetadata-sp123"/>
 
-    <!--
     <MetadataProvider id="ICMDQ" xsi:type="DynamicHTTPMetadataProvider"
             minCacheDuration="PT5M" maxCacheDuration="PT24H" maxIdleEntityData="PT1H">
         <MetadataFilter xsi:type="RequiredValidUntil" maxValidityInterval="P14D" />
         <MetadataQueryProtocol>https://mdq.incommon.org/</MetadataQueryProtocol>
     </MetadataProvider>
-    -->
 
 </MetadataProvider>
