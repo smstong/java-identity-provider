@@ -68,7 +68,7 @@ public final class PluginVersionTest {
         failParse("-1");
         failParse("1.-1");
         failParse("1.1.-1");
-        failParse("10001.99.0");
+        failParse("30001.99.0");
 
         try {
             new InstallableComponentVersion(1,2,-1);
@@ -77,13 +77,13 @@ public final class PluginVersionTest {
             // OK
         }
         try {
-            new InstallableComponentVersion(10000,2,0);
+            new InstallableComponentVersion(30000,2,0);
             fail("Bad version not caught");
         } catch (NumberFormatException ex) {
             // OK
         }
         try {
-            new InstallableComponentVersion(1, 10000,2);
+            new InstallableComponentVersion(1, 30000,2);
             fail("Bad version not caught");
         } catch (NumberFormatException ex) {
             // OK
