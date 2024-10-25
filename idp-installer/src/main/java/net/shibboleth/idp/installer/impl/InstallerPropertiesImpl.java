@@ -155,7 +155,7 @@ public class InstallerPropertiesImpl  {
         }
         log.debug("Source dir {}", srcDir);
 
-        final Path propertyFile = getMergeFile(InstallerProperties.ENTITY_ID);
+        final Path propertyFile = getMergeFile(InstallerProperties.PROPERTY_SOURCE_FILE);
         if (propertyFile != null) {
             /* The file specified in the system file idp.property.file (if present). */
             final File idpPropertyFile = propertyFile.toFile();
@@ -564,5 +564,4 @@ public class InstallerPropertiesImpl  {
     @Nullable public Path getLDAPMergeProperties() throws BuildException {
         return getMergeFile(InstallerProperties.LDAP_PROPERTIES_MERGE);
     }
-
 }
