@@ -555,9 +555,9 @@ public final class PluginInstaller extends AbstractInitializableComponent implem
                     // IdP-2340
                     final String moduleId = module.getId();
                     if (reenabledPluginModules.contains(moduleId)) {
-                        LOG.debug("Module '{}' already enabled by Plugin rule", moduleId);
+                        LOG.debug("Module {} already enabled by Plugin rule", moduleId);
                     } else if (!loadedModules.contains(module.getId())) {
-                        LOG.debug("Module '{]' not previously enabled", moduleId);
+                        LOG.debug("Module {} not previously enabled", moduleId);
                     } else {
                         LOG.debug("Re-enabling module {}", moduleId);
                         captureChanges(module.enable(getModuleContext()));
