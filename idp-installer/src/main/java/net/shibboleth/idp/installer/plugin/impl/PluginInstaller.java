@@ -157,6 +157,9 @@ public final class PluginInstaller extends AbstractInitializableComponent implem
     /** The Module Context. */
     @NonnullAfterInit private ModuleContext moduleContext;
 
+    /** The names of those plugin modules enabled by rule. */
+    @Nonnull private Set<String> reenabledPluginModules = new HashSet<>();
+
     /** Module Changes.*/
     @Nonnull private final  Map<ModuleResource,ResourceResult> moduleChanges = new HashMap<>();
 
@@ -545,13 +548,22 @@ public final class PluginInstaller extends AbstractInitializableComponent implem
     private void reEnableModules(final Set<String> loadedModules) throws BuildException  {
         try {
             final Iterator<IdPModule> modules = ServiceLoader.load(IdPModule.class, getDistributionLoader()).iterator();
+            LOG.debug("Reloading Plugin-supplied modules (if any)");
             while (modules.hasNext()) {
                 final IdPModule module = modules.next();
-                if (pluginId.equals(module.getOwnerId()) && loadedModules.contains(module.getId())) {
-                    LOG.debug("Re-enabling module {}", module.getId());
-                    captureChanges(module.enable(getModuleContext()));
+                if (pluginId.equals(module.getOwnerId())) {
+                    // IdP-2340
+                    final String moduleId = module.getId();
+                    if (reenabledPluginModules.contains(moduleId)) {
+                        LOG.debug("Module '{}' already enabled by Plugin rule", moduleId);
+                    } else if (!loadedModules.contains(module.getId())) {
+                        LOG.debug("Module '{]' not previously enabled", moduleId);
+                    } else {
+                        LOG.debug("Re-enabling module {}", moduleId);
+                        captureChanges(module.enable(getModuleContext()));
+                    }
                 } else {
-                    LOG.debug("Not re-enabling module {}, not provided by this plugin", module.getId());
+                    LOG.debug("Module {}, not provided by this plugin", module.getId());
                 }
             }
         } catch (final ServiceConfigurationError | ModuleException e) {
@@ -625,8 +637,10 @@ public final class PluginInstaller extends AbstractInitializableComponent implem
                     captureChanges(module.enable(getModuleContext()));
                     rollBack.getModulesEnabled().add(module);
                 } else {
-                    LOG.debug("Module {} is already enabled, so not enabling", moduleId);
+                    LOG.debug("Re-enabling Module {}", moduleId);
+                    captureChanges(module.enable(getModuleContext()));
                 }
+                reenabledPluginModules.add(moduleId);
             }
         } catch (final ModuleException e) {
             LOG.error("Error enabling {}", moduleId);
