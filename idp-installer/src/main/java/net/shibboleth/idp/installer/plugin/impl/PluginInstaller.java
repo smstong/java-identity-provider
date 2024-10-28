@@ -465,6 +465,7 @@ public final class PluginInstaller extends AbstractInitializableComponent implem
             try {
                 final IdPModule module = modules.next();
                 if (module.isEnabled(getModuleContext())) {
+                    LOG.debug("Found Enabled Module {}",module.getId());
                     enablededModules.add(module.getId());
                 }
             } catch (final ServiceConfigurationError e) {
@@ -620,8 +621,11 @@ public final class PluginInstaller extends AbstractInitializableComponent implem
             for (final IdPModule module: getDescription().getEnableOnInstall()) {
                 moduleId = module.getId();
                 if (!module.isEnabled(getModuleContext())) {
+                    LOG.debug("Enabling Module {}", moduleId);
                     captureChanges(module.enable(getModuleContext()));
                     rollBack.getModulesEnabled().add(module);
+                } else {
+                    LOG.debug("Module {} is already enabled, so not enabling", moduleId);
                 }
             }
         } catch (final ModuleException e) {
