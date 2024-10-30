@@ -26,7 +26,6 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import net.shibboleth.idp.test.flows.AbstractFlowTest;
 import net.shibboleth.shared.logic.Constraint;
 import net.shibboleth.shared.net.IPRange;
 
@@ -532,7 +531,7 @@ public class SAML2TestResponseValidator extends SAML2TestStatusResponseTypeValid
         Assert.assertEquals(audiences.size(), 1);
 
         final Audience audience = audiences.get(0);
-        Assert.assertEquals(audience.getURI(), AbstractFlowTest.SP_ENTITY_ID);
+        Assert.assertEquals(audience.getURI(), spEntityID);
     }
 
     /**
