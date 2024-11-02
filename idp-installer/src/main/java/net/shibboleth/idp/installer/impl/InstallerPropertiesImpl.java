@@ -17,11 +17,15 @@ package net.shibboleth.idp.installer.impl;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
@@ -189,6 +193,76 @@ public class InstallerPropertiesImpl  {
     }
 // CheckStyle: CyclomaticComplexity ON
 
+
+    /**
+     * Is this address named?
+     *
+     * <p>Helper method for {@link #getBestHostName()}.</p>
+     * @deprecated to be removed in V6
+     * @param addr what to look at
+     * @return true unless the name is the canonical name
+     */
+    private static boolean hasHostName(final InetAddress addr) {
+        return !addr.getHostAddress().equals(addr.getCanonicalHostName());
+    }
+
+
+    /**
+     * Find the most apposite network connector, taken from Ant.
+     * @deprecated To be removed in V6
+     * @return the best name we can work out
+     */
+    // CheckStyle: CyclomaticComplexity OFF
+    @Nonnull private static String getBestHostName() {
+        InetAddress bestSoFar = null;
+        try {
+            for (final NetworkInterface netInterface : Collections.list(NetworkInterface.getNetworkInterfaces())) {
+                for (final InetAddress address : Collections.list(netInterface.getInetAddresses())) {
+                    if (bestSoFar == null) {
+                        // none selected so far, so this one is better.
+                        bestSoFar = address;
+                    } else if (address == null || address.isLoopbackAddress()) {
+                        // definitely not better than the previously selected address.
+                    } else if (address.isLinkLocalAddress()) {
+                        // link local considered better than loopback
+                        if (bestSoFar.isLoopbackAddress()) {
+                            bestSoFar = address;
+                        }
+                    } else if (address.isSiteLocalAddress()) {
+                        // site local considered better than link local (and loopback)
+                        // address with hostname resolved considered better than
+                        // address without hostname
+                        if (bestSoFar.isLoopbackAddress()
+                                || bestSoFar.isLinkLocalAddress()
+                                || (bestSoFar.isSiteLocalAddress() && !hasHostName(bestSoFar))) {
+                            bestSoFar = address;
+                        }
+                    } else {
+                        // current is a "Global address", considered better than
+                        // site local (and better than link local, loopback)
+                        // address with hostname resolved considered better than
+                        // address without hostname
+                        if (bestSoFar.isLoopbackAddress()
+                                || bestSoFar.isLinkLocalAddress()
+                                || bestSoFar.isSiteLocalAddress()
+                                || !hasHostName(bestSoFar)) {
+                            bestSoFar = address;
+                        }
+                    }
+                }
+            }
+        } catch (final SocketException e) {
+            LoggerFactory.getLogger(InstallerSupport.class).error("Could not get host information", e);
+        }
+        if (bestSoFar == null) {
+            return "localhost.localdomain";
+        }
+        final String result = bestSoFar.getCanonicalHostName();
+        assert result!=null;
+        return result;
+    }
+    // CheckStyle: CyclomaticComplexity ON
+
     /**
      * Lookup a property; if it isn't defined then ask the user (if we are allowed).
      * 
@@ -316,7 +390,7 @@ public class InstallerPropertiesImpl  {
     @Nonnull public String getHostName() {
         String result = hostname;
         if (result == null) {
-            result = hostname = getValue(InstallerProperties.HOST_NAME, "Host Name:", () -> InstallerSupport.getBestHostName());
+            result = hostname = getValue(InstallerProperties.HOST_NAME, "Host Name:", () -> getBestHostName());
         }
         return result;
     }
