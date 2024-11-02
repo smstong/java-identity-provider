@@ -43,6 +43,7 @@ import org.bouncycastle.openpgp.operator.jcajce.JcaPGPContentVerifierBuilderProv
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 
+import net.shibboleth.idp.installer.InstallerSupport;
 import net.shibboleth.shared.annotation.constraint.NonnullAfterInit;
 import net.shibboleth.shared.collection.CollectionSupport;
 import net.shibboleth.shared.component.AbstractInitializableComponent;
@@ -296,12 +297,12 @@ import net.shibboleth.shared.primitive.LoggerFactory;
         }
 
         if (explicitTrustStore != null) {
-            store = Path.of(explicitTrustStore);
+            store = InstallerSupport.pathOf(explicitTrustStore);
             if (!Files.exists(store)) {
                 log.error("Trust store {} does not exist", explicitTrustStore);
                 throw new ComponentInitializationException("Supplied trust store does not exist.");
             }
-            backup = Path.of(explicitTrustStore + ".backup");
+            backup = InstallerSupport.pathOf(explicitTrustStore + ".backup");
             log.debug("Plugin {}: Loading explicit truststore {}", pluginId, explicitTrustStore);
             try {
                 loadStore();

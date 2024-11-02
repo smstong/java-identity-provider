@@ -31,9 +31,11 @@ import org.springframework.core.io.Resource;
 
 import net.shibboleth.idp.Version;
 import net.shibboleth.idp.installer.InstallerProperties;
+import net.shibboleth.idp.installer.InstallerSupport;
 import net.shibboleth.shared.cli.AbstractCommandLine;
 import net.shibboleth.shared.collection.CollectionSupport;
 import net.shibboleth.shared.component.ComponentInitializationException;
+import net.shibboleth.shared.logic.Constraint;
 import net.shibboleth.shared.primitive.LoggerFactory;
 
 /**
@@ -80,7 +82,7 @@ public class IdPInstallerCLI extends AbstractCommandLine<IdPInstallerArguments> 
 
         super.doRun(args);
         
-        final Path source = Path.of(args.getSourceDir());
+        final Path source = InstallerSupport.pathOf(Constraint.isNotNull(args.getSourceDir(), "Source dir mist be specified"));
         assert source!=null;
         if (!Files.exists(source)) {
             getLogger().error("Could not find {}", source);

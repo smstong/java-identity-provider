@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import com.beust.jcommander.Parameter;
 
 import net.shibboleth.idp.cli.AbstractIdPHomeAwareCommandLineArguments;
+import net.shibboleth.idp.installer.InstallerSupport;
 import net.shibboleth.profile.installablecomponent.InstallableComponentVersion;
 import net.shibboleth.shared.logic.Constraint;
 import net.shibboleth.shared.primitive.LoggerFactory;
@@ -356,7 +357,9 @@ public class PluginInstallerArguments extends AbstractIdPHomeAwareCommandLineArg
             getLog().error("File {} does not exist", inputAsFile.getAbsolutePath());
             throw new IllegalArgumentException("Input File does not exist");
         }
-        final Path inputAsPath = Path.of(inputAsFile.getAbsolutePath());
+        final String inputAsFileString = inputAsFile.getAbsolutePath();
+        assert inputAsFileString != null;
+        final Path inputAsPath = InstallerSupport.pathOf(inputAsFileString);
         inputDirectory = inputAsPath.getParent();
         inputName = inputAsPath.getFileName().toString();
         getLog().trace("Found File: {}\t{}", inputDirectory, inputName);

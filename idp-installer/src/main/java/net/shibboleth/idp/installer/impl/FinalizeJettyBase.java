@@ -49,7 +49,7 @@ import net.shibboleth.idp.installer.PropertiesWithComments;
             System.err.println("idp.home not specified");
             throw new IOException("idp.home not specified");
         }
-        Path p = Path.of(home);
+        Path p = InstallerSupport.pathOf(home);
         assert p!=null;
         idpHome = p;
         if (!Files.exists(idpHome) || !Files.isDirectory(idpHome)) {

@@ -723,7 +723,8 @@ public final class PluginInstaller extends AbstractInitializableComponent implem
                 } else {
                     LOG.info("Inferred initial install to {}", s);
                 }
-                return Path.of(s);
+                assert s != null;
+                return InstallerSupport.pathOf(s);
             }
             val = props.getProperty(PLUGIN_FILE_PROPERTY_PREFIX+Integer.toString(count++));
         }
@@ -765,7 +766,7 @@ public final class PluginInstaller extends AbstractInitializableComponent implem
         int count = 1;
         String val = props.getProperty(PLUGIN_FILE_PROPERTY_PREFIX+Integer.toString(count++));
         while (val != null) {
-            final Path valAsPath = Path.of(val);
+            final Path valAsPath = InstallerSupport.pathOf(val);
             if (relativePaths || installedIdPHome == null) {
                 result.add(getIdpHome().resolve(valAsPath));
             } else {

@@ -269,7 +269,7 @@ public class InstallerPropertiesImpl  {
             return targetDir;
         }
         final Path td = targetDir =
-                Path.of(getValue(InstallerProperties.TARGET_DIR, "Installation Directory:", () -> "/opt/shibboleth-idp"));
+                InstallerSupport.pathOf(getValue(InstallerProperties.TARGET_DIR, "Installation Directory:", () -> "/opt/shibboleth-idp"));
         assert td != null;
         return td;
     }
@@ -524,7 +524,7 @@ public class InstallerPropertiesImpl  {
         if (propValue == null) {
             return null;
         }
-        Path path = Path.of(propValue);
+        Path path = InstallerSupport.pathOf(propValue);
         if (Files.exists(path)) {
             log.debug("Property '{}' had value '{}' Path exists ", propName, propValue);
         } else {

@@ -23,6 +23,7 @@ import javax.annotation.Nullable;
 import org.slf4j.Logger;
 
 import net.shibboleth.idp.Version;
+import net.shibboleth.idp.installer.InstallerSupport;
 import net.shibboleth.shared.cli.AbstractCommandLine;
 import net.shibboleth.shared.primitive.LoggerFactory;
 
@@ -66,13 +67,14 @@ public class IdPBuildWar extends AbstractCommandLine<IdPBuildArguments> {
         getLogger().debug("{}", args);
         getLogger().info("{}", args);
 
-        if (args.getIdPHome() == null) {
+        final String idpHomeString = args.getIdPHome(); 
+        
+        if (idpHomeString == null) {
             getLogger().error("--home must be specified");
             return RC_INIT;
         }
 
-        final Path idpHome = Path.of(args.getIdPHome());
-        assert idpHome!=null;
+        final Path idpHome = InstallerSupport.pathOf(idpHomeString);
         if (!Files.exists(idpHome)) {
             getLogger().error("Could not find {}", idpHome);
             return RC_INIT;

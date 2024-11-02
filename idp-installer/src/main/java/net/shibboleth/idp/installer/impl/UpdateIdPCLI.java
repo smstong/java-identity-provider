@@ -53,6 +53,7 @@ import net.shibboleth.profile.installablecomponent.InstallableComponentSupport.S
 import net.shibboleth.shared.cli.AbstractCommandLine;
 import net.shibboleth.shared.collection.CollectionSupport;
 import net.shibboleth.shared.component.ComponentInitializationException;
+import net.shibboleth.shared.logic.Constraint;
 import net.shibboleth.shared.primitive.LoggerFactory;
 import net.shibboleth.shared.spring.httpclient.resource.HTTPResource;
 
@@ -290,7 +291,7 @@ public class UpdateIdPCLI extends AbstractIdPHomeAwareCommandLine<UpdateIdPArgum
         try (final InputStream sigStream = new BufferedInputStream(
                 new FileInputStream(args.getDownloadLocation().resolve(fileName + ".asc").toFile()))) {
             final TrustStore trust = new TrustStore();
-            final Path idpHome = Path.of(args.getIdPHome());
+            final Path idpHome = InstallerSupport.pathOf(Constraint.isNotNull(args.getIdPHome(), "idp home must be specified"));
             assert idpHome != null;
             trust.setIdpHome(idpHome);
             trust.setTrustStore(args.getTruststore());

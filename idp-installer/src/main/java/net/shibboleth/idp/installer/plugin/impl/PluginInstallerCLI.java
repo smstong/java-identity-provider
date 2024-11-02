@@ -242,7 +242,8 @@ public final class PluginInstallerCLI extends AbstractIdPHomeAwareCommandLine<Pl
      */
     private void constructPluginInstaller(final PluginInstaller inst,
             final PluginInstallerArguments args) throws ComponentInitializationException {
-        final Path idpHome = Path.of(getApplicationContext().getEnvironment().getProperty("idp.home"));
+        final Path idpHome = InstallerSupport.pathOf(Constraint.isNotNull(
+                         getApplicationContext().getEnvironment().getProperty("idp.home"), "idp home must be specified"));
         assert idpHome != null;
         inst.setIdpHome(idpHome);
         if (!args.isUnattended()) {

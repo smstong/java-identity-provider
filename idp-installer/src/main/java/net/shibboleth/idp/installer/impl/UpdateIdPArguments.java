@@ -28,6 +28,7 @@ import com.beust.jcommander.Parameter;
 
 import net.shibboleth.idp.Version;
 import net.shibboleth.idp.cli.AbstractIdPHomeAwareCommandLineArguments;
+import net.shibboleth.idp.installer.InstallerSupport;
 import net.shibboleth.profile.installablecomponent.InstallableComponentVersion;
 import net.shibboleth.shared.annotation.constraint.NonnullBeforeExec;
 import net.shibboleth.shared.collection.CollectionSupport;
@@ -201,21 +202,23 @@ public class UpdateIdPArguments extends AbstractIdPHomeAwareCommandLineArguments
             throw new IllegalArgumentException("Error in version specifier", e);
         }
 
+        final String localDownloadDir = downloadDir; 
+        
         if (list) {
             operation = OperationType.LIST;
-            if (downloadDir !=  null) {
+            if (localDownloadDir !=  null) {
                 getLog().error("Cannot List and Dowload in the same operation.");
                 throw new IllegalArgumentException("Cannot List and Download in the same operation.");
             }
-        } else if (downloadDir != null) {
+        } else if (localDownloadDir != null) {
             operation = OperationType.DOWLOAD;
-            downloadDirPath = Path.of(downloadDir);
+            downloadDirPath = InstallerSupport.pathOf(localDownloadDir);
             if (!Files.exists(downloadDirPath)) {
-                getLog().error("Download directory {}, does not exist", downloadDir);
+                getLog().error("Download directory {}, does not exist", localDownloadDir);
                 throw new IllegalArgumentException("Download directory does not exist");
             }
             if (!Files.isDirectory(downloadDirPath)) {
-                getLog().error("Download location {}, exists, but is not a directory", downloadDir);
+                getLog().error("Download location {}, exists, but is not a directory", localDownloadDir);
                 throw new IllegalArgumentException("Download locaition is not a directory");
             }
         } else {

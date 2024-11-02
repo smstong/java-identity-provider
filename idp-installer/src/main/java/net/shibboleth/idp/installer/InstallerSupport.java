@@ -529,6 +529,21 @@ public final class InstallerSupport {
     }
     // CheckStyle: CyclomaticComplexity ON
 
+    /** A version of {@link Path#of(String, String...)} that throw a catchable exception.
+     * @param pathString the path as a string
+     * @return the Path
+     * @throws BuildException if  {@link Path#of(String, String...)} threw an exception.
+     */
+    @Nonnull public static final Path pathOf(@Nonnull String pathString) throws BuildException {
+        try {
+            final Path result = Path.of(pathString);
+            assert result != null;
+            return result;
+        }
+        catch (final Exception e) {
+            throw new BuildException(e);
+        }
+    }
 
     /**
      * A @{link {@link FileVisitor} which detects (and logs) whether a copy would overwrite.
