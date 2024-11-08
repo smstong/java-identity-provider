@@ -213,6 +213,7 @@
 	<bean id="csrfTokenFlowExecutionListener" init-method="initialize" destroy-method="destroy"
           class="net.shibboleth.idp.ui.csrf.impl.CSRFTokenFlowExecutionListener" p:csrfTokenManager-ref="shibboleth.CSRFTokenManager"
           p:enabled="%{idp.csrf.enabled:false}"
+          p:tokenPerFlow="%{idp.csrf.tokenPerFlow:true}"
           p:viewRequiresCSRFTokenPredicate-ref="shibboleth.DefaultViewRequiresCSRFTokenPredicate"
           p:eventRequiresCSRFTokenValidationPredicate-ref="shibboleth.DefaultEventRequiresCSRFTokenValidationPredicate"/>
     

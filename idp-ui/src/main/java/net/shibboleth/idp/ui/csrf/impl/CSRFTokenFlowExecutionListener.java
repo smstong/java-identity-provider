@@ -21,10 +21,11 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.slf4j.Logger;
-import net.shibboleth.shared.primitive.LoggerFactory;
+import org.springframework.webflow.core.collection.MutableAttributeMap;
 import org.springframework.webflow.definition.StateDefinition;
 import org.springframework.webflow.execution.Event;
 import org.springframework.webflow.execution.FlowExecutionListener;
+import org.springframework.webflow.execution.FlowSession;
 import org.springframework.webflow.execution.RequestContext;
 import org.springframework.webflow.execution.View;
 
@@ -35,14 +36,18 @@ import net.shibboleth.shared.annotation.constraint.NonnullAfterInit;
 import net.shibboleth.shared.component.AbstractInitializableComponent;
 import net.shibboleth.shared.component.ComponentInitializationException;
 import net.shibboleth.shared.logic.Constraint;
+import net.shibboleth.shared.primitive.LoggerFactory;
 
 /**
  * A flow execution lifecycle listener that, if enabled:
- * <ul>
- *      <li>Sets an anti-CSRF token into the view-scope map on rendering of a suitable view-state</li>
+ * <ol>
+ *      <li>Sets an anti-CSRF token into the flow-scope map when a flow session starts and a token per-flow is 
+ *      enabled.</li>
+ *      <li>Sets an anti-CSRF token into the view-scope map when rendering a suitable view-state. This token is 
+ *      either retrieved from the flow-scope, if available from step 1, or generated anew.</li>
  *      <li>Checks the CSRF token in a HTTP request matches that stored in the view-scope map when a suitable 
  *       view-state event occurs.</li>
- * </ul>
+ * </ol>
  */
 public class CSRFTokenFlowExecutionListener extends AbstractInitializableComponent implements FlowExecutionListener {
     
@@ -60,6 +65,9 @@ public class CSRFTokenFlowExecutionListener extends AbstractInitializableCompone
     
     /** Is this listener enabled? */
     private boolean enabled;
+    
+    /** Should a new token should be created for each flow session and not for each view? */
+    private boolean tokenPerFlow;
 
     /** The CSRF token manager for getting and validating tokens. */    
     @NonnullAfterInit private CSRFTokenManager csrfTokenManager;
@@ -68,6 +76,7 @@ public class CSRFTokenFlowExecutionListener extends AbstractInitializableCompone
     /** Constructor. */
     public CSRFTokenFlowExecutionListener() {
         enabled = false;
+        tokenPerFlow = true;
     }
     
     /**
@@ -78,6 +87,16 @@ public class CSRFTokenFlowExecutionListener extends AbstractInitializableCompone
     public void setEnabled(final boolean enable) {
         checkSetterPreconditions();
         enabled = enable;
+    }
+    
+    /**
+     * Sets whether a new token should be created for each flow session and not for each view.
+     * 
+     * @param flag enable or disable the token per flow pattern
+     */
+    public void setTokenPerFlow(final boolean flag) {
+        checkSetterPreconditions();
+        tokenPerFlow = flag;
     }
     
     /**
@@ -101,8 +120,7 @@ public class CSRFTokenFlowExecutionListener extends AbstractInitializableCompone
         checkSetterPreconditions();
         eventRequiresCSRFTokenValidationPredicate = Constraint.isNotNull(condition, 
                 "Validate CSRF token condition cannot be null");
-    }
-    
+    }    
 
     /**
      * Sets the CSRF token manager.
@@ -113,8 +131,22 @@ public class CSRFTokenFlowExecutionListener extends AbstractInitializableCompone
         checkSetterPreconditions();
         csrfTokenManager = Constraint.isNotNull(tokenManager, "CSRF Token manager can not be null");
     }
-
-
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>If per flow-session tokens are enabled, creates a CSRF token and adds it to the request context flow scope 
+     * for extraction into the view scope later on.</p>
+     */
+    @Override
+    public void sessionStarting(final RequestContext context, final FlowSession session, 
+            final MutableAttributeMap<?> input) {
+        
+        if (enabled && tokenPerFlow) {
+            context.getFlowScope().put(CSRF_TOKEN_VIEWSCOPE_NAME, csrfTokenManager.generateCSRFToken()); 
+        }
+    }
+    
     /**
      * Generates a CSRF token and adds it to the request context view scope, overwriting any existing token. 
      * 
@@ -126,7 +158,13 @@ public class CSRFTokenFlowExecutionListener extends AbstractInitializableCompone
 
         //state here should always be a view-state, but guard anyway.
         if (enabled && viewState.isViewState() && viewRequiresCSRFTokenPredicate.test(context)) {
-            context.getViewScope().put(CSRF_TOKEN_VIEWSCOPE_NAME, csrfTokenManager.generateCSRFToken());            
+            final Object flowScopedCsrfTokenObject  = context.getFlowScope().get(CSRF_TOKEN_VIEWSCOPE_NAME);
+            if (flowScopedCsrfTokenObject instanceof final CSRFToken token) {
+                context.getViewScope().put(CSRF_TOKEN_VIEWSCOPE_NAME, token);
+            } else {
+                context.getViewScope().put(CSRF_TOKEN_VIEWSCOPE_NAME, csrfTokenManager.generateCSRFToken());
+            }
+                        
         }
 
     }
@@ -192,6 +230,7 @@ public class CSRFTokenFlowExecutionListener extends AbstractInitializableCompone
 
 
     /** {@inheritDoc} */
+    @Override
     public void doInitialize() throws ComponentInitializationException {
         super.doInitialize();
         

@@ -58,7 +58,7 @@ public class CSRFTokenFlowExecutionListenerTest extends BaseCSRFTest{
     
     @BeforeMethod public void setup() throws ComponentInitializationException {
         
-        CSRFTokenManager manager = new CSRFTokenManager();
+        final CSRFTokenManager manager = new CSRFTokenManager();
         manager.setCsrfParameterName(CSRF_PARAM_NAME);
         manager.initialize();
         listener = new CSRFTokenFlowExecutionListener();
@@ -66,6 +66,7 @@ public class CSRFTokenFlowExecutionListenerTest extends BaseCSRFTest{
         listener.setEnabled(true);
         listener.setViewRequiresCSRFTokenPredicate(new DefaultViewRequiresCSRFTokenPredicate());
         listener.setEventRequiresCSRFTokenValidationPredicate(new DefaultEventRequiresCSRFTokenValidationPredicate());
+        listener.setTokenPerFlow(false);
         //specifically do not init here, so things can be changed, test init later on.
         //listener.initialize();
     }
@@ -78,17 +79,79 @@ public class CSRFTokenFlowExecutionListenerTest extends BaseCSRFTest{
     @Test public void testAddingCsrfTokenToViewScopeOnRendering() throws ComponentInitializationException {
 
         listener.initialize();
-        MockFlowSession flowSession = new MockFlowSession();
-        MockViewState currentState = new MockViewState("testFlow", "a-view-state");
+        final MockFlowSession flowSession = new MockFlowSession();
+        final MockViewState currentState = new MockViewState("testFlow", "a-view-state");
         flowSession.setState(currentState);
-        MockFlowExecutionContext context = new MockFlowExecutionContext(flowSession);
-        MockRequestContext src = new MockRequestContext(context);
+        final MockFlowExecutionContext context = new MockFlowExecutionContext(flowSession);
+        final MockRequestContext src = new MockRequestContext(context);
         
         listener.viewRendering(src, new MockView("login",src), currentState);
-        Object csrfTokenValueObject = src.getViewScope().get(CSRFTokenFlowExecutionListener.CSRF_TOKEN_VIEWSCOPE_NAME);
+        final Object csrfTokenValueObject = src.getViewScope().get(CSRFTokenFlowExecutionListener.CSRF_TOKEN_VIEWSCOPE_NAME);
         Assert.assertNotNull(csrfTokenValueObject);
         Assert.assertTrue(csrfTokenValueObject instanceof CSRFToken);
         Assert.assertFalse(((CSRFToken) csrfTokenValueObject).getToken().isEmpty());
+
+    }
+    
+    @Test public void testAddingCsrfTokenToViewScopeOnRendering_NewTokenOnEachRequest() 
+            throws ComponentInitializationException {
+
+        listener.initialize();
+        final MockFlowSession flowSession = new MockFlowSession();
+        final MockViewState currentState = new MockViewState("testFlow", "a-view-state");
+        flowSession.setState(currentState);
+        final MockFlowExecutionContext context = new MockFlowExecutionContext(flowSession);
+        final MockRequestContext src = new MockRequestContext(context);
+        
+        listener.viewRendering(src, new MockView("login",src), currentState);
+        final Object csrfTokenValueObject = src.getViewScope().get(CSRFTokenFlowExecutionListener.CSRF_TOKEN_VIEWSCOPE_NAME);
+        Assert.assertNotNull(csrfTokenValueObject);
+        Assert.assertTrue(csrfTokenValueObject instanceof CSRFToken);
+        Assert.assertFalse(((CSRFToken) csrfTokenValueObject).getToken().isEmpty());
+        
+        listener.viewRendering(src, new MockView("login",src), currentState);
+        final Object csrfTokenValueObjectSecond = 
+                src.getViewScope().get(CSRFTokenFlowExecutionListener.CSRF_TOKEN_VIEWSCOPE_NAME);
+        
+        Assert.assertNotNull(csrfTokenValueObjectSecond);
+        Assert.assertTrue(csrfTokenValueObjectSecond instanceof CSRFToken);
+        Assert.assertFalse(((CSRFToken) csrfTokenValueObjectSecond).getToken().isEmpty());
+        
+        Assert.assertNotEquals(((CSRFToken)csrfTokenValueObject).getToken(),
+            ((CSRFToken)csrfTokenValueObjectSecond).getToken());
+
+    }
+    
+    @Test public void testAddingCsrfTokenToFlowScope_SameTokenForEachRequest() 
+            throws ComponentInitializationException {
+        listener.setTokenPerFlow(true);
+        listener.initialize();
+        final MockFlowSession flowSession = new MockFlowSession();
+        final MockViewState currentState = new MockViewState("testFlow", "a-view-state");
+        flowSession.setState(currentState);
+        final MockFlowExecutionContext context = new MockFlowExecutionContext(flowSession);
+        final MockRequestContext src = new MockRequestContext(context);
+        
+        listener.sessionStarting(src, flowSession, null);
+        
+        listener.viewRendering(src, new MockView("login",src), currentState);
+        final Object csrfTokenValueObject = 
+                src.getViewScope().get(CSRFTokenFlowExecutionListener.CSRF_TOKEN_VIEWSCOPE_NAME);
+        Assert.assertNotNull(csrfTokenValueObject);
+        Assert.assertTrue(csrfTokenValueObject instanceof CSRFToken);
+        Assert.assertFalse(((CSRFToken) csrfTokenValueObject).getToken().isEmpty());
+        
+        // Now try the listener again, it should give the same token value
+        listener.viewRendering(src, new MockView("login",src), currentState);
+        final Object csrfTokenValueObjectSecond = 
+                src.getViewScope().get(CSRFTokenFlowExecutionListener.CSRF_TOKEN_VIEWSCOPE_NAME);
+        
+        Assert.assertNotNull(csrfTokenValueObjectSecond);
+        Assert.assertTrue(csrfTokenValueObjectSecond instanceof CSRFToken);
+        Assert.assertFalse(((CSRFToken) csrfTokenValueObjectSecond).getToken().isEmpty());
+        
+        Assert.assertEquals(((CSRFToken)csrfTokenValueObject).getToken(),
+            ((CSRFToken)csrfTokenValueObjectSecond).getToken());
 
     }
     
@@ -101,20 +164,21 @@ public class CSRFTokenFlowExecutionListenerTest extends BaseCSRFTest{
     @Test(expectedExceptions=InvalidCSRFTokenException.class) public void testInvalidToken() throws ComponentInitializationException {
         
         listener.initialize();
-        MockFlowSession flowSession = new MockFlowSession();
-        MockViewState currentState = new MockViewState("testFlow", "a-view-state");
+        final MockFlowSession flowSession = new MockFlowSession();
+        final MockViewState currentState = new MockViewState("testFlow", "a-view-state");
         flowSession.setState(currentState);
         
         @SuppressWarnings("null")
+        final
         CSRFToken viewScopeToken = new SimpleCSRFToken(UUID.randomUUID().toString(), CSRF_PARAM_NAME);
         flowSession.getViewScope().put(CSRFTokenFlowExecutionListener.CSRF_TOKEN_VIEWSCOPE_NAME, viewScopeToken);
        
         
-        MockFlowExecutionContext context = new MockFlowExecutionContext(flowSession);
-        MockParameterMap map = new MockParameterMap();
+        final MockFlowExecutionContext context = new MockFlowExecutionContext(flowSession);
+        final MockParameterMap map = new MockParameterMap();
         map.put(CSRF_PARAM_NAME, "will-fail");
-        MockExternalContext extContext = new MockExternalContext(map);        
-        MockRequestContext src = new MockRequestContext(context);
+        final MockExternalContext extContext = new MockExternalContext(map);        
+        final MockRequestContext src = new MockRequestContext(context);
         src.setExternalContext(extContext);       
         
         listener.eventSignaled(src, new Event(this,"proceed"));        
@@ -129,20 +193,21 @@ public class CSRFTokenFlowExecutionListenerTest extends BaseCSRFTest{
     @Test public void testValidToken() throws ComponentInitializationException {
         
         listener.initialize();
-        MockFlowSession flowSession = new MockFlowSession();
-        MockViewState currentState = new MockViewState("testFlow", "a-view-state");
+        final MockFlowSession flowSession = new MockFlowSession();
+        final MockViewState currentState = new MockViewState("testFlow", "a-view-state");
         flowSession.setState(currentState);
         
         @SuppressWarnings("null")
+        final
         CSRFToken viewScopeToken = new SimpleCSRFToken(UUID.randomUUID().toString(), CSRF_PARAM_NAME);
         flowSession.getViewScope().put(CSRFTokenFlowExecutionListener.CSRF_TOKEN_VIEWSCOPE_NAME, viewScopeToken);
        
         
-        MockFlowExecutionContext context = new MockFlowExecutionContext(flowSession);
-        MockParameterMap map = new MockParameterMap();
+        final MockFlowExecutionContext context = new MockFlowExecutionContext(flowSession);
+        final MockParameterMap map = new MockParameterMap();
         map.put(CSRF_PARAM_NAME, viewScopeToken.getToken());
-        MockExternalContext extContext = new MockExternalContext(map);        
-        MockRequestContext src = new MockRequestContext(context);
+        final MockExternalContext extContext = new MockExternalContext(map);        
+        final MockRequestContext src = new MockRequestContext(context);
         src.setExternalContext(extContext);       
         
         listener.eventSignaled(src, new Event(this,"proceed"));        
@@ -159,21 +224,22 @@ public class CSRFTokenFlowExecutionListenerTest extends BaseCSRFTest{
     @Test public void testViewExcluded() throws ComponentInitializationException {
         
         listener.initialize();
-        MockFlowSession flowSession = new MockFlowSession();
-        MockViewState currentState = new MockViewState("testFlow", "a-view-state");
+        final MockFlowSession flowSession = new MockFlowSession();
+        final MockViewState currentState = new MockViewState("testFlow", "a-view-state");
         currentState.getAttributes().put(BaseCSRFTokenPredicate.CSRF_EXCLUDED_ATTRIBUTE_NAME, true);
         flowSession.setState(currentState);
         
         @SuppressWarnings("null")
+        final
         CSRFToken viewScopeToken = new SimpleCSRFToken(UUID.randomUUID().toString(), CSRF_PARAM_NAME);
         flowSession.getViewScope().put(CSRFTokenFlowExecutionListener.CSRF_TOKEN_VIEWSCOPE_NAME, viewScopeToken);
        
         
-        MockFlowExecutionContext context = new MockFlowExecutionContext(flowSession);
-        MockParameterMap map = new MockParameterMap();
+        final MockFlowExecutionContext context = new MockFlowExecutionContext(flowSession);
+        final MockParameterMap map = new MockParameterMap();
         map.put(CSRF_PARAM_NAME, "would-fail-but-is-excluded");
-        MockExternalContext extContext = new MockExternalContext(map);        
-        MockRequestContext src = new MockRequestContext(context);
+        final MockExternalContext extContext = new MockExternalContext(map);        
+        final MockRequestContext src = new MockRequestContext(context);
         src.setExternalContext(extContext);       
         
         listener.eventSignaled(src, new Event(this,"proceed"));        
@@ -192,20 +258,21 @@ public class CSRFTokenFlowExecutionListenerTest extends BaseCSRFTest{
         //set enabled to false.
         listener.setEnabled(false);
         listener.initialize();     
-        MockFlowSession flowSession = new MockFlowSession();
-        MockViewState currentState = new MockViewState("testFlow", "a-view-state");
+        final MockFlowSession flowSession = new MockFlowSession();
+        final MockViewState currentState = new MockViewState("testFlow", "a-view-state");
         flowSession.setState(currentState);
         
         @SuppressWarnings("null")
+        final
         CSRFToken viewScopeToken = new SimpleCSRFToken(UUID.randomUUID().toString(), CSRF_PARAM_NAME);
         flowSession.getViewScope().put(CSRFTokenFlowExecutionListener.CSRF_TOKEN_VIEWSCOPE_NAME, viewScopeToken);
        
         
-        MockFlowExecutionContext context = new MockFlowExecutionContext(flowSession);
-        MockParameterMap map = new MockParameterMap();
+        final MockFlowExecutionContext context = new MockFlowExecutionContext(flowSession);
+        final MockParameterMap map = new MockParameterMap();
         map.put(CSRF_PARAM_NAME, "should-fail-but-disabled");
-        MockExternalContext extContext = new MockExternalContext(map);        
-        MockRequestContext src = new MockRequestContext(context);
+        final MockExternalContext extContext = new MockExternalContext(map);        
+        final MockRequestContext src = new MockRequestContext(context);
         src.setExternalContext(extContext);       
         
         listener.eventSignaled(src, new Event(this,"proceed")); 
@@ -221,11 +288,11 @@ public class CSRFTokenFlowExecutionListenerTest extends BaseCSRFTest{
     @Test public void testDoesNotAddTokenToNonViewState() throws ComponentInitializationException {
 
         listener.initialize();
-        MockFlowSession flowSession = new MockFlowSession();
-        ActionState currentState = new ActionState(new Flow("testFlow"), "action-state");
+        final MockFlowSession flowSession = new MockFlowSession();
+        final ActionState currentState = new ActionState(new Flow("testFlow"), "action-state");
         flowSession.setState(currentState);
-        MockFlowExecutionContext context = new MockFlowExecutionContext(flowSession);
-        MockRequestContext src = new MockRequestContext(context);
+        final MockFlowExecutionContext context = new MockFlowExecutionContext(flowSession);
+        final MockRequestContext src = new MockRequestContext(context);
        
         listener.viewRendering(src, new MockView("login",src), currentState);
     }    
@@ -240,11 +307,11 @@ public class CSRFTokenFlowExecutionListenerTest extends BaseCSRFTest{
     @Test public void testDoesNotTestTokenInNonViewState() throws ComponentInitializationException {
         
         listener.initialize();
-        MockFlowSession flowSession = new MockFlowSession();
-        ActionState currentState = new ActionState(new Flow("testFlow"), "action-state");
+        final MockFlowSession flowSession = new MockFlowSession();
+        final ActionState currentState = new ActionState(new Flow("testFlow"), "action-state");
         flowSession.setState(currentState);
-        MockFlowExecutionContext context = new MockFlowExecutionContext(flowSession);
-        MockRequestContext src = new MockRequestContext(context);
+        final MockFlowExecutionContext context = new MockFlowExecutionContext(flowSession);
+        final MockRequestContext src = new MockRequestContext(context);
 
         listener.eventSignaled(src, new Event(this,"proceed"));     
     }
@@ -260,16 +327,17 @@ public class CSRFTokenFlowExecutionListenerTest extends BaseCSRFTest{
             throws ComponentInitializationException {
 
         listener.initialize();
-        MockFlowSession flowSession = new MockFlowSession();
-        MockViewState currentState = new MockViewState("testFlow", "a-view-state");
+        final MockFlowSession flowSession = new MockFlowSession();
+        final MockViewState currentState = new MockViewState("testFlow", "a-view-state");
         flowSession.setState(currentState);
         
         @SuppressWarnings("null")
+        final
         CSRFToken viewScopeToken = new SimpleCSRFToken(UUID.randomUUID().toString(), "csrf_token");
         flowSession.getViewScope().put(CSRFTokenFlowExecutionListener.CSRF_TOKEN_VIEWSCOPE_NAME, viewScopeToken);
         
-        MockFlowExecutionContext context = new MockFlowExecutionContext(flowSession);
-        MockRequestContext src = new MockRequestContext(context);
+        final MockFlowExecutionContext context = new MockFlowExecutionContext(flowSession);
+        final MockRequestContext src = new MockRequestContext(context);
 
         listener.eventSignaled(src, new Event(this,"proceed"));        
 
@@ -286,7 +354,7 @@ public class CSRFTokenFlowExecutionListenerTest extends BaseCSRFTest{
         
         listener.setEventRequiresCSRFTokenValidationPredicate(new BiPredicate<RequestContext, Event>() {
             
-            public boolean test(RequestContext context, Event event) {
+            public boolean test(final RequestContext context, final Event event) {
                if (event.getId().equals("new-event-id")) {
                    return true;
                }
@@ -295,20 +363,21 @@ public class CSRFTokenFlowExecutionListenerTest extends BaseCSRFTest{
         });
         listener.initialize();
 
-        MockFlowSession flowSession = new MockFlowSession();
-        MockViewState currentState = new MockViewState("testFlow", "a-view-state");
+        final MockFlowSession flowSession = new MockFlowSession();
+        final MockViewState currentState = new MockViewState("testFlow", "a-view-state");
         flowSession.setState(currentState);
         
         @SuppressWarnings("null")
+        final
         CSRFToken viewScopeToken = new SimpleCSRFToken(UUID.randomUUID().toString(), CSRF_PARAM_NAME);
         flowSession.getViewScope().put(CSRFTokenFlowExecutionListener.CSRF_TOKEN_VIEWSCOPE_NAME, viewScopeToken);
        
         
-        MockFlowExecutionContext context = new MockFlowExecutionContext(flowSession);
-        MockParameterMap map = new MockParameterMap();
+        final MockFlowExecutionContext context = new MockFlowExecutionContext(flowSession);
+        final MockParameterMap map = new MockParameterMap();
         map.put(CSRF_PARAM_NAME, "should-fail");
-        MockExternalContext extContext = new MockExternalContext(map);        
-        MockRequestContext src = new MockRequestContext(context);
+        final MockExternalContext extContext = new MockExternalContext(map);        
+        final MockRequestContext src = new MockRequestContext(context);
         src.setExternalContext(extContext);       
         
         listener.eventSignaled(src, new Event(this,"new-event-id"));  
@@ -324,11 +393,11 @@ public class CSRFTokenFlowExecutionListenerTest extends BaseCSRFTest{
             throws ComponentInitializationException {
 
         listener.initialize();
-        MockFlowSession flowSession = new MockFlowSession();
-        MockViewState currentState = new MockViewState("testFlow", "a-view-state");
+        final MockFlowSession flowSession = new MockFlowSession();
+        final MockViewState currentState = new MockViewState("testFlow", "a-view-state");
         flowSession.setState(currentState);
-        MockFlowExecutionContext context = new MockFlowExecutionContext(flowSession);
-        MockRequestContext src = new MockRequestContext(context);
+        final MockFlowExecutionContext context = new MockFlowExecutionContext(flowSession);
+        final MockRequestContext src = new MockRequestContext(context);
         listener.eventSignaled(src, new Event(this,"proceed"));        
 
     }
@@ -347,7 +416,7 @@ public class CSRFTokenFlowExecutionListenerTest extends BaseCSRFTest{
     @Test public void testSetEnabled() {
 
         //create a new instance to test default enabled = false.
-        CSRFTokenFlowExecutionListener theListener = new CSRFTokenFlowExecutionListener();
+        final CSRFTokenFlowExecutionListener theListener = new CSRFTokenFlowExecutionListener();
         // test default is false.
         Object enabledObject = ReflectionTestUtils.getField(theListener, "enabled");
         assert enabledObject != null;
@@ -372,14 +441,14 @@ public class CSRFTokenFlowExecutionListenerTest extends BaseCSRFTest{
         //set enabled to false.
         listener.setEnabled(false);
         listener.initialize();
-        MockFlowSession flowSession = new MockFlowSession();
-        MockViewState currentState = new MockViewState("testFlow", "a-view-state");
+        final MockFlowSession flowSession = new MockFlowSession();
+        final MockViewState currentState = new MockViewState("testFlow", "a-view-state");
         flowSession.setState(currentState);
-        MockFlowExecutionContext context = new MockFlowExecutionContext(flowSession);
-        MockRequestContext src = new MockRequestContext(context);
+        final MockFlowExecutionContext context = new MockFlowExecutionContext(flowSession);
+        final MockRequestContext src = new MockRequestContext(context);
         
         listener.viewRendering(src, new MockView("login",src), currentState);
-        Object csrfTokenValueObject = src.getViewScope().get(CSRFTokenFlowExecutionListener.CSRF_TOKEN_VIEWSCOPE_NAME);
+        final Object csrfTokenValueObject = src.getViewScope().get(CSRFTokenFlowExecutionListener.CSRF_TOKEN_VIEWSCOPE_NAME);
         Assert.assertNull(csrfTokenValueObject);
       
 
@@ -415,19 +484,19 @@ public class CSRFTokenFlowExecutionListenerTest extends BaseCSRFTest{
             throws ComponentInitializationException {
         
         listener.initialize();
-        MockFlowSession flowSession = new MockFlowSession();
-        MockViewState currentState = new MockViewState("testFlow", "a-view-state");
+        final MockFlowSession flowSession = new MockFlowSession();
+        final MockViewState currentState = new MockViewState("testFlow", "a-view-state");
         flowSession.setState(currentState);
         
       
         flowSession.getViewScope().put(CSRFTokenFlowExecutionListener.CSRF_TOKEN_VIEWSCOPE_NAME, "string-token");
        
         
-        MockFlowExecutionContext context = new MockFlowExecutionContext(flowSession);
-        MockParameterMap map = new MockParameterMap();
+        final MockFlowExecutionContext context = new MockFlowExecutionContext(flowSession);
+        final MockParameterMap map = new MockParameterMap();
         map.put(CSRF_PARAM_NAME, "string-token");
-        MockExternalContext extContext = new MockExternalContext(map);        
-        MockRequestContext src = new MockRequestContext(context);
+        final MockExternalContext extContext = new MockExternalContext(map);        
+        final MockRequestContext src = new MockRequestContext(context);
         src.setExternalContext(extContext);       
         
         listener.eventSignaled(src, new Event(this,"proceed")); 
@@ -441,7 +510,7 @@ public class CSRFTokenFlowExecutionListenerTest extends BaseCSRFTest{
     @Test(expectedExceptions=ComponentInitializationException.class) void testUnsetCsrfTokenManager() 
             throws ComponentInitializationException{
         
-        CSRFTokenFlowExecutionListener theListener = new CSRFTokenFlowExecutionListener();
+        final CSRFTokenFlowExecutionListener theListener = new CSRFTokenFlowExecutionListener();
         theListener.setViewRequiresCSRFTokenPredicate(new DefaultViewRequiresCSRFTokenPredicate());
         theListener.setEventRequiresCSRFTokenValidationPredicate(new DefaultEventRequiresCSRFTokenValidationPredicate());
         theListener.initialize();
@@ -455,7 +524,7 @@ public class CSRFTokenFlowExecutionListenerTest extends BaseCSRFTest{
     @Test(expectedExceptions=ComponentInitializationException.class) void testUnsetEventRequiresCSRFValidationPredicate() 
             throws ComponentInitializationException{
         
-        CSRFTokenFlowExecutionListener theListener = new CSRFTokenFlowExecutionListener();
+        final CSRFTokenFlowExecutionListener theListener = new CSRFTokenFlowExecutionListener();
         theListener.setCsrfTokenManager(new CSRFTokenManager());
         theListener.setViewRequiresCSRFTokenPredicate(new DefaultViewRequiresCSRFTokenPredicate());
         theListener.initialize();
@@ -469,7 +538,7 @@ public class CSRFTokenFlowExecutionListenerTest extends BaseCSRFTest{
     @Test(expectedExceptions=ComponentInitializationException.class) void testUnsetViewRequiresCSRFTokenPredicate() 
             throws ComponentInitializationException{
         
-        CSRFTokenFlowExecutionListener theListener = new CSRFTokenFlowExecutionListener();
+        final CSRFTokenFlowExecutionListener theListener = new CSRFTokenFlowExecutionListener();
         theListener.setCsrfTokenManager(new CSRFTokenManager());
         theListener.setEventRequiresCSRFTokenValidationPredicate(new DefaultEventRequiresCSRFTokenValidationPredicate());
         theListener.initialize();
