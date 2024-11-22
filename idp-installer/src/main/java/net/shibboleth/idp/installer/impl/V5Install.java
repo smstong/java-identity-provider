@@ -60,6 +60,7 @@ import net.shibboleth.idp.plugin.IdPPlugin;
 import net.shibboleth.idp.spring.IdPPropertiesApplicationContextInitializer;
 import net.shibboleth.profile.installablecomponent.InstallableComponentVersion;
 import net.shibboleth.profile.module.ModuleContext;
+import net.shibboleth.profile.module.ModuleContext.OperationType;
 import net.shibboleth.profile.module.ModuleException;
 import net.shibboleth.shared.collection.CollectionSupport;
 import net.shibboleth.shared.component.ComponentInitializationException;
@@ -92,6 +93,9 @@ public class V5Install {
 
     /** The Injected security parameters. */
     @Nullable private final HttpClientSecurityParameters httpClientSecurityParameters;
+
+    /** Local cache of the module Context. */
+    @Nullable private ModuleContext theModuleContext;
 
     /** Constructor.
      * @param props The properties to drive the installs.
@@ -369,16 +373,34 @@ public class V5Install {
     }
 
     /**
+     * Build an appropriate {@link ModuleContext} , cache it and return it.
+     * @return a guaranteed not null context
+     */
+    @Nonnull private ModuleContext ensureModuleContext() {
+        ModuleContext context = theModuleContext;
+        if (context == null) {
+            final String targetDir = installerProps.getTargetDir().toString();
+            assert targetDir!=null;
+            context = new ModuleContext(targetDir);
+            context.setHttpClient(httpClient);
+            context.setHttpClientSecurityParameters(httpClientSecurityParameters);
+            if (currentState.getInstalledVersion() == null) {
+                context.setOperationType(OperationType.Install);
+            } else {
+                context.setOperationType(OperationType.Upgrade);
+            }
+            theModuleContext = context;
+        }
+        return context;
+    }
+
+    /**
      * Enable Core modules if this is a new install.
      * 
      * @throws BuildException if badness occurs
      */
     protected void enableCoreModules() throws BuildException {
-        final String targetDir = installerProps.getTargetDir().toString();
-        assert targetDir!=null;
-        final ModuleContext moduleContext = new ModuleContext(targetDir);
-        moduleContext.setHttpClient(httpClient);
-        moduleContext.setHttpClientSecurityParameters(httpClientSecurityParameters);
+        final ModuleContext moduleContext = ensureModuleContext();
         final Iterator<IdPModule> modules = ServiceLoader.load(IdPModule.class).iterator();
 
         while (modules.hasNext()) {
@@ -387,7 +409,7 @@ public class V5Install {
                 final String id = module.getId();
                 if (installerProps.getCoreModules().contains(id) && !currentState.getEnabledModules().contains(id)) {
                     try {
-                        module.enable(moduleContext);
+                        module.enable(moduleContext, false);
                     } catch (final ModuleException e) {
                         log.error("Error performing initial enable on module {}", id, e);
                         throw new BuildException(e);
@@ -404,11 +426,7 @@ public class V5Install {
      * @throws BuildException if badness occurs
      */
     protected void enableModules() throws BuildException {
-        final String targetDir = installerProps.getTargetDir().toString();
-        assert targetDir!=null;
-        final ModuleContext moduleContext = new ModuleContext(targetDir);
-        moduleContext.setHttpClient(httpClient);
-        moduleContext.setHttpClientSecurityParameters(httpClientSecurityParameters);
+        final ModuleContext moduleContext = ensureModuleContext();
         final Iterator<IdPModule> modules = ServiceLoader.load(IdPModule.class).iterator();
 
         while (modules.hasNext()) {
@@ -418,7 +436,7 @@ public class V5Install {
                 if (currentState.getEnabledModules().contains(id)) {
                     log.debug("Re-enabling Module {}", id);
                     try {
-                        module.enable(moduleContext);
+                        module.enable(moduleContext, true);
                     } catch (final ModuleException e) {
                         log.error("Error re-enabling module {}", id, e);
                         throw new BuildException(e);
@@ -426,7 +444,7 @@ public class V5Install {
                 }
                 if (currentState.getInstalledVersion() == null && installerProps.getModulesToEnable().contains(id)) {
                     try {
-                        module.enable(moduleContext);
+                        module.enable(moduleContext, false);
                     } catch (final ModuleException e) {
                         log.error("Error performing initial enable on module {}", id, e);
                         throw new BuildException(e);

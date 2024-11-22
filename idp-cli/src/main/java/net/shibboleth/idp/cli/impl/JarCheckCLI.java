@@ -222,7 +222,7 @@ public final class JarCheckCLI extends AbstractIdPHomeAwareCommandLine<JarCheckA
     private void processClassNames(@Nonnull final Map<String, String> namesSoFar, @Nonnull final Path jar) {
         final String source = jar.toString();
         try (final InputStream inStream = new BufferedInputStream(new FileInputStream(jar.toFile()));
-             final ArchiveInputStream classes = new ZipArchiveInputStream(inStream)) {
+             final ArchiveInputStream<?> classes = new ZipArchiveInputStream(inStream)) {
             
             ArchiveEntry entry = null;
             while ((entry = classes.getNextEntry()) != null) {

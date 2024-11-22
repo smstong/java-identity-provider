@@ -138,10 +138,10 @@ public class RollbackPluginInstall implements AutoCloseable {
         for (int i = modulesDisabled.size()-1; i >=0; i--) {
             final IdPModule module = modulesDisabled.get(i);
             try {
-                log.trace("Deleting {}", module.getId());
-                captureChanges(module.enable(moduleContext));
+                log.trace("Re-Enabling {}", module.getId());
+                captureChanges(module.enable(moduleContext, true));
             } catch (final Throwable t) {
-                log.error("Could not disable {}, continuing ", module.getId(), t);
+                log.error("Could not re-enable {}, continuing ", module.getId(), t);
             }            
         }
         return true;

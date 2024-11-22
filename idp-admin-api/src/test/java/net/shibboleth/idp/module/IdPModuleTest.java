@@ -56,6 +56,7 @@ import com.google.common.io.ByteStreams;
 import net.shibboleth.idp.Version;
 import net.shibboleth.profile.module.Module;
 import net.shibboleth.profile.module.ModuleContext;
+import net.shibboleth.profile.module.ModuleContext.OperationType;
 import net.shibboleth.profile.module.ModuleException;
 import net.shibboleth.shared.httpclient.HttpClientBuilder;
 import net.shibboleth.shared.testing.RepositorySupport;
@@ -94,6 +95,7 @@ public class IdPModuleTest {
         final HttpClientSecurityParameters params = new HttpClientSecurityParameters();
         params.setTLSTrustEngine(buildExplicitKeyTrustEngine());
         context.setHttpClientSecurityParameters(params);
+        context.setOperationType(OperationType.CommandLine);
     }
     
     private void tearDownWorker() throws IOException {

@@ -73,6 +73,7 @@ import net.shibboleth.profile.installablecomponent.InstallableComponentVersion;
 import net.shibboleth.profile.module.Module.ModuleResource;
 import net.shibboleth.profile.module.Module.ResourceResult;
 import net.shibboleth.profile.module.ModuleContext;
+import net.shibboleth.profile.module.ModuleContext.OperationType;
 import net.shibboleth.profile.module.ModuleException;
 import net.shibboleth.profile.plugin.Plugin.Package;
 import net.shibboleth.shared.annotation.constraint.NonnullAfterInit;
@@ -145,7 +146,7 @@ public final class PluginInstaller extends AbstractInitializableComponent implem
     /** Pluginss webapp. */
     @NonnullAfterInit private Path pluginsWebapp;
 
-    /** Pluginss webapp. */
+    /** Plugins webapp. */
     @NonnullAfterInit private Path pluginsContents;
 
     /** The absolute paths of what was installed - this is setup by {@link #loadCopiedFiles()}. */
@@ -314,6 +315,12 @@ public final class PluginInstaller extends AbstractInitializableComponent implem
                 getDescription().getPatchVersion());
 
         final Set<String> loadedModules = getLoadedModules();
+        if (getVersionFromContents() == null) {
+            getModuleContext().setOperationType(OperationType.Install);
+        } else {
+            getModuleContext().setOperationType(OperationType.Upgrade);
+        }
+        getModuleContext().setPluginId(pluginId);
         try (final RollbackPluginInstall rollBack = new RollbackPluginInstall(getModuleContext(), moduleChanges)) {
             uninstallOld(rollBack);
 
@@ -340,8 +347,11 @@ public final class PluginInstaller extends AbstractInitializableComponent implem
     public void uninstall() throws BuildException {
 
         String moduleId = null;
-        assert pluginId != null;
-        description = getInstalledPlugin(pluginId);
+        final String pId = pluginId;
+        assert pId != null;
+        getModuleContext().setPluginId(pId);
+        getModuleContext().setOperationType(OperationType.Uninstall);
+        description = getInstalledPlugin(pId);
         if (description == null) {
             LOG.warn("Description for {} not found", pluginId);
         } else {
@@ -439,7 +449,7 @@ public final class PluginInstaller extends AbstractInitializableComponent implem
     }
     
     /** Check for initialized and if so return the {@link #pluginsWebapp}.
-     * @return the {@link #moduleContext}.
+     * @return the {@link #pluginsWebapp}.
      */
     @Nonnull private Path getPluginsWebapp() {
         checkComponentActive();
@@ -560,7 +570,7 @@ public final class PluginInstaller extends AbstractInitializableComponent implem
                         LOG.debug("Module {} not previously enabled", moduleId);
                     } else {
                         LOG.debug("Re-enabling module {}", moduleId);
-                        captureChanges(module.enable(getModuleContext()));
+                        captureChanges(module.enable(getModuleContext(), true));
                     }
                 } else {
                     LOG.debug("Module {}, not provided by this plugin", module.getId());
@@ -634,11 +644,11 @@ public final class PluginInstaller extends AbstractInitializableComponent implem
                 moduleId = module.getId();
                 if (!module.isEnabled(getModuleContext())) {
                     LOG.debug("Enabling Module {}", moduleId);
-                    captureChanges(module.enable(getModuleContext()));
+                    captureChanges(module.enable(getModuleContext(), false));
                     rollBack.getModulesEnabled().add(module);
                 } else {
                     LOG.debug("Re-enabling Module {}", moduleId);
-                    captureChanges(module.enable(getModuleContext()));
+                    captureChanges(module.enable(getModuleContext(), true));
                 }
                 reenabledPluginModules.add(moduleId);
             }

@@ -43,6 +43,7 @@ import net.shibboleth.idp.module.IdPModule;
 import net.shibboleth.profile.module.Module.ModuleResource;
 import net.shibboleth.profile.module.Module.ResourceResult;
 import net.shibboleth.profile.module.ModuleContext;
+import net.shibboleth.profile.module.ModuleContext.OperationType;
 import net.shibboleth.profile.module.ModuleException;
 import net.shibboleth.shared.annotation.constraint.NotLive;
 import net.shibboleth.shared.annotation.constraint.Unmodifiable;
@@ -105,6 +106,7 @@ public final class ModuleManagerCLI extends AbstractIdPHomeAwareCommandLine<Modu
             moduleContext.setHttpClient(getHttpClient());
             moduleContext.setHttpClientSecurityParameters(getHttpClientSecurityParameters());
             moduleContext.setLanguageRanges(args.getLanguageRanges());
+            moduleContext.setOperationType(OperationType.CommandLine);
             
             if (args.getList() || !args.getInfoModuleIds().isEmpty() || !args.getTestModuleIds().isEmpty()) {
                 return doList(moduleContext, args);

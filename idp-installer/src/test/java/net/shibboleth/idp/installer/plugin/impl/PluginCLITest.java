@@ -41,9 +41,9 @@ public class PluginCLITest extends BasePluginTest {
     
     private final String PLUGIN_DISTRO = "http://test.shibboleth.net/downloads/identity-provider/plugins/oidc-common/3.1.0/oidc-common-dist-3.1.0.tar.gz";
 
-    private final String PLUGIN_IDS[] = { "net.shibboleth.oidc.common", "net.shibboleth.idp.plugin.jettybase","net.shibboleth.idp.plugin.authn.oidc.rp"};
+    private final String PLUGIN_IDS[] = { "net.shibboleth.oidc.common", "net.shibboleth.idp.plugin.authn.oidc.rp"};
 
-    private final String PLUGIN_ID = PLUGIN_IDS[1];
+    private final String PLUGIN_ID = PLUGIN_IDS[0];
 
     @BeforeSuite public void setUp() throws IOException
     {
