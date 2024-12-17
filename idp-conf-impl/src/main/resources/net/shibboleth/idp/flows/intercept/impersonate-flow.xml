@@ -28,7 +28,7 @@
             <evaluate expression="flowRequestContext.getExternalContext().getNativeResponse()" result="viewScope.response" />
             <evaluate expression="opensamlProfileRequestContext" result="viewScope.profileRequestContext" />
             <evaluate expression="flowRequestContext.getActiveFlow().getApplicationContext().getBean('shibboleth.AttributeHelper')" result="viewScope.attributeHelper" />
-            <evaluate expression="opensamlProfileRequestContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationContext)).getSubcontext(T(net.shibboleth.idp.ui.context.RelyingPartyUIContext))" result="viewScope.rpUIContext" />
+            <evaluate expression="opensamlProfileRequestContext.ensureSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationContext)).getSubcontext(T(net.shibboleth.idp.ui.context.RelyingPartyUIContext))" result="viewScope.rpUIContext" />
             <evaluate expression="flowRequestContext.getActiveFlow().getApplicationContext().containsBean('shibboleth.CustomViewContext') ? flowRequestContext.getActiveFlow().getApplicationContext().getBean('shibboleth.CustomViewContext') : null" result="viewScope.custom" />
         </on-render>
         
@@ -55,9 +55,9 @@
     <action-state id="DoImpersonate">
         <on-entry>
             <!-- Clear existing attribute state. -->
-            <evaluate expression="opensamlProfileRequestContext.getSubcontext(T(net.shibboleth.profile.context.RelyingPartyContext)).removeSubcontext(T(net.shibboleth.idp.attribute.context.AttributeContext))" />
+            <evaluate expression="opensamlProfileRequestContext.ensureSubcontext(T(net.shibboleth.profile.context.RelyingPartyContext)).removeSubcontext(T(net.shibboleth.idp.attribute.context.AttributeContext))" />
             <!-- Log the impersonation. -->
-            <evaluate expression="opensamlProfileRequestContext.getSubcontext(T(net.shibboleth.profile.context.RelyingPartyContext)).getRelyingPartyId()" result="requestScope.relyingPartyId" />
+            <evaluate expression="opensamlProfileRequestContext.ensureSubcontext(T(net.shibboleth.profile.context.RelyingPartyContext)).getRelyingPartyId()" result="requestScope.relyingPartyId" />
             <evaluate expression="T(org.slf4j.LoggerFactory).getLogger('net.shibboleth.idp.profile.interceptor').info('Impersonation by principal ''{}'' as ''{}'' to relying party ''{}''', new Object[]{subjectContext.getPrincipalName(), principalToSpoof, relyingPartyId})" />
             <!-- Swap identities. -->
             <evaluate expression="subjectContext.setImpersonatingPrincipalName(subjectContext.getPrincipalName())" />
@@ -75,7 +75,7 @@
     <end-state id="ImpersonationViolation">
         <on-entry>
             <!-- Log violation. -->
-            <evaluate expression="opensamlProfileRequestContext.getSubcontext(T(net.shibboleth.profile.context.RelyingPartyContext)).getRelyingPartyId()" result="requestScope.relyingPartyId" />
+            <evaluate expression="opensamlProfileRequestContext.ensureSubcontext(T(net.shibboleth.profile.context.RelyingPartyContext)).getRelyingPartyId()" result="requestScope.relyingPartyId" />
             <evaluate expression="T(org.slf4j.LoggerFactory).getLogger('net.shibboleth.idp.profile.interceptor').warn('Unauthorized impersonation attempt by principal ''{}'' as ''{}'' to relying party ''{}''', new Object[]{subjectContext.getPrincipalName(), principalToSpoof, relyingPartyId})" />
         </on-entry>
     </end-state>
